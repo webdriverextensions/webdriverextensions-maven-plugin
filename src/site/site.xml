@@ -31,8 +31,8 @@
    <menu ref="reports"/>
 
    <menu name="External Links">
-     <item name="WebDriverExtensions Docs" href="http://webdriverextensions.github.io/" />
-     <item name="Selenium WebDriver Docs" href="http://docs.seleniumhq.org/docs/03_webdriver.jsp" />
+     <item name="WebDriver Extensions" href="http://github.com/webdriverextensions/webdriverextensions#webdriver-extensions" />
+     <item name="Selenium/WebDriver" href="http://docs.seleniumhq.org" />
    </menu>
 
   </body>
