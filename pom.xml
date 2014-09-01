@@ -29,8 +29,8 @@
         <connection>scm:git:git@github.com:webdriverextensions/webdriverextensions-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:webdriverextensions/webdriverextensions-maven-plugin.git</developerConnection>
         <url>scm:git:git@github.com:webdriverextensions/webdriverextensions-maven-plugin.git</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <organization>
         <name>WebDriver Extensions</name>
@@ -340,6 +340,10 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${maven-javadoc-plugin.version}</version>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                            <quiet>true</quiet>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
