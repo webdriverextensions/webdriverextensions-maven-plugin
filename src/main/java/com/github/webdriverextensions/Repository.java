@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
 import java.net.URL;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.CharEncoding.UTF_8;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
