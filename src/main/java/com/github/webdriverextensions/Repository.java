@@ -103,10 +103,7 @@ public class Repository {
         try {
             return getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).get(0);
         } catch (IndexOutOfBoundsException ex) {
-            throw new MojoExecutionException("Driver does not exist in repository,"
-                    + " please set the url where the driver zip lives"
-                    + " or chose a driver available in the repository,"
-                    + " driver = " + driver.toString());
+            return null;
         }
     }
 
@@ -146,7 +143,9 @@ public class Repository {
     public String getLatestDriverVersion(String driverId) {
         List<Driver> allDriverVersions = select(drivers, having(on(Driver.class).getId(), is(driverId)));
         Driver latestDriver = selectMax(allDriverVersions, on(Driver.class).getComparableVersion());
-
+        if (latestDriver == null) {
+            return null;
+        }
         return latestDriver.getVersion();
     }
 

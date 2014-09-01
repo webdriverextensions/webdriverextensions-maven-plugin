@@ -148,6 +148,9 @@ public class InstallDriversMojo extends AbstractMojo {
             }
             for (Driver driver : drivers) {
                 driver = repository.getDriver(driver);
+                if (driver == null) {
+                    continue;
+                }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
                     cleanup();
@@ -162,6 +165,8 @@ public class InstallDriversMojo extends AbstractMojo {
                         installDriver(driver);
                     }
                     cleanup();
+                } else {
+                    getLog().info("  Already installed");
                 }
             }
         }
