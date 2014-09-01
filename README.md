@@ -32,7 +32,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <executions>
         <execution>
             <goals>
@@ -58,7 +58,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <executions>
         <execution>
             <goals>
@@ -141,7 +141,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <executions>
         <execution>
             <goals>
