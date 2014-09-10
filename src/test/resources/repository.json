@@ -60,6 +60,34 @@
             "name": "internetexplorerdriver",
             "platform": "windows",
             "bit": "32",
+            "version": "2.43",
+            "url": "http://selenium-release.storage.googleapis.com/2.43/IEDriverServer_Win32_2.43.0.zip",
+            "checksum": "b73ceae23d7e17438253653595b10c70"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.43",
+            "url": "http://selenium-release.storage.googleapis.com/2.43/IEDriverServer_x64_2.43.0.zip",
+            "checksum": "ad7f4a9b7a99aa5eea2ee40f0a4e34c8"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.42",
+            "url": "http://selenium-release.storage.googleapis.com/2.42/IEDriverServer_Win32_2.42.0.zip",
+            "checksum": "f4bd9994aa78d096c5b41a7c60384de4"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.42",
+            "url": "http://selenium-release.storage.googleapis.com/2.42/IEDriverServer_x64_2.42.0.zip",
+            "checksum": "0d76fa1db44427c748e55b4cbd4e9989"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
             "version": "2.41",
             "url": "http://selenium-release.storage.googleapis.com/2.41/IEDriverServer_Win32_2.41.0.zip",
             "checksum": "3e5ecbd38461d58cf020e37833eafed6"

@@ -8,6 +8,7 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 import java.io.File;
+import java.net.URL;
 
 public class InstallDriversMojoTest extends AbstractMojoTestCase {
 
@@ -33,6 +34,7 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
     public void testConfigurationInstallAllLatestDrivers() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-install-all-latest-drivers-pom.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
+        installDriversMojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         installDriversMojo.execute();
     }
