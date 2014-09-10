@@ -72,13 +72,13 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.42</version>
+                <version>2.43</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>2.42</version>
+                <version>2.43</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
