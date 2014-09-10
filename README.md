@@ -72,37 +72,37 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.43</version>
+                <version>2.43.0</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>2.43</version>
+                <version>2.43.0</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.10</version>
+                <version>2.10.0</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>32</bit>
-                <version>2.10</version>
+                <version>2.10.0</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>2.10</version>
+                <version>2.10.0</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>2.10</version>
+                <version>2.10.0</version>
             </driver>
         </drivers>
     </configuration>

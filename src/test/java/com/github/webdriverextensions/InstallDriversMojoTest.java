@@ -8,7 +8,6 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 import java.io.File;
-import java.net.URL;
 
 public class InstallDriversMojoTest extends AbstractMojoTestCase {
 
