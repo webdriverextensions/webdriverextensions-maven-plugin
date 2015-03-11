@@ -43,7 +43,7 @@ version add the plugin configured to execute the install-drivers goal.
 </plugin>
 ```
 The installed driver's bit version will be 32 bit if you are running the plugin
-from a windows or mac platform. However on lunux platforms the OS bit version 
+from a windows or mac platform. However on lunux platforms the OS bit version
 will determine the bit version of the installed driver.
 
 Note that the plugin will automatically update the driver if a newer driver
@@ -72,37 +72,37 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.44</version>
+                <version>2.45</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>2.44</version>
+                <version>2.45</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.12</version>
+                <version>2.14</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>32</bit>
-                <version>2.12</version>
+                <version>2.14</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>2.12</version>
+                <version>2.14</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>2.12</version>
+                <version>2.14</version>
             </driver>
         </drivers>
     </configuration>

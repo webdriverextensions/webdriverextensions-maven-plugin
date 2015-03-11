@@ -98,7 +98,7 @@
         <commons-codec.version>1.9</commons-codec.version>
         <commons-lang.version>2.6</commons-lang.version>
         <httpclient.version>4.3.3</httpclient.version>
-        <selenium.version>2.42.2</selenium.version>
+        <selenium.version>2.45.0</selenium.version>
 
         <!-- Plugin Versions -->
         <maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
