@@ -6,6 +6,7 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.select;
 import static ch.lambdaj.Lambda.selectDistinct;
 import static ch.lambdaj.Lambda.selectMax;
+import static com.github.webdriverextensions.Utils.downloadAsString;
 import static com.github.webdriverextensions.Utils.is64Bit;
 import static com.github.webdriverextensions.Utils.isLinux;
 import static com.github.webdriverextensions.Utils.isMac;
@@ -15,13 +16,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
 import java.net.URL;
-import static org.apache.commons.lang3.CharEncoding.UTF_8;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.apache.commons.io.IOUtils;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.settings.Proxy;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.is;
 
@@ -29,10 +29,10 @@ public class Repository {
 
     private List<Driver> drivers;
 
-    public static Repository load(URL repositoryUrl) throws MojoExecutionException {
+    public static Repository load(URL repositoryUrl, Proxy proxySettings) throws MojoExecutionException {
         String repositoryAsString;
         try {
-            repositoryAsString = IOUtils.toString(repositoryUrl, UTF_8);
+            repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
         } catch (IOException ex) {
             throw new MojoExecutionException("ERROR: Could not download repository from url " + quote(repositoryUrl), ex);
         }

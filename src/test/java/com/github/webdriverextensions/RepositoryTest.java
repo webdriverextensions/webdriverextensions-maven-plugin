@@ -12,7 +12,7 @@ public class RepositoryTest {
     @Test
     public void testConstructor() throws MojoExecutionException, InterruptedException, MalformedURLException {
         URL repositoryFile = new URL("file://" + getClass().getResource("/repository.json").getPath());
-        Driver driver = Repository.load(repositoryFile).getDrivers("chromedriver", "linux", "32", "2.9").get(0);
+        Driver driver = Repository.load(repositoryFile, null).getDrivers("chromedriver", "linux", "32", "2.9").get(0);
 
         assertThat(driver.getName(), is("chromedriver"));
         assertThat(driver.getPlatform(), is("linux"));

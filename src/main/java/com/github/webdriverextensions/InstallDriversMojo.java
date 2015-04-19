@@ -6,6 +6,7 @@ import static com.github.webdriverextensions.Utils.deleteFile;
 import static com.github.webdriverextensions.Utils.directoryContainsSingleDirectory;
 import static com.github.webdriverextensions.Utils.directoryContainsSingleFile;
 import static com.github.webdriverextensions.Utils.downloadFile;
+import static com.github.webdriverextensions.Utils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.makeExecutable;
 import static com.github.webdriverextensions.Utils.moveAllFilesInDirectory;
 import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
@@ -24,6 +25,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
 import static org.codehaus.plexus.util.FileUtils.fileExists;
 
 // TODO: refactor exception messages
@@ -32,6 +34,9 @@ public class InstallDriversMojo extends AbstractMojo {
 
     @Component
     MavenProject project;
+
+    @Parameter(defaultValue = "${settings}", readonly = true)
+    Settings settings;
 
     /**
      * URL to where the repository file is located. The repository file is a
@@ -46,6 +51,13 @@ public class InstallDriversMojo extends AbstractMojo {
      */
     @Parameter(defaultValue = "${basedir}/drivers")
     File installationDirectory;
+
+    /**
+     * The id of the proxy to use if it is configured in settings.xml. If not provided the first
+     * active proxy in settings.xml will be used.
+     */
+    @Parameter
+    String proxyId;
 
     /**
      * List of drivers to install. Each driver has a name, platform, bit,
@@ -138,7 +150,7 @@ public class InstallDriversMojo extends AbstractMojo {
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
-            repository = Repository.load(repositoryUrl);
+            repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
             getLog().info("Installation directory " + quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
@@ -188,7 +200,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
     void downloadDriver(Driver driver) throws MojoExecutionException {
         getLog().info("  Downloading");
-        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getUrlFileName(), getLog());
+        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getUrlFileName(), getLog(), getProxyFromSettings(settings, proxyId));
     }
 
     boolean downloadedDriverIsZipped(Driver driver) {
