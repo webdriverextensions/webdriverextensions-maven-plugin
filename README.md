@@ -155,6 +155,30 @@ path through the configuration parameter named `installationDirectory`.
 </plugin>
 ```
 
+
+### Using a proxy
+If you have configured a proxy in the settings.xml file the first encountered active proxy
+will be used. To specify a specific proxy to use you can provide the proxy id
+in the configuration.
+```xml
+<plugin>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>webdriverextensions-maven-plugin</artifactId>
+    <version>1.0.1</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>install-drivers</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <proxyId>yourproxyid</proxyId>
+    </configuration>
+</plugin>
+```
+
+
 ### Further Configurations
 For more details on how to further configure this plugin please see the
 [plugin goal documentation](http://webdriverextensions.github.io/webdriverextensions-maven-plugin/install-drivers-mojo.html).
