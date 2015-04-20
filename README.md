@@ -32,7 +32,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -58,7 +58,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -141,7 +141,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -164,7 +164,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -179,11 +179,24 @@ in the configuration.
 ```
 
 
+
 ### Further Configurations
 For more details on how to further configure this plugin please see the
 [plugin goal documentation](http://webdriverextensions.github.io/webdriverextensions-maven-plugin/install-drivers-mojo.html).
 
 
+
+# Changelog
+
+#### 1.1.0 (2015 April 2)
+- FEATURE Added support for using proxy configured in settings.xml
+
+#### 1.0.1 (2014 September 2)
+- BUGFIX - Fixed platform not provided bug
+- BUGFIX - Removed dependency to java 7
+
+#### 1.0.0 (2014 June 6)
+- Initial release!
 
 ## License
 
