@@ -186,7 +186,7 @@ For more details on how to further configure this plugin please see the
 
 
 
-# Changelog
+## Changelog
 
 #### 1.1.0 (2015 April 2)
 - FEATURE Added support for using proxy configured in settings.xml
