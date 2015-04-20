@@ -10,6 +10,7 @@ import org.junit.Test;
 public class RepositoryTest {
 
     @Test
+    //@Ignore // Ignore this test if you use a proxy since it will fail
     public void testConstructor() throws MojoExecutionException, InterruptedException, MalformedURLException {
         URL repositoryFile = new URL("file://" + getClass().getResource("/repository.json").getPath());
         Driver driver = Repository.load(repositoryFile, null).getDrivers("chromedriver", "linux", "32", "2.9").get(0);
