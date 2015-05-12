@@ -1,6 +1,34 @@
 {
     "drivers": [
         {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "32",
+            "version": "2.15.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.15/chromedriver_linux32.zip",
+            "checksum": "3683a8a70ae00ac174853b27602007ca"
+        }, {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "2.15.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.15/chromedriver_linux64.zip",
+            "checksum": "0c01065246ad5c195535aefdf5dc7ac9"
+        }, {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.15.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.15/chromedriver_mac32.zip",
+            "checksum": "dac872fccdc8e7dac747d7264ad8a01d"
+        }, {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.15.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.15/chromedriver_win32.zip",
+            "checksum": "79eb94fe89aeecd41393b572e4194818"
+        }, {
             "name": "internetexplorerdriver",
             "platform": "windows",
             "bit": "32",
