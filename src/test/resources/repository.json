@@ -4,6 +4,48 @@
             "name": "chromedriver",
             "platform": "linux",
             "bit": "32",
+            "version": "2.16.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.16/chromedriver_linux32.zip",
+            "checksum": "4da9c4edc3e3db90835414eed0e7a889"
+        }, {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "2.16.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.16/chromedriver_linux64.zip",
+            "checksum": "db22d7991404554110722e9270bd91eb"
+        }, {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.16.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.16/chromedriver_mac32.zip",
+            "checksum": "4ea970f458a0eb732de815555d928023"
+        }, {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.16.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.16/chromedriver_win32.zip",
+            "checksum": "d662fef51894e4e5b6a6f508ed214904"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.46.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.46/IEDriverServer_Win32_2.46.0.zip",
+            "checksum": "133e360d6d0abbc0310602284e7b6c94"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.46.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.46/IEDriverServer_x64_2.46.0.zip",
+            "checksum": "a54c8400b5b616a2f4b24c09f1677eda"
+        }, {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "32",
             "version": "2.15.0",
             "url": "http://chromedriver.storage.googleapis.com/2.15/chromedriver_linux32.zip",
             "checksum": "3683a8a70ae00ac174853b27602007ca"
