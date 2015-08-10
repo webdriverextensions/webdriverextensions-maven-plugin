@@ -3,6 +3,41 @@
         {
             "name": "chromedriver",
             "platform": "linux",
+            "bit": "64",
+            "version": "2.17.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.17/chromedriver_linux64.zip",
+            "checksum": "1e3cc76e7d9bd045020077e0fb06620b"
+        }, {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.17.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.17/chromedriver_mac32.zip",
+            "checksum": "b28fdf54127bad7f7f296775b694c00d"
+        }, {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.17.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.17/chromedriver_win32.zip",
+            "checksum": "732b929ea1fc9dd997786102774e19db"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.47.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.47/IEDriverServer_Win32_2.47.0.zip",
+            "checksum": "70b17d6e71f415dbed8c232e194ebd64"
+        }, {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.47.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.47/IEDriverServer_x64_2.47.0.zip",
+            "checksum": "1322a2eb87c625a7693cd1f34181c7c5"
+        }, {
+            "name": "chromedriver",
+            "platform": "linux",
             "bit": "32",
             "version": "2.16.0",
             "url": "http://chromedriver.storage.googleapis.com/2.16/chromedriver_linux32.zip",
