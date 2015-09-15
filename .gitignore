@@ -1,2 +1,5 @@
+/.idea
+/target
+/*.iml
 src/test/resources/target
 src/test/resources/drivers
