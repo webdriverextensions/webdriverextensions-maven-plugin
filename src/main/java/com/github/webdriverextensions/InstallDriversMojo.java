@@ -13,10 +13,19 @@ import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
 import static com.github.webdriverextensions.Utils.moveFileInDirectory;
 import static com.github.webdriverextensions.Utils.quote;
 import static com.github.webdriverextensions.Utils.unzipFile;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -77,16 +86,16 @@ public class InstallDriversMojo extends AbstractMojo {
      * If no platform is provided for a driver the platform will automatically
      * be set to the running platform.<br/>
      * <br/>
-     * If no bit version is provided for a driver the bit will automatically 
+     * If no bit version is provided for a driver the bit will automatically
      * be set to 32 if running the plugin on a windows or mac platform. However
-     * if running the plugin from a linux platform the bit will be determined 
+     * if running the plugin from a linux platform the bit will be determined
      * from the OS bit version.<br/>
      * <br/>
      * If the driver is not available in the repository the plugin does not know
      * from which URL to download the driver. In that case the URL should be
      * provided for the driver together with a checksum (to retrieve the
      * checksum run the plugin without providing a checksum once, the plugin
-     * will then calculate and print the checksum for you). The default 
+     * will then calculate and print the checksum for you). The default
      * repository with all available drivers can be found <a href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository.json">here</a>.<br/>
      * <br/>
      * <strong>Some Examples</strong><br/>

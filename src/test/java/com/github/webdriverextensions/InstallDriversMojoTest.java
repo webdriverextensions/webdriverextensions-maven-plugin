@@ -20,6 +20,7 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
     public void testNoConfiguration() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-no-configuration-pom.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
+        installDriversMojo.getLog().info("## TEST: testNoConfiguration");
 
         installDriversMojo.execute();
     }
@@ -27,6 +28,7 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
     public void testConfiguration() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-pom.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
+        installDriversMojo.getLog().info("## TEST: testConfiguration");
 
         installDriversMojo.execute();
     }
@@ -34,6 +36,7 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
     public void testConfigurationInstallAllLatestDrivers() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-install-all-latest-drivers-pom.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
+        installDriversMojo.getLog().info("## TEST: testConfigurationInstallAllLatestDrivers");
         installDriversMojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         installDriversMojo.execute();
