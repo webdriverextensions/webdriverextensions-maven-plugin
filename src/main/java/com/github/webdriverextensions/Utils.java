@@ -97,45 +97,25 @@ public class Utils {
     }
 
     private static String calculateChecksumForFile(String file) throws MojoExecutionException {
-        FileInputStream fileInputStream = null;
-        try {
-            fileInputStream = new FileInputStream(new File(file));
+        try (FileInputStream fileInputStream = new FileInputStream(new File(file))){
             return DigestUtils.md5Hex(fileInputStream);
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when calculating checksum for file " + quote(file), ex);
-        } finally {
-            if (fileInputStream != null) {
-                try {
-                    fileInputStream.close();
-                } catch (IOException ex) {
-                    throw new MojoExecutionException("Error when calculating checksum for file " + quote(file), ex);
-                }
-            }
         }
     }
 
     private static String calculateChecksumForDirectory(String directory) throws MojoExecutionException {
-        SequenceInputStream sequenceInputStream = null;
         try {
             // Collect all files in directory as streams
             List<FileInputStream> fileStreams = new ArrayList<>();
             for (Object file : FileUtils.getFiles(new File(directory), null, null)) {
                 fileStreams.add(new FileInputStream((File) file));
             }
-
-            sequenceInputStream = new SequenceInputStream(Collections.enumeration(fileStreams));
-
-            return DigestUtils.md5Hex(sequenceInputStream);
+            try (SequenceInputStream sequenceInputStream = new SequenceInputStream(Collections.enumeration(fileStreams))){
+                return DigestUtils.md5Hex(sequenceInputStream);
+            }
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when calculating checksum for directory " + quote(directory), ex);
-        } finally {
-            if (sequenceInputStream != null) {
-                try {
-                    sequenceInputStream.close();
-                } catch (IOException ex) {
-                    throw new MojoExecutionException("Error when calculating checksum for directory " + quote(directory), ex);
-                }
-            }
         }
     }
 
@@ -159,13 +139,11 @@ public class Utils {
                         httpClientBuilder.setDefaultCredentialsProvider(proxyCredentials);
                     }
                 }
-                CloseableHttpClient httpClient = httpClientBuilder.build();
-                CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url));
-                try {
-                    HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
-                    copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
-                } finally {
-                    fileDownloadResponse.close();
+                try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
+                    try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
+                        HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
+                        copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
+                    }
                 }
                 return;
             } catch (IOException ex) {
