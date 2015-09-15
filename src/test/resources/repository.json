@@ -347,7 +347,7 @@
            "name": "phantomjs",
            "platform": "linux",
            "bit": "32",
-           "version": "1.97",
+           "version": "1.9.7",
            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-i686.tar.bz2",
            "checksum": "9c1426eef5b04679d65198b1bdd6ef88"
         }
