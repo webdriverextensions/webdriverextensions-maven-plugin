@@ -158,10 +158,10 @@ public class InstallDriversMojo extends AbstractMojo {
             } else {
                 getLog().info("Installing drivers from configuration");
             }
-            for (Driver driver : drivers) {
-                driver = repository.getDriver(driver);
+            for (Driver _driver : drivers) {
+                Driver driver = repository.getDriver(_driver);
                 if (driver == null) {
-                    continue;
+                    throw new MojoExecutionException("could not found driver: "+_driver);
                 }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
