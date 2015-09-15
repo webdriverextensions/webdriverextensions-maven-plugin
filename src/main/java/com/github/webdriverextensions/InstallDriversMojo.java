@@ -235,7 +235,7 @@ public class InstallDriversMojo extends AbstractMojo {
     }
 
     void cleanup() throws MojoExecutionException {
-//        getLog().info("  Cleaning up");
+        getLog().debug("  Cleaning up temp directory: " + tempDirectory);
         deleteDirectory(tempDirectory);
     }
 
