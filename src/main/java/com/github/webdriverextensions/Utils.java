@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections.ComparatorUtils;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
@@ -201,19 +199,6 @@ public class Utils {
 
         throw new MojoExecutionException("Failed to download file");
 
-    }
-
-    public static void unzipFile(String file, String to) throws MojoExecutionException {
-        try {
-            ZipFile zipFile = new ZipFile(new File(file));
-            zipFile.extractAll(to);
-        } catch (ZipException ex) {
-            throw new MojoExecutionException("Error when extracting zip file " + quote(file), ex);
-        }
-    }
-
-    public static void deleteFile(String file) {
-        FileUtils.fileDelete(file);
     }
 
     public static void deleteDirectory(String directory) throws MojoExecutionException {

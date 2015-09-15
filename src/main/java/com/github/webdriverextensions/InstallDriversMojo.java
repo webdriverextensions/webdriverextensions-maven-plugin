@@ -2,7 +2,6 @@ package com.github.webdriverextensions;
 
 import static com.github.webdriverextensions.Utils.calculateChecksum;
 import static com.github.webdriverextensions.Utils.deleteDirectory;
-import static com.github.webdriverextensions.Utils.deleteFile;
 import static com.github.webdriverextensions.Utils.directoryContainsSingleDirectory;
 import static com.github.webdriverextensions.Utils.directoryContainsSingleFile;
 import static com.github.webdriverextensions.Utils.downloadFile;
@@ -12,7 +11,6 @@ import static com.github.webdriverextensions.Utils.moveAllFilesInDirectory;
 import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
 import static com.github.webdriverextensions.Utils.moveFileInDirectory;
 import static com.github.webdriverextensions.Utils.quote;
-import static com.github.webdriverextensions.Utils.unzipFile;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -26,6 +24,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -233,7 +233,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
         try {
             String contentType = Files.probeContentType(path);
-            getLog().debug("handing type:" + contentType);
+            getLog().debug("handling type:" + contentType);
             switch (contentType) {
                 case "application/x-bzip":
                     BZip2CompressorInputStream bZip2CompressorInputStream = new BZip2CompressorInputStream(new BufferedInputStream(new FileInputStream(downloadFileLocation)));
@@ -291,7 +291,15 @@ public class InstallDriversMojo extends AbstractMojo {
                     getLog().debug("finally extracted");
                     break;
                 case "application/zip":
-                    unzipDriver(driver);
+                    getLog().info("  Unzipping " + tempDirectory + "/" + driver.getId());
+                    File file = new File(downloadFileLocation);
+                    try {
+                        ZipFile zipFile = new ZipFile(file);
+                        zipFile.extractAll(tempDirectory);
+                    } catch (ZipException ex) {
+                        throw new MojoExecutionException("Error when extracting zip file " + quote(downloadFileLocation), ex);
+                    }
+                    FileUtils.deleteQuietly(file);
                     break;
                 default:
                     throw new MojoExecutionException("unhandled content-type:" + contentType);
@@ -299,12 +307,6 @@ public class InstallDriversMojo extends AbstractMojo {
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(),e);
         }
-    }
-
-    void unzipDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Unzipping " + tempDirectory + "/" + driver.getId());
-        unzipFile(tempDirectory + "/" + driver.getId(), tempDirectory);
-        deleteFile(tempDirectory + "/" + driver.getId());
     }
 
     void verifyChecksum(Driver driver) throws MojoExecutionException {
@@ -332,5 +334,4 @@ public class InstallDriversMojo extends AbstractMojo {
         getLog().debug("  Cleaning up temp directory: " + tempDirectory);
         deleteDirectory(tempDirectory);
     }
-
 }
