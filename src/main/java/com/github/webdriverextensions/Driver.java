@@ -45,10 +45,6 @@ public class Driver {
     public String getVersion() {
         return version;
     }
-    //
-    //        public void setVersion(ComparableVersion version) {
-    //            this.version = version;
-    //        }
 
     public void setVersion(String version) {
         this.version = version;
@@ -70,19 +66,7 @@ public class Driver {
         return checksum;
     }
 
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
-
     public String getFileName() {
-        if ("windows".equalsIgnoreCase(platform)) {
-            return getId() + ".exe";
-        } else {
-            return getId();
-        }
-    }
-
-    public String getUrlFileName() {
         if ("windows".equalsIgnoreCase(platform)) {
             return getId() + ".exe";
         } else {
@@ -94,14 +78,9 @@ public class Driver {
         return fileMatchInside;
     }
 
-    public void setFileMatchInside(String fileMatchInside) {
-        this.fileMatchInside= fileMatchInside;
-    }
-
     @Override
     public String toString() {
         Gson gson = new Gson();
         return gson.toJson(this);
     }
-
 }

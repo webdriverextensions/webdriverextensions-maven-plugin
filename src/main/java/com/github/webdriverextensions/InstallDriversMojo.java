@@ -161,7 +161,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
-        tempDirectory = project.getBuild().getDirectory() + "/temp/com/github/webdriverextensions";
+        tempDirectory = createTempPath(project);
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
@@ -183,15 +183,8 @@ public class InstallDriversMojo extends AbstractMojo {
                 if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
                     cleanup();
                     downloadDriver(driver);
+                    extractDriver(driver);
 
-                    String fileMatchInside = driver.getFileMatchInside();
-                    if (null != fileMatchInside && !fileMatchInside.isEmpty()) {
-                        extractFileFromInside(fileMatchInside, tempDirectory + "/" + driver.getUrlFileName());
-                    }
-
-                    if (downloadedDriverIsZipped(driver)) {
-                        unzipDriver(driver);
-                    }
                     if (StringUtils.isBlank(driver.getChecksum())) {
                         printChecksumMissingWarning(driver);
                     } else {
@@ -204,6 +197,12 @@ public class InstallDriversMojo extends AbstractMojo {
                 }
             }
         }
+    }
+
+    private static String createTempPath(MavenProject project) {
+        String workingDirectory = new File(System.getProperty("user.dir")).toString()                ;
+        String tempDirectory = project.getBuild().getDirectory() + "/temp";
+        return tempDirectory.replaceFirst(workingDirectory +"/","");
     }
 
     boolean driverIsNotInstalled(Driver driver) throws MojoExecutionException {
@@ -221,18 +220,20 @@ public class InstallDriversMojo extends AbstractMojo {
     }
 
     void downloadDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Downloading");
-        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getUrlFileName(), getLog(), getProxyFromSettings(settings, proxyId));
+        getLog().info("  Downloading " + driver.getUrl() + " -> " + tempDirectory + "/" + driver.getId());
+        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getId(), getLog(), getProxyFromSettings(settings, proxyId));
     }
 
-    private void extractFileFromInside(String fileMatchInside, String downloadFileLocation) throws MojoExecutionException {
+    private void extractDriver(Driver driver) throws MojoExecutionException {
+
+        String downloadFileLocation= tempDirectory + "/" + driver.getId();
         Path path = Paths.get(downloadFileLocation);
         String tempLocation = downloadFileLocation + ".temp";
         File tempFile = new File(tempLocation);
-        Pattern pattern = Pattern.compile(fileMatchInside);
 
         try {
             String contentType = Files.probeContentType(path);
+            getLog().debug("handing type:" + contentType);
             switch (contentType) {
                 case "application/x-bzip":
                     BZip2CompressorInputStream bZip2CompressorInputStream = new BZip2CompressorInputStream(new BufferedInputStream(new FileInputStream(downloadFileLocation)));
@@ -241,13 +242,20 @@ public class InstallDriversMojo extends AbstractMojo {
                     if (!tempFile.renameTo(new File(downloadFileLocation))) {
                         throw new MojoExecutionException("renaming failed, from " + tempLocation + " -> " + downloadFileLocation);
                     }
-                    extractFileFromInside(fileMatchInside, downloadFileLocation);
+                    extractDriver(driver);
                     break;
                 case "application/x-tar":
                     TarArchiveInputStream tarStream = null;
                     try {
                         tarStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", new BufferedInputStream(new FileInputStream(downloadFileLocation)));
                         TarArchiveEntry entry;
+
+                        String fileMatchInside = driver.getFileMatchInside();
+                        if ( fileMatchInside == null){
+                            throw new MojoExecutionException("tar needs fileMatchInside-configuration");
+                        }
+
+                        Pattern pattern = Pattern.compile(fileMatchInside);
 
                         int matchCount = 0;
                         while ((entry = (TarArchiveEntry) tarStream.getNextEntry()) != null) {
@@ -279,24 +287,24 @@ public class InstallDriversMojo extends AbstractMojo {
                     }
                     break;
                 case "application/x-executable":
+                case "application/x-ms-dos-executable":
                     getLog().debug("finally extracted");
+                    break;
+                case "application/zip":
+                    unzipDriver(driver);
                     break;
                 default:
                     throw new MojoExecutionException("unhandled content-type:" + contentType);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new MojoExecutionException(e.getMessage(),e);
         }
     }
 
-    boolean downloadedDriverIsZipped(Driver driver) {
-        return driver.getUrl().toLowerCase().endsWith(".zip");
-    }
-
     void unzipDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Unzipping");
-        unzipFile(tempDirectory + "/" + driver.getUrlFileName(), tempDirectory);
-        deleteFile(tempDirectory + "/" + driver.getUrlFileName());
+        getLog().info("  Unzipping " + tempDirectory + "/" + driver.getId());
+        unzipFile(tempDirectory + "/" + driver.getId(), tempDirectory);
+        deleteFile(tempDirectory + "/" + driver.getId());
     }
 
     void verifyChecksum(Driver driver) throws MojoExecutionException {
