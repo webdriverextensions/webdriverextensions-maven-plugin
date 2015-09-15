@@ -49,21 +49,13 @@ public class Utils {
     public static final int FILE_DOWNLOAD_RETRY_ATTEMPTS = 3;
 
     public static boolean directoryContainsSingleDirectory(String directory) {
-        String[] files = new File(directory).list();
-        if (files.length != 1) {
-            return false;
-        }
-
-        return new File(directory + File.separator + files[0]).isDirectory();
+        File[] files = new File(directory).listFiles();
+        return files != null && files.length == 1 && files[0].isDirectory();
     }
 
     public static boolean directoryContainsSingleFile(String directory) throws MojoExecutionException {
-        String[] files = new File(directory).list();
-        if (files.length != 1) {
-            return false;
-        }
-
-        return new File(directory + File.separator + files[0]).isFile();
+        File[] files = new File(directory).listFiles();
+        return files != null && files.length == 1 && files[0].isFile();
     }
 
     public static void moveDirectoryInDirectory(String from, String to) throws MojoExecutionException {
@@ -95,16 +87,6 @@ public class Utils {
         }
     }
 
-    public static List<String> getDirectories(String directory) throws MojoExecutionException {
-
-        throw new MojoExecutionException("File or directory does not exist " + quote(directory));
-    }
-
-    public static List<String> getFiles(String directory) throws MojoExecutionException {
-
-        throw new MojoExecutionException("File or directory does not exist " + quote(directory));
-    }
-
     public static String calculateChecksum(String fileOrDirectory) throws MojoExecutionException {
         if (new File(fileOrDirectory).isDirectory()) {
             return calculateChecksumForDirectory(fileOrDirectory);
@@ -130,14 +112,13 @@ public class Utils {
                 }
             }
         }
-
     }
 
     private static String calculateChecksumForDirectory(String directory) throws MojoExecutionException {
         SequenceInputStream sequenceInputStream = null;
         try {
             // Collect all files in directory as streams
-            ArrayList<FileInputStream> fileStreams = new ArrayList<FileInputStream>();
+            List<FileInputStream> fileStreams = new ArrayList<>();
             for (Object file : FileUtils.getFiles(new File(directory), null, null)) {
                 fileStreams.add(new FileInputStream((File) file));
             }
@@ -198,19 +179,6 @@ public class Utils {
         }
 
         throw new MojoExecutionException("Failed to download file");
-
-    }
-
-    public static void deleteDirectory(String directory) throws MojoExecutionException {
-        try {
-            FileUtils.deleteDirectory(directory);
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when deleting directory " + quote(directory), ex);
-        }
-    }
-
-    public static boolean fileExists(String file) {
-        return FileUtils.fileExists(file);
     }
 
     public static List<Driver> sortDrivers(List<Driver> drivers) {

@@ -1,7 +1,6 @@
 package com.github.webdriverextensions;
 
 import static com.github.webdriverextensions.Utils.calculateChecksum;
-import static com.github.webdriverextensions.Utils.deleteDirectory;
 import static com.github.webdriverextensions.Utils.directoryContainsSingleDirectory;
 import static com.github.webdriverextensions.Utils.directoryContainsSingleFile;
 import static com.github.webdriverextensions.Utils.downloadFile;
@@ -332,6 +331,10 @@ public class InstallDriversMojo extends AbstractMojo {
 
     void cleanup() throws MojoExecutionException {
         getLog().debug("  Cleaning up temp directory: " + tempDirectory);
-        deleteDirectory(tempDirectory);
+        try {
+            org.codehaus.plexus.util.FileUtils.deleteDirectory(tempDirectory);
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Error when deleting directory " + quote(tempDirectory), ex);
+        }
     }
 }
