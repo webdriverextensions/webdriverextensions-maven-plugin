@@ -53,6 +53,25 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         }
     }
 
+    public void testConfigurationExtractPhantomJSDriverFromTarBz2() throws Exception {
+        try {
+            MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-pom_phantomjs-extract.xml");
+            InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
+            installDriversMojo.getLog().info("## TEST: testConfigurationExtractPhantomJSDriverFromTarBz2");
+            installDriversMojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+            installDriversMojo.execute();
+        } finally {
+            File dir = new File("src/test/resources/target_phantomjs-extract-test");
+            if (dir.exists()) {
+                for (File file : dir.listFiles()) {
+                    file.delete();
+                }
+                dir.delete();
+            }
+        }
+    }
+
     private MavenProject getMavenProject(String pomPath) throws Exception {
         File pom = new File(pomPath);
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();

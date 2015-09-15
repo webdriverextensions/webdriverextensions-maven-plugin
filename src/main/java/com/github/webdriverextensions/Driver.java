@@ -10,6 +10,7 @@ public class Driver {
     private String version;
     private String url;
     private String checksum;
+    private String fileMatchInside;
 
     public String getId() {
         return name
@@ -87,6 +88,14 @@ public class Driver {
         } else {
             return getId();
         }
+    }
+
+    public String getFileMatchInside() {
+        return fileMatchInside;
+    }
+
+    public void setFileMatchInside(String fileMatchInside) {
+        this.fileMatchInside= fileMatchInside;
     }
 
     @Override
