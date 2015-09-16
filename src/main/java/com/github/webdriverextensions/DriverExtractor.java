@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -63,10 +64,17 @@ public class DriverExtractor {
                                 }
                                 extractToDirectory.toFile().mkdirs();
 
+                                Pattern pattern = null;
+                                if (null != driver.getFileMatchInside()) {
+                                    pattern = Pattern.compile(driver.getFileMatchInside());
+                                }
+
                                 ArchiveEntry entry;
                                 while ((entry = aiStream.getNextEntry()) != null) {
                                     String name = entry.getName();
-                                    if (entry.isDirectory()) {
+                                    if (pattern != null && entry.isDirectory()) {
+                                        // ignore
+                                    } else if (entry.isDirectory()) {
                                         File directory = new File(extractToDirectory.toFile(), name);
                                         if (!directory.mkdirs()) {
                                             throw new MojoExecutionException("failed to create " + directory);
@@ -85,13 +93,22 @@ public class DriverExtractor {
                                             }
                                         }
 
+                                        if (pattern != null) {
+                                            if (pattern.matcher(name).matches()) {
+                                                file = new File(extractToDirectory.toFile(), driver.getId());
+                                            } else {
+                                                file = null;
+                                            }
+                                        }
+
                                         if (file != null) {
                                             try (OutputStream out = new FileOutputStream(file)) {
                                                 IOUtils.copy(aiStream, out);
                                             }
                                         }
                                     }
-                                } return extractToDirectory;
+                                }
+                                return extractToDirectory;
                             } catch (ArchiveException e) {
                                 throw new MojoExecutionException(e.getMessage(), e);
                             }
