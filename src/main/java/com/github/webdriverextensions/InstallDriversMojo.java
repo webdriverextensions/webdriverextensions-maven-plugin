@@ -1,8 +1,6 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.downloadFile;
 import static com.github.webdriverextensions.Utils.getProxyFromSettings;
-import static com.github.webdriverextensions.Utils.quote;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -18,7 +16,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
 
 // TODO: refactor exception messages
@@ -112,7 +109,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * &lt;/drivers&gt;
      * </pre>
      * <br/>
-     *
+     * <p/>
      * Installing a driver not available in the repository, e.g. PhantomJS<br/>
      * <pre>
      * &lt;driver&gt;
@@ -126,24 +123,28 @@ public class InstallDriversMojo extends AbstractMojo {
      * </pre>
      */
     @Parameter
-    List<Driver> drivers = new ArrayList<Driver>();
+    List<Driver> drivers = new ArrayList<>();
     /**
      * Skips installation of drivers.
      */
     @Parameter(defaultValue = "false")
     boolean skip;
 
+    /**
+     * keep downloaded files as local cache
+     */
+    @Parameter(defaultValue = "false")
+    boolean keepDownloadedWebdrivers;
+
     private String tempDirectory = createTempPath();
-    private Repository repository;
-    private DriverInstaller driverInstaller;
 
     public void execute() throws MojoExecutionException {
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
-            repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
-            getLog().info("Installation directory " + quote(installationDirectory));
+            Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
+            getLog().info("Installation directory " + Utils.quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
                 drivers = repository.getLatestDrivers();
@@ -151,20 +152,18 @@ public class InstallDriversMojo extends AbstractMojo {
                 getLog().info("Installing drivers from configuration");
             }
 
-            driverInstaller = new DriverInstaller(installationDirectory, getLog());
+            DriverDownloader driverDownloader = new DriverDownloader(settings, proxyId, getLog());
+            DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, getLog());
+            DriverInstaller driverInstaller = new DriverInstaller(installationDirectory, getLog());
 
             for (Driver _driver : drivers) {
-                Driver driver = repository.getDriver(_driver);
-                if (driver == null) {
-                    throw new MojoExecutionException("could not found driver: " + _driver);
-                }
+                Driver driver = repository.enrichDriver(_driver);
                 getLog().info(driver.getId() + " version " + driver.getVersion());
-                if ( driverInstaller.needInstallation(driver)) {
-//                    cleanup();
-                    Path downloadLocation = downloadDriver(driver);
-                    Path extractLocation = extractDriver(driver, downloadLocation);
-                    installDriver(driver,extractLocation);
-//                    cleanup();
+                if (driverInstaller.needInstallation(driver)) {
+                    Path downloadLocation = driverDownloader.downloadFile(driver, tempDirectory);
+                    Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
+                    driverInstaller.install(driver, extractLocation);
+                    cleanup();
                 } else {
                     getLog().info("  Already installed");
                 }
@@ -172,31 +171,22 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    private Path extractDriver(Driver driver, Path downloadLocation) throws MojoExecutionException {
-         return new DriverExtractor(tempDirectory, getLog()).extractDriver(driver, downloadLocation);
-    }
-
     private static String createTempPath() {
         String systemTemporaryDestination = System.getProperty("java.io.tmpdir");
         String folderIdentifier = InstallDriversMojo.class.getSimpleName();
-        return Paths.get(systemTemporaryDestination,folderIdentifier).toString();
+        return Paths.get(systemTemporaryDestination, folderIdentifier).toString();
     }
 
-    Path downloadDriver(Driver driver) throws MojoExecutionException {
-        Proxy proxyFromSettings = getProxyFromSettings(settings, proxyId);
-        return downloadFile(driver, tempDirectory, getLog(), proxyFromSettings);
-    }
-
-    void installDriver(Driver driver, Path extractLocation) throws MojoExecutionException {
-        new DriverInstaller(installationDirectory, getLog()).install(driver, extractLocation);
-    }
-
-    void cleanup() throws MojoExecutionException {
-        getLog().debug("  Cleaning up temp directory: " + tempDirectory);
-        try {
-            FileUtils.deleteDirectory(new File(tempDirectory));
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when deleting directory " + quote(tempDirectory), ex);
+    private void cleanup() throws MojoExecutionException {
+        if (keepDownloadedWebdrivers) {
+            getLog().debug("skip cleanup, keep downloaded webdrivers");
+        } else {
+            getLog().debug("Cleaning up temp directory: " + tempDirectory);
+            try {
+                FileUtils.deleteDirectory(new File(tempDirectory));
+            } catch (IOException ex) {
+                throw new MojoExecutionException("Error when deleting directory " + Utils.quote(tempDirectory), ex);
+            }
         }
     }
 }

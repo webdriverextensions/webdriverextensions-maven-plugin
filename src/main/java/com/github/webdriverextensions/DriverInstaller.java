@@ -1,6 +1,5 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.makeExecutable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -78,6 +77,14 @@ public class DriverInstaller {
         }
 
         versionHandler.writeVersionFile(driver);
+    }
+
+
+    private static void makeExecutable(String path) {
+        File file = new File(path);
+        if (file.exists() && !file.canExecute()) {
+            file.setExecutable(true);
+        }
     }
 
     private boolean isInstalled(Driver driver) {
