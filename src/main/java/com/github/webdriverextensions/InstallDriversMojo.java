@@ -155,12 +155,10 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean skip;
 
-    String tempDirectory;
-    Repository repository;
+    private String tempDirectory = createTempPath();
+    private Repository repository;
 
     public void execute() throws MojoExecutionException {
-
-        tempDirectory = createTempPath(project);
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
@@ -198,10 +196,10 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    private static String createTempPath(MavenProject project) {
-        String workingDirectory = new File(System.getProperty("user.dir")).toString()                ;
-        String tempDirectory = project.getBuild().getDirectory() + "/temp";
-        return tempDirectory.replaceFirst(workingDirectory +"/","");
+    private static String createTempPath() {
+        String systemTemporaryDestination = System.getProperty("java.io.tmpdir");
+        String folderIdentifier = InstallDriversMojo.class.getSimpleName();
+        return Paths.get(systemTemporaryDestination,folderIdentifier).toString();
     }
 
     boolean driverIsNotInstalled(Driver driver) throws MojoExecutionException {
