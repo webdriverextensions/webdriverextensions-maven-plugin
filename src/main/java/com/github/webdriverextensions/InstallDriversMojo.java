@@ -11,26 +11,25 @@ import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
 import static com.github.webdriverextensions.Utils.moveFileInDirectory;
 import static com.github.webdriverextensions.Utils.quote;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
+import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -179,17 +178,17 @@ public class InstallDriversMojo extends AbstractMojo {
                 }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
-                    cleanup();
-                    downloadDriver(driver);
-                    extractDriver(driver);
+//                    cleanup();
+                    Path downloadLocation = downloadDriver(driver);
+                    extractDriver(driver,downloadLocation);
 
-                    if (StringUtils.isBlank(driver.getChecksum())) {
-                        printChecksumMissingWarning(driver);
-                    } else {
-                        verifyChecksum(driver);
-                        installDriver(driver);
-                    }
-                    cleanup();
+//                    if (StringUtils.isBlank(driver.getChecksum())) {
+//                        printChecksumMissingWarning(driver);
+//                    } else {
+//                        verifyChecksum(driver);
+//                        installDriver(driver);
+//                    }
+//                    cleanup();
                 } else {
                     getLog().info("  Already installed");
                 }
@@ -217,91 +216,82 @@ public class InstallDriversMojo extends AbstractMojo {
         getLog().warn("Skipped " + driver.getId() + " version " + driver.getVersion() + ", please set checksum to " + checksum + " to install the driver");
     }
 
-    void downloadDriver(Driver driver) throws MojoExecutionException {
+    Path downloadDriver(Driver driver) throws MojoExecutionException {
         Proxy proxyFromSettings = getProxyFromSettings(settings, proxyId);
-        downloadFile(driver, tempDirectory, getLog(), proxyFromSettings);
+        return downloadFile(driver, tempDirectory, getLog(), proxyFromSettings);
     }
 
-    private void extractDriver(Driver driver) throws MojoExecutionException {
+    private void extractDriver(Driver driver, Path path) throws MojoExecutionException {
 
-        String downloadFileLocation= tempDirectory + "/" + driver.getId();
-        Path path = Paths.get(downloadFileLocation);
-        String tempLocation = downloadFileLocation + ".temp";
-        File tempFile = new File(tempLocation);
+        String filename = path.toString();
+        String filextension = FilenameUtils.getExtension(filename);
+
+        String extractedFilename = FilenameUtils.getName(path.toString()).replaceFirst("\\."+ filextension+"$","");
+        Path extractPath = Paths.get(path.getParent().toString(), extractedFilename);
+
+        getLog().debug("handling type:" + filextension + "(" + filename + ")");
 
         try {
-            String contentType = Files.probeContentType(path);
-            getLog().debug("handling type:" + contentType);
-            switch (contentType) {
-                case "application/x-bzip":
-                    BZip2CompressorInputStream bZip2CompressorInputStream = new BZip2CompressorInputStream(new BufferedInputStream(new FileInputStream(downloadFileLocation)));
-
-                    FileUtils.copyInputStreamToFile(bZip2CompressorInputStream, tempFile);
-                    if (!tempFile.renameTo(new File(downloadFileLocation))) {
-                        throw new MojoExecutionException("renaming failed, from " + tempLocation + " -> " + downloadFileLocation);
-                    }
-                    extractDriver(driver);
-                    break;
-                case "application/x-tar":
-                    TarArchiveInputStream tarStream = null;
-                    try {
-                        tarStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", new BufferedInputStream(new FileInputStream(downloadFileLocation)));
-                        TarArchiveEntry entry;
-
-                        String fileMatchInside = driver.getFileMatchInside();
-                        if ( fileMatchInside == null){
-                            throw new MojoExecutionException("tar needs fileMatchInside-configuration");
-                        }
-
-                        Pattern pattern = Pattern.compile(fileMatchInside);
-
-                        int matchCount = 0;
-                        while ((entry = (TarArchiveEntry) tarStream.getNextEntry()) != null) {
-                            boolean matches = pattern.matcher(entry.getName()).matches();
-
-                            if (matches) {
-                                if (!entry.isFile()) {
-                                    throw new MojoExecutionException("can only handle files");
-                                }
-
-                                matchCount++;
-                                if (matchCount > 1) {
-                                    throw new MojoExecutionException("at least two entries matches, this seems to be wrong");
-                                }
-
-                                getLog().debug("entry " + entry.getName() + " matches '" + fileMatchInside + "'");
-                                IOUtils.copy(tarStream, new BufferedOutputStream(new FileOutputStream(tempFile)));
-                                if (!tempFile.renameTo(new File(downloadFileLocation))) {
-                                    throw new MojoExecutionException("renaming failed, from " + tempLocation + " -> " + downloadFileLocation);
-                                }
+            switch (filextension) {
+                case "bz2":
+                    try (FileInputStream fin = new FileInputStream(path.toFile())) {
+                        try (BufferedInputStream bin = new BufferedInputStream(fin)) {
+                            try (BZip2CompressorInputStream input = new BZip2CompressorInputStream(bin)) {
+                                FileUtils.copyInputStreamToFile(input, extractPath.toFile());
+                                extractDriver(driver, extractPath);
                             }
                         }
-                    } catch (ArchiveException e) {
-                        throw new MojoExecutionException(e.getMessage(), e);
-                    } finally {
-                        if (tarStream != null) {
-                            tarStream.close();
+                    }
+                    break;
+                case "tar":
+                case "zip":
+                    try (FileInputStream fin = new FileInputStream(path.toFile())) {
+                        try (BufferedInputStream bin = new BufferedInputStream(fin)) {
+                            try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
+
+                                Path extractToDirectory = Paths.get(tempDirectory, driver.getId());
+                                if (extractToDirectory.toFile().exists()) {
+                                    FileUtils.deleteDirectory(extractToDirectory.toFile());
+                                }
+                                extractToDirectory.toFile().mkdirs();
+
+                                ArchiveEntry entry;
+                                while ((entry = aiStream.getNextEntry()) != null) {
+                                    String name = entry.getName();
+                                    if (entry.isDirectory()) {
+                                        File directory = new File(extractToDirectory.toFile(), name);
+                                        if (!directory.mkdirs()) {
+                                            throw new MojoExecutionException("failed to create " + directory);
+                                        }
+                                    } else {
+                                        File file = null;
+                                        if (entry instanceof TarArchiveEntry) {
+                                            TarArchiveEntry archiveEntry = (TarArchiveEntry) entry;
+                                            if (archiveEntry.isFile()) {
+                                                file = new File(extractToDirectory.toFile(), name);
+                                            }
+                                        } else if (entry instanceof ZipArchiveEntry) {
+                                            ZipArchiveEntry archiveEntry = (ZipArchiveEntry) entry;
+                                            if (!archiveEntry.isUnixSymlink()) {
+                                                file = new File(extractToDirectory.toFile(), name);
+                                            }
+                                        }
+
+                                        if (file != null) {
+                                            try (OutputStream out = new FileOutputStream(file)) {
+                                                IOUtils.copy(aiStream, out);
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (ArchiveException e) {
+                                throw new MojoExecutionException(e.getMessage(), e);
+                            }
                         }
                     }
                     break;
-                case "application/x-executable":
-                case "application/x-ms-dos-executable":
-                    getLog().debug("finally extracted");
-                    break;
-                case "application/zip":
-                    getLog().info("  Unzipping " + tempDirectory + "/" + driver.getId());
-                    File file = new File(downloadFileLocation);
-                    try {
-                        ZipFile zipFile = new ZipFile(file);
-                        zipFile.extractAll(tempDirectory);
-                    } catch (ZipException ex) {
-                        throw new MojoExecutionException("Error when extracting zip file " + quote(downloadFileLocation), ex);
-                    }
-                    FileUtils.deleteQuietly(file);
-                    break;
                 default:
-                    throw new MojoExecutionException("unhandled content-type:" + contentType);
-            }
+                    throw new MojoExecutionException("unhandled type:" + filextension);}
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(),e);
         }

@@ -122,7 +122,7 @@ public class Utils {
         }
     }
 
-    public static void downloadFile(Driver driver, String tempdirectory, Log log, Proxy proxySettings) throws MojoExecutionException {
+    public static Path downloadFile(Driver driver, String tempdirectory, Log log, Proxy proxySettings) throws MojoExecutionException {
 
         String url = driver.getUrl();
         Path downloadLocation = Paths.get(tempdirectory, driver.getFilenameFromUrl());
@@ -144,6 +144,7 @@ public class Utils {
                 throw new MojoExecutionException("Failed to download file", ex);
             }
         }
+        return downloadLocation;
     }
 
     private static HttpClientBuilder prepareHttpClientBuilderWithTimeoutsAndProxySettings(Proxy proxySettings) throws MojoExecutionException {
