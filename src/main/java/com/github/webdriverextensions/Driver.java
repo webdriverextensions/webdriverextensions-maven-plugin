@@ -11,7 +11,6 @@ public class Driver {
     private String bit;
     private String version;
     private String url;
-    private String checksum;
     private String fileMatchInside;
 
     public String getId() {
@@ -62,10 +61,6 @@ public class Driver {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    public String getChecksum() {
-        return checksum;
     }
 
     public String getFileName() {

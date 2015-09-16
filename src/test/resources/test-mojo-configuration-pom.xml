@@ -56,7 +56,6 @@
                             <bit>32</bit>
                             <version>1.9.7</version>
                             <url>http://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-macosx.zip</url>
-                            <checksum>dfd8c7520cf0caf78de4a77dd7267398</checksum>
                         </driver>
                     </drivers>
                 </configuration>
