@@ -1,6 +1,5 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.calculateChecksum;
 import static com.github.webdriverextensions.Utils.downloadFile;
 import static com.github.webdriverextensions.Utils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.quote;
@@ -11,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -135,6 +135,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
     private String tempDirectory = createTempPath();
     private Repository repository;
+    private DriverInstaller driverInstaller;
 
     public void execute() throws MojoExecutionException {
 
@@ -150,6 +151,7 @@ public class InstallDriversMojo extends AbstractMojo {
                 getLog().info("Installing drivers from configuration");
             }
 
+            driverInstaller = new DriverInstaller(installationDirectory, getLog());
 
             for (Driver _driver : drivers) {
                 Driver driver = repository.getDriver(_driver);
@@ -157,18 +159,11 @@ public class InstallDriversMojo extends AbstractMojo {
                     throw new MojoExecutionException("could not found driver: " + _driver);
                 }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
-                if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
+                if ( driverInstaller.needInstallation(driver)) {
 //                    cleanup();
                     Path downloadLocation = downloadDriver(driver);
                     Path extractLocation = extractDriver(driver, downloadLocation);
                     installDriver(driver,extractLocation);
-//
-//                    if (StringUtils.isBlank(driver.getChecksum())) {
-//                        printChecksumMissingWarning(driver);
-//                    } else {
-//                        verifyChecksum(driver);
-//                        installDriver(driver);
-//                    }
 //                    cleanup();
                 } else {
                     getLog().info("  Already installed");
@@ -178,7 +173,7 @@ public class InstallDriversMojo extends AbstractMojo {
     }
 
     private Path extractDriver(Driver driver, Path downloadLocation) throws MojoExecutionException {
-         return new DriverExtractor(tempDirectory, getLog()).extractDriver(driver,downloadLocation);
+         return new DriverExtractor(tempDirectory, getLog()).extractDriver(driver, downloadLocation);
     }
 
     private static String createTempPath() {
@@ -187,33 +182,9 @@ public class InstallDriversMojo extends AbstractMojo {
         return Paths.get(systemTemporaryDestination,folderIdentifier).toString();
     }
 
-    boolean driverIsNotInstalled(Driver driver) throws MojoExecutionException {
-        return !new DriverInstaller(installationDirectory,getLog()).isInstalled(driver);
-    }
-
-    boolean driverVersionIsNew(Driver driver) throws MojoExecutionException {
-        String checksum = calculateChecksum(installationDirectory + "/" + driver.getFileName());
-        return !checksum.equals(driver.getChecksum());
-    }
-
-    void printChecksumMissingWarning(Driver driver) throws MojoExecutionException {
-        String checksum = calculateChecksum(tempDirectory);
-        getLog().warn("Skipped " + driver.getId() + " version " + driver.getVersion() + ", please set checksum to " + checksum + " to install the driver");
-    }
-
     Path downloadDriver(Driver driver) throws MojoExecutionException {
         Proxy proxyFromSettings = getProxyFromSettings(settings, proxyId);
         return downloadFile(driver, tempDirectory, getLog(), proxyFromSettings);
-    }
-
-
-    void verifyChecksum(Driver driver) throws MojoExecutionException {
-        getLog().info("  Verifying checksum");
-        String checksum = calculateChecksum(Paths.get(tempDirectory,driver.getId()).toString() );
-        if (!checksum.equals(driver.getChecksum())) {
-            throw new MojoExecutionException("Error checksum is " + quote(checksum) + " for downloaded driver, when it should be "
-                    + quote(driver.getChecksum()));
-        }
     }
 
     void installDriver(Driver driver, Path extractLocation) throws MojoExecutionException {
@@ -223,7 +194,7 @@ public class InstallDriversMojo extends AbstractMojo {
     void cleanup() throws MojoExecutionException {
         getLog().debug("  Cleaning up temp directory: " + tempDirectory);
         try {
-            org.codehaus.plexus.util.FileUtils.deleteDirectory(tempDirectory);
+            FileUtils.deleteDirectory(new File(tempDirectory));
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when deleting directory " + quote(tempDirectory), ex);
         }

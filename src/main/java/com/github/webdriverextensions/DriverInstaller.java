@@ -13,10 +13,12 @@ import org.codehaus.plexus.util.FileUtils;
 public class DriverInstaller {
     private final File installationDirectory;
     private final Log log;
+    private final DriverVersionHandler versionHandler;
 
     public DriverInstaller(File installationDirectory, Log log) {
         this.installationDirectory = installationDirectory;
         this.log = log;
+        this.versionHandler = new DriverVersionHandler(installationDirectory);
     }
 
     private static boolean directoryContainsSingleDirectory(File directory) {
@@ -33,7 +35,12 @@ public class DriverInstaller {
         assert directoryContainsSingleDirectory(from);
         try {
             List<String> subDirectories = FileUtils.getDirectoryNames(from, null, null, true);
-            org.apache.commons.io.FileUtils.moveDirectory(new File(subDirectories.get(1)), new File(to));
+            File destDir = new File(to);
+            if ( destDir.exists()){
+                org.apache.commons.io.FileUtils.deleteDirectory(destDir);
+            }
+
+            org.apache.commons.io.FileUtils.moveDirectory(new File(subDirectories.get(1)), destDir);
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when moving direcotry in directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);
         }
@@ -70,20 +77,15 @@ public class DriverInstaller {
             moveAllFilesInDirectory(extractLocationFile, installationDirectory + "/" + driver.getId());
         }
 
-        writeVersionFile(driver);
+        versionHandler.writeVersionFile(driver);
     }
 
-    private void writeVersionFile(Driver driver) throws MojoExecutionException {
-        File file = new File(installationDirectory + "/" + driver.getId() + ".version");
-        try {
-            org.apache.commons.io.FileUtils.writeStringToFile(file,driver.toString());
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(),e);
-        }
-    }
-
-    public boolean isInstalled(Driver driver) {
+    private boolean isInstalled(Driver driver) {
         Path path = Paths.get(installationDirectory.getPath(), driver.getId());
         return path.toFile().exists();
+    }
+
+    public boolean needInstallation(Driver driver) throws MojoExecutionException {
+        return ! isInstalled(driver) || !versionHandler.isSameVersion(driver);
     }
 }

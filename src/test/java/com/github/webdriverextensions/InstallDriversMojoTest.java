@@ -1,5 +1,6 @@
 package com.github.webdriverextensions;
 
+import java.io.File;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -7,8 +8,6 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
-
-import java.io.File;
 
 public class InstallDriversMojoTest extends AbstractMojoTestCase {
 
@@ -56,7 +55,8 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         }
     }
 
-    public void testConfigurationExtractPhantomJSDriverFromTarBz2() throws Exception {
+
+    public void ignore_testConfigurationExtractPhantomJSDriverFromTarBz2() throws Exception {
         try {
             MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-pom_phantomjs-extract.xml");
             InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
