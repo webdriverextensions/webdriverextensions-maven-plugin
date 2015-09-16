@@ -14,6 +14,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -121,7 +122,11 @@ public class Utils {
         }
     }
 
-    public static void downloadFile(String url, Path downloadLocation, Log log, Proxy proxySettings) throws MojoExecutionException {
+    public static void downloadFile(Driver driver, String tempdirectory, Log log, Proxy proxySettings) throws MojoExecutionException {
+
+        String url = driver.getUrl();
+        Path downloadLocation = Paths.get(tempdirectory, driver.getFilenameFromUrl());
+
         log.info("  Downloading " + url + " -> " + downloadLocation);
         File fileToDownload = downloadLocation.toFile();
         if (fileToDownload.exists()) {

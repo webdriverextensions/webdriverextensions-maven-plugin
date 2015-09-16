@@ -219,7 +219,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
     void downloadDriver(Driver driver) throws MojoExecutionException {
         Proxy proxyFromSettings = getProxyFromSettings(settings, proxyId);
-        downloadFile(driver.getUrl(), Paths.get(tempDirectory,driver.getFilenameFromUrl()), getLog(), proxyFromSettings);
+        downloadFile(driver, tempDirectory, getLog(), proxyFromSettings);
     }
 
     private void extractDriver(Driver driver) throws MojoExecutionException {

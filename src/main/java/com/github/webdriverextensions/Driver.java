@@ -78,7 +78,8 @@ public class Driver {
 
     public String getFilenameFromUrl(){
         try {
-            return new URL(url).getFile();
+            String file = new URL(url).getFile();
+            return name + "_"+ version + "_" + file.replaceAll("\\/", "_");
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }
