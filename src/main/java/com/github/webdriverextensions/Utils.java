@@ -51,45 +51,6 @@ public class Utils {
     public static final int FILE_DOWNLOAD_CONNECT_TIMEOUT = 30 * 1000; // 30 seconds
     public static final int FILE_DOWNLOAD_RETRY_ATTEMPTS = 3;
 
-    public static boolean directoryContainsSingleDirectory(String directory) {
-        File[] files = new File(directory).listFiles();
-        return files != null && files.length == 1 && files[0].isDirectory();
-    }
-
-    public static boolean directoryContainsSingleFile(String directory) throws MojoExecutionException {
-        File[] files = new File(directory).listFiles();
-        return files != null && files.length == 1 && files[0].isFile();
-    }
-
-    public static void moveDirectoryInDirectory(String from, String to) throws MojoExecutionException {
-        assert directoryContainsSingleDirectory(from);
-        try {
-            List<String> subDirectories = FileUtils.getDirectoryNames(new File(from), null, null, true);
-            FileUtils.rename(new File(subDirectories.get(1)), new File(to));
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when moving direcotry in directory " + quote(from) + " to " + quote(to), ex);
-        }
-    }
-
-    public static void moveFileInDirectory(String from, String to) throws MojoExecutionException {
-        assert directoryContainsSingleFile(from);
-        try {
-            List<String> files = FileUtils.getFileNames(new File(from), null, null, true);
-            FileUtils.rename(new File(files.get(0)), new File(to));
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when moving file in directory " + quote(from) + " to " + quote(to), ex);
-        }
-    }
-
-    public static void moveAllFilesInDirectory(String from, String to) throws MojoExecutionException {
-        try {
-            List<String> subDirectories = FileUtils.getDirectoryNames(new File(from), null, null, true);
-            FileUtils.rename(new File(subDirectories.get(0)), new File(to));
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when moving direcotry " + quote(from) + " to " + quote(to), ex);
-        }
-    }
-
     public static String calculateChecksum(String fileOrDirectory) throws MojoExecutionException {
         if (new File(fileOrDirectory).isDirectory()) {
             return calculateChecksumForDirectory(fileOrDirectory);

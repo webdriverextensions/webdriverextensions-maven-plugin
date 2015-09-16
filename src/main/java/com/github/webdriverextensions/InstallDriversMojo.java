@@ -1,37 +1,16 @@
 package com.github.webdriverextensions;
 
 import static com.github.webdriverextensions.Utils.calculateChecksum;
-import static com.github.webdriverextensions.Utils.directoryContainsSingleDirectory;
-import static com.github.webdriverextensions.Utils.directoryContainsSingleFile;
 import static com.github.webdriverextensions.Utils.downloadFile;
 import static com.github.webdriverextensions.Utils.getProxyFromSettings;
-import static com.github.webdriverextensions.Utils.makeExecutable;
-import static com.github.webdriverextensions.Utils.moveAllFilesInDirectory;
-import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
-import static com.github.webdriverextensions.Utils.moveFileInDirectory;
 import static com.github.webdriverextensions.Utils.quote;
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveInputStream;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -41,7 +20,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
-import static org.codehaus.plexus.util.FileUtils.fileExists;
 
 // TODO: refactor exception messages
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
@@ -182,8 +160,9 @@ public class InstallDriversMojo extends AbstractMojo {
                 if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
 //                    cleanup();
                     Path downloadLocation = downloadDriver(driver);
-                    extractDriver(driver,downloadLocation);
-
+                    Path extractLocation = extractDriver(driver, downloadLocation);
+                    installDriver(driver,extractLocation);
+//
 //                    if (StringUtils.isBlank(driver.getChecksum())) {
 //                        printChecksumMissingWarning(driver);
 //                    } else {
@@ -209,7 +188,7 @@ public class InstallDriversMojo extends AbstractMojo {
     }
 
     boolean driverIsNotInstalled(Driver driver) throws MojoExecutionException {
-        return !fileExists(installationDirectory + "/" + driver.getFileName());
+        return !new DriverInstaller(installationDirectory,getLog()).isInstalled(driver);
     }
 
     boolean driverVersionIsNew(Driver driver) throws MojoExecutionException {
@@ -230,23 +209,15 @@ public class InstallDriversMojo extends AbstractMojo {
 
     void verifyChecksum(Driver driver) throws MojoExecutionException {
         getLog().info("  Verifying checksum");
-        String checksum = calculateChecksum(tempDirectory);
+        String checksum = calculateChecksum(Paths.get(tempDirectory,driver.getId()).toString() );
         if (!checksum.equals(driver.getChecksum())) {
             throw new MojoExecutionException("Error checksum is " + quote(checksum) + " for downloaded driver, when it should be "
                     + quote(driver.getChecksum()));
         }
     }
 
-    void installDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Installing");
-        if (directoryContainsSingleDirectory(tempDirectory)) {
-            moveDirectoryInDirectory(tempDirectory, installationDirectory + "/" + driver.getId());
-        } else if (directoryContainsSingleFile(tempDirectory)) {
-            moveFileInDirectory(tempDirectory, installationDirectory + "/" + driver.getFileName());
-            makeExecutable(installationDirectory + "/" + driver.getFileName());
-        } else {
-            moveAllFilesInDirectory(tempDirectory, installationDirectory + "/" + driver.getId());
-        }
+    void installDriver(Driver driver, Path extractLocation) throws MojoExecutionException {
+        new DriverInstaller(installationDirectory, getLog()).install(driver, extractLocation);
     }
 
     void cleanup() throws MojoExecutionException {
