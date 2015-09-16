@@ -171,6 +171,8 @@ public class InstallDriversMojo extends AbstractMojo {
             } else {
                 getLog().info("Installing drivers from configuration");
             }
+
+
             for (Driver _driver : drivers) {
                 Driver driver = repository.getDriver(_driver);
                 if (driver == null) {
@@ -194,6 +196,10 @@ public class InstallDriversMojo extends AbstractMojo {
                 }
             }
         }
+    }
+
+    private Path extractDriver(Driver driver, Path downloadLocation) throws MojoExecutionException {
+         return new DriverExtractor(tempDirectory, getLog()).extractDriver(driver,downloadLocation);
     }
 
     private static String createTempPath() {
@@ -221,81 +227,6 @@ public class InstallDriversMojo extends AbstractMojo {
         return downloadFile(driver, tempDirectory, getLog(), proxyFromSettings);
     }
 
-    private void extractDriver(Driver driver, Path path) throws MojoExecutionException {
-
-        String filename = path.toString();
-        String filextension = FilenameUtils.getExtension(filename);
-
-        String extractedFilename = FilenameUtils.getName(path.toString()).replaceFirst("\\."+ filextension+"$","");
-        Path extractPath = Paths.get(path.getParent().toString(), extractedFilename);
-
-        getLog().debug("handling type:" + filextension + "(" + filename + ")");
-
-        try {
-            switch (filextension) {
-                case "bz2":
-                    try (FileInputStream fin = new FileInputStream(path.toFile())) {
-                        try (BufferedInputStream bin = new BufferedInputStream(fin)) {
-                            try (BZip2CompressorInputStream input = new BZip2CompressorInputStream(bin)) {
-                                FileUtils.copyInputStreamToFile(input, extractPath.toFile());
-                                extractDriver(driver, extractPath);
-                            }
-                        }
-                    }
-                    break;
-                case "tar":
-                case "zip":
-                    try (FileInputStream fin = new FileInputStream(path.toFile())) {
-                        try (BufferedInputStream bin = new BufferedInputStream(fin)) {
-                            try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
-
-                                Path extractToDirectory = Paths.get(tempDirectory, driver.getId());
-                                if (extractToDirectory.toFile().exists()) {
-                                    FileUtils.deleteDirectory(extractToDirectory.toFile());
-                                }
-                                extractToDirectory.toFile().mkdirs();
-
-                                ArchiveEntry entry;
-                                while ((entry = aiStream.getNextEntry()) != null) {
-                                    String name = entry.getName();
-                                    if (entry.isDirectory()) {
-                                        File directory = new File(extractToDirectory.toFile(), name);
-                                        if (!directory.mkdirs()) {
-                                            throw new MojoExecutionException("failed to create " + directory);
-                                        }
-                                    } else {
-                                        File file = null;
-                                        if (entry instanceof TarArchiveEntry) {
-                                            TarArchiveEntry archiveEntry = (TarArchiveEntry) entry;
-                                            if (archiveEntry.isFile()) {
-                                                file = new File(extractToDirectory.toFile(), name);
-                                            }
-                                        } else if (entry instanceof ZipArchiveEntry) {
-                                            ZipArchiveEntry archiveEntry = (ZipArchiveEntry) entry;
-                                            if (!archiveEntry.isUnixSymlink()) {
-                                                file = new File(extractToDirectory.toFile(), name);
-                                            }
-                                        }
-
-                                        if (file != null) {
-                                            try (OutputStream out = new FileOutputStream(file)) {
-                                                IOUtils.copy(aiStream, out);
-                                            }
-                                        }
-                                    }
-                                }
-                            } catch (ArchiveException e) {
-                                throw new MojoExecutionException(e.getMessage(), e);
-                            }
-                        }
-                    }
-                    break;
-                default:
-                    throw new MojoExecutionException("unhandled type:" + filextension);}
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(),e);
-        }
-    }
 
     void verifyChecksum(Driver driver) throws MojoExecutionException {
         getLog().info("  Verifying checksum");
