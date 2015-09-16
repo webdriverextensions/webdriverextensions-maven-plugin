@@ -32,7 +32,11 @@ class DriverVersionHandler {
 
     public boolean isSameVersion(Driver driver) throws MojoExecutionException {
         try {
-            String savedVersion = org.apache.commons.io.FileUtils.readFileToString(getVersionFile(driver));
+            File versionFile = getVersionFile(driver);
+            if (!versionFile.exists()) {
+                return false;
+            }
+            String savedVersion = org.apache.commons.io.FileUtils.readFileToString(versionFile);
             String currentVersion = createVersionString(driver);
             return savedVersion.equals(currentVersion);
         } catch (IOException e) {
