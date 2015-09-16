@@ -1,23 +1,14 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.calculateChecksum;
-import static com.github.webdriverextensions.Utils.deleteDirectory;
-import static com.github.webdriverextensions.Utils.deleteFile;
-import static com.github.webdriverextensions.Utils.directoryContainsSingleDirectory;
-import static com.github.webdriverextensions.Utils.directoryContainsSingleFile;
-import static com.github.webdriverextensions.Utils.downloadFile;
 import static com.github.webdriverextensions.Utils.getProxyFromSettings;
-import static com.github.webdriverextensions.Utils.makeExecutable;
-import static com.github.webdriverextensions.Utils.moveAllFilesInDirectory;
-import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
-import static com.github.webdriverextensions.Utils.moveFileInDirectory;
-import static com.github.webdriverextensions.Utils.quote;
-import static com.github.webdriverextensions.Utils.unzipFile;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -26,7 +17,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
-import static org.codehaus.plexus.util.FileUtils.fileExists;
 
 // TODO: refactor exception messages
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
@@ -70,16 +60,16 @@ public class InstallDriversMojo extends AbstractMojo {
      * If no platform is provided for a driver the platform will automatically
      * be set to the running platform.<br/>
      * <br/>
-     * If no bit version is provided for a driver the bit will automatically 
+     * If no bit version is provided for a driver the bit will automatically
      * be set to 32 if running the plugin on a windows or mac platform. However
-     * if running the plugin from a linux platform the bit will be determined 
+     * if running the plugin from a linux platform the bit will be determined
      * from the OS bit version.<br/>
      * <br/>
      * If the driver is not available in the repository the plugin does not know
      * from which URL to download the driver. In that case the URL should be
      * provided for the driver together with a checksum (to retrieve the
      * checksum run the plugin without providing a checksum once, the plugin
-     * will then calculate and print the checksum for you). The default 
+     * will then calculate and print the checksum for you). The default
      * repository with all available drivers can be found <a href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository.json">here</a>.<br/>
      * <br/>
      * <strong>Some Examples</strong><br/>
@@ -119,7 +109,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * &lt;/drivers&gt;
      * </pre>
      * <br/>
-     *
+     * <p/>
      * Installing a driver not available in the repository, e.g. PhantomJS<br/>
      * <pre>
      * &lt;driver&gt;
@@ -133,49 +123,46 @@ public class InstallDriversMojo extends AbstractMojo {
      * </pre>
      */
     @Parameter
-    List<Driver> drivers = new ArrayList<Driver>();
+    List<Driver> drivers = new ArrayList<>();
     /**
      * Skips installation of drivers.
      */
     @Parameter(defaultValue = "false")
     boolean skip;
 
-    String tempDirectory;
-    Repository repository;
+    /**
+     * keep downloaded files as local cache
+     */
+    @Parameter(defaultValue = "false")
+    boolean keepDownloadedWebdrivers;
+
+    private String tempDirectory = createTempPath();
 
     public void execute() throws MojoExecutionException {
-
-        tempDirectory = project.getBuild().getDirectory() + "/temp/com/github/webdriverextensions";
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
-            repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
-            getLog().info("Installation directory " + quote(installationDirectory));
+            Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
+            getLog().info("Installation directory " + Utils.quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
                 drivers = repository.getLatestDrivers();
             } else {
                 getLog().info("Installing drivers from configuration");
             }
-            for (Driver driver : drivers) {
-                driver = repository.getDriver(driver);
-                if (driver == null) {
-                    continue;
-                }
+
+            DriverDownloader driverDownloader = new DriverDownloader(settings, proxyId, getLog());
+            DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, getLog());
+            DriverInstaller driverInstaller = new DriverInstaller(installationDirectory, getLog());
+
+            for (Driver _driver : drivers) {
+                Driver driver = repository.enrichDriver(_driver);
                 getLog().info(driver.getId() + " version " + driver.getVersion());
-                if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
-                    cleanup();
-                    downloadDriver(driver);
-                    if (downloadedDriverIsZipped(driver)) {
-                        unzipDriver(driver);
-                    }
-                    if (StringUtils.isBlank(driver.getChecksum())) {
-                        printChecksumMissingWarning(driver);
-                    } else {
-                        verifyChecksum(driver);
-                        installDriver(driver);
-                    }
+                if (driverInstaller.needInstallation(driver)) {
+                    Path downloadLocation = driverDownloader.downloadFile(driver, tempDirectory);
+                    Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
+                    driverInstaller.install(driver, extractLocation);
                     cleanup();
                 } else {
                     getLog().info("  Already installed");
@@ -184,59 +171,22 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    boolean driverIsNotInstalled(Driver driver) throws MojoExecutionException {
-        return !fileExists(installationDirectory + "/" + driver.getFileName());
+    private static String createTempPath() {
+        String systemTemporaryDestination = System.getProperty("java.io.tmpdir");
+        String folderIdentifier = InstallDriversMojo.class.getSimpleName();
+        return Paths.get(systemTemporaryDestination, folderIdentifier).toString();
     }
 
-    boolean driverVersionIsNew(Driver driver) throws MojoExecutionException {
-        String checksum = calculateChecksum(installationDirectory + "/" + driver.getFileName());
-        return !checksum.equals(driver.getChecksum());
-    }
-
-    void printChecksumMissingWarning(Driver driver) throws MojoExecutionException {
-        String checksum = calculateChecksum(tempDirectory);
-        getLog().warn("Skipped " + driver.getId() + " version " + driver.getVersion() + ", please set checksum to " + checksum + " to install the driver");
-    }
-
-    void downloadDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Downloading");
-        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getUrlFileName(), getLog(), getProxyFromSettings(settings, proxyId));
-    }
-
-    boolean downloadedDriverIsZipped(Driver driver) {
-        return driver.getUrl().toLowerCase().endsWith(".zip");
-    }
-
-    void unzipDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Unzipping");
-        unzipFile(tempDirectory + "/" + driver.getUrlFileName(), tempDirectory);
-        deleteFile(tempDirectory + "/" + driver.getUrlFileName());
-    }
-
-    void verifyChecksum(Driver driver) throws MojoExecutionException {
-        getLog().info("  Verifying checksum");
-        String checksum = calculateChecksum(tempDirectory);
-        if (!checksum.equals(driver.getChecksum())) {
-            throw new MojoExecutionException("Error checksum is " + quote(checksum) + " for downloaded driver, when it should be "
-                    + quote(driver.getChecksum()));
-        }
-    }
-
-    void installDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Installing");
-        if (directoryContainsSingleDirectory(tempDirectory)) {
-            moveDirectoryInDirectory(tempDirectory, installationDirectory + "/" + driver.getId());
-        } else if (directoryContainsSingleFile(tempDirectory)) {
-            moveFileInDirectory(tempDirectory, installationDirectory + "/" + driver.getFileName());
-            makeExecutable(installationDirectory + "/" + driver.getFileName());
+    private void cleanup() throws MojoExecutionException {
+        if (keepDownloadedWebdrivers) {
+            getLog().debug("skip cleanup, keep downloaded webdrivers");
         } else {
-            moveAllFilesInDirectory(tempDirectory, installationDirectory + "/" + driver.getId());
+            getLog().debug("Cleaning up temp directory: " + tempDirectory);
+            try {
+                FileUtils.deleteDirectory(new File(tempDirectory));
+            } catch (IOException ex) {
+                throw new MojoExecutionException("Error when deleting directory " + Utils.quote(tempDirectory), ex);
+            }
         }
     }
-
-    void cleanup() throws MojoExecutionException {
-//        getLog().info("  Cleaning up");
-        deleteDirectory(tempDirectory);
-    }
-
 }

@@ -1,6 +1,8 @@
 package com.github.webdriverextensions;
 
 import com.google.gson.Gson;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Driver {
 
@@ -9,7 +11,7 @@ public class Driver {
     private String bit;
     private String version;
     private String url;
-    private String checksum;
+    private String fileMatchInside;
 
     public String getId() {
         return name
@@ -44,10 +46,6 @@ public class Driver {
     public String getVersion() {
         return version;
     }
-    //
-    //        public void setVersion(ComparableVersion version) {
-    //            this.version = version;
-    //        }
 
     public void setVersion(String version) {
         this.version = version;
@@ -65,14 +63,6 @@ public class Driver {
         this.url = url;
     }
 
-    public String getChecksum() {
-        return checksum;
-    }
-
-    public void setChecksum(String checksum) {
-        this.checksum = checksum;
-    }
-
     public String getFileName() {
         if ("windows".equalsIgnoreCase(platform)) {
             return getId() + ".exe";
@@ -81,18 +71,21 @@ public class Driver {
         }
     }
 
-    public String getUrlFileName() {
-        if ("windows".equalsIgnoreCase(platform)) {
-            return getId() + ".exe";
-        } else {
-            return getId();
+    public String getFilenameFromUrl(){
+        try {
+            String file = new URL(url).getFile();
+            return name + "_"+ version + "_" + file.replaceAll("\\/", "_");
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(e);
         }
+    }
+
+    public String getFileMatchInside() {
+        return fileMatchInside;
     }
 
     @Override
     public String toString() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
+        return new Gson().toJson(this);
     }
-
 }
