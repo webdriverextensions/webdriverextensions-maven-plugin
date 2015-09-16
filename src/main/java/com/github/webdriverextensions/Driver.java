@@ -1,6 +1,8 @@
 package com.github.webdriverextensions;
 
 import com.google.gson.Gson;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Driver {
 
@@ -71,6 +73,14 @@ public class Driver {
             return getId() + ".exe";
         } else {
             return getId();
+        }
+    }
+
+    public String getFilenameFromUrl(){
+        try {
+            return new URL(url).getFile();
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(e);
         }
     }
 

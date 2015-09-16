@@ -13,6 +13,7 @@ import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -119,44 +121,43 @@ public class Utils {
         }
     }
 
-    public static void downloadFile(String url, String file, Log log, Proxy proxySettings) throws MojoExecutionException {
-        File fileToDownload = new File(file);
-
-        for (int n = 0; n < FILE_DOWNLOAD_RETRY_ATTEMPTS; n++) {
-            try {
-                SocketConfig socketConfig = SocketConfig.custom().setSoTimeout(FILE_DOWNLOAD_READ_TIMEOUT).build();
-                RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(FILE_DOWNLOAD_CONNECT_TIMEOUT).build();
-                HttpClientBuilder httpClientBuilder = HttpClients.custom();
-                httpClientBuilder
-                        .setDefaultSocketConfig(socketConfig)
-                        .setDefaultRequestConfig(requestConfig)
-                        .disableContentCompression();
-                HttpHost proxy = createProxyFromSettings(proxySettings);
-                if (proxy != null) {
-                    httpClientBuilder.setProxy(proxy);
-                    CredentialsProvider proxyCredentials = createProxyCredentialsFromSettings(proxySettings);
-                    if (proxyCredentials != null) {
-                        httpClientBuilder.setDefaultCredentialsProvider(proxyCredentials);
-                    }
+    public static void downloadFile(String url, Path downloadLocation, Log log, Proxy proxySettings) throws MojoExecutionException {
+        log.info("  Downloading " + url + " -> " + downloadLocation);
+        File fileToDownload = downloadLocation.toFile();
+        if (fileToDownload.exists()) {
+            log.info("file " + downloadLocation + " already downloaded");
+        } else {
+            HttpClientBuilder httpClientBuilder = prepareHttpClientBuilderWithTimeoutsAndProxySettings(proxySettings);
+            httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(FILE_DOWNLOAD_RETRY_ATTEMPTS, true));
+            try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
+                try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
+                    HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
+                    copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
                 }
-                try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
-                    try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
-                        HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
-                        copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
-                    }
-                }
-                return;
             } catch (IOException ex) {
                 log.info("Problem downloading file from " + url + " cause of " + ex.getCause());
-                if (n + 1 < FILE_DOWNLOAD_RETRY_ATTEMPTS) {
-                    log.info("Retrying download...");
-                } else {
-                    throw new MojoExecutionException("Failed to download file", ex);
-                }
+                throw new MojoExecutionException("Failed to download file", ex);
             }
         }
+    }
 
-        throw new MojoExecutionException("Failed to download file");
+    private static HttpClientBuilder prepareHttpClientBuilderWithTimeoutsAndProxySettings(Proxy proxySettings) throws MojoExecutionException {
+        SocketConfig socketConfig = SocketConfig.custom().setSoTimeout(FILE_DOWNLOAD_READ_TIMEOUT).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(FILE_DOWNLOAD_CONNECT_TIMEOUT).build();
+        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+        httpClientBuilder
+                .setDefaultSocketConfig(socketConfig)
+                .setDefaultRequestConfig(requestConfig)
+                .disableContentCompression();
+        HttpHost proxy = createProxyFromSettings(proxySettings);
+        if (proxy != null) {
+            httpClientBuilder.setProxy(proxy);
+            CredentialsProvider proxyCredentials = createProxyCredentialsFromSettings(proxySettings);
+            if (proxyCredentials != null) {
+                httpClientBuilder.setDefaultCredentialsProvider(proxyCredentials);
+            }
+        }
+        return httpClientBuilder;
     }
 
     public static List<Driver> sortDrivers(List<Driver> drivers) {

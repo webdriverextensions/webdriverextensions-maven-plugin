@@ -40,6 +40,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
 import static org.codehaus.plexus.util.FileUtils.fileExists;
 
@@ -217,8 +218,8 @@ public class InstallDriversMojo extends AbstractMojo {
     }
 
     void downloadDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Downloading " + driver.getUrl() + " -> " + tempDirectory + "/" + driver.getId());
-        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getId(), getLog(), getProxyFromSettings(settings, proxyId));
+        Proxy proxyFromSettings = getProxyFromSettings(settings, proxyId);
+        downloadFile(driver.getUrl(), Paths.get(tempDirectory,driver.getFilenameFromUrl()), getLog(), proxyFromSettings);
     }
 
     private void extractDriver(Driver driver) throws MojoExecutionException {
