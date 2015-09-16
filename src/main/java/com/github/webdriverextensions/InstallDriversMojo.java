@@ -1,38 +1,14 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.calculateChecksum;
-import static com.github.webdriverextensions.Utils.directoryContainsSingleDirectory;
-import static com.github.webdriverextensions.Utils.directoryContainsSingleFile;
-import static com.github.webdriverextensions.Utils.downloadFile;
 import static com.github.webdriverextensions.Utils.getProxyFromSettings;
-import static com.github.webdriverextensions.Utils.makeExecutable;
-import static com.github.webdriverextensions.Utils.moveAllFilesInDirectory;
-import static com.github.webdriverextensions.Utils.moveDirectoryInDirectory;
-import static com.github.webdriverextensions.Utils.moveFileInDirectory;
-import static com.github.webdriverextensions.Utils.quote;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
-import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
-import org.apache.commons.compress.archivers.ArchiveException;
-import org.apache.commons.compress.archivers.ArchiveStreamFactory;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
@@ -41,7 +17,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
-import static org.codehaus.plexus.util.FileUtils.fileExists;
 
 // TODO: refactor exception messages
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
@@ -134,7 +109,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * &lt;/drivers&gt;
      * </pre>
      * <br/>
-     *
+     * <p/>
      * Installing a driver not available in the repository, e.g. PhantomJS<br/>
      * <pre>
      * &lt;driver&gt;
@@ -148,48 +123,46 @@ public class InstallDriversMojo extends AbstractMojo {
      * </pre>
      */
     @Parameter
-    List<Driver> drivers = new ArrayList<Driver>();
+    List<Driver> drivers = new ArrayList<>();
     /**
      * Skips installation of drivers.
      */
     @Parameter(defaultValue = "false")
     boolean skip;
 
-    String tempDirectory;
-    Repository repository;
+    /**
+     * keep downloaded files as local cache
+     */
+    @Parameter(defaultValue = "false")
+    boolean keepDownloadedWebdrivers;
+
+    private String tempDirectory = createTempPath();
 
     public void execute() throws MojoExecutionException {
-
-        tempDirectory = createTempPath(project);
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
-            repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
-            getLog().info("Installation directory " + quote(installationDirectory));
+            Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
+            getLog().info("Installation directory " + Utils.quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
                 drivers = repository.getLatestDrivers();
             } else {
                 getLog().info("Installing drivers from configuration");
             }
-            for (Driver _driver : drivers) {
-                Driver driver = repository.getDriver(_driver);
-                if (driver == null) {
-                    throw new MojoExecutionException("could not found driver: " + _driver);
-                }
-                getLog().info(driver.getId() + " version " + driver.getVersion());
-                if (driverIsNotInstalled(driver) || driverVersionIsNew(driver)) {
-                    cleanup();
-                    downloadDriver(driver);
-                    extractDriver(driver);
 
-                    if (StringUtils.isBlank(driver.getChecksum())) {
-                        printChecksumMissingWarning(driver);
-                    } else {
-                        verifyChecksum(driver);
-                        installDriver(driver);
-                    }
+            DriverDownloader driverDownloader = new DriverDownloader(settings, proxyId, getLog());
+            DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, getLog());
+            DriverInstaller driverInstaller = new DriverInstaller(installationDirectory, getLog());
+
+            for (Driver _driver : drivers) {
+                Driver driver = repository.enrichDriver(_driver);
+                getLog().info(driver.getId() + " version " + driver.getVersion());
+                if (driverInstaller.needInstallation(driver)) {
+                    Path downloadLocation = driverDownloader.downloadFile(driver, tempDirectory);
+                    Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
+                    driverInstaller.install(driver, extractLocation);
                     cleanup();
                 } else {
                     getLog().info("  Already installed");
@@ -198,143 +171,22 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    private static String createTempPath(MavenProject project) {
-        String workingDirectory = new File(System.getProperty("user.dir")).toString()                ;
-        String tempDirectory = project.getBuild().getDirectory() + "/temp";
-        return tempDirectory.replaceFirst(workingDirectory +"/","");
+    private static String createTempPath() {
+        String systemTemporaryDestination = System.getProperty("java.io.tmpdir");
+        String folderIdentifier = InstallDriversMojo.class.getSimpleName();
+        return Paths.get(systemTemporaryDestination, folderIdentifier).toString();
     }
 
-    boolean driverIsNotInstalled(Driver driver) throws MojoExecutionException {
-        return !fileExists(installationDirectory + "/" + driver.getFileName());
-    }
-
-    boolean driverVersionIsNew(Driver driver) throws MojoExecutionException {
-        String checksum = calculateChecksum(installationDirectory + "/" + driver.getFileName());
-        return !checksum.equals(driver.getChecksum());
-    }
-
-    void printChecksumMissingWarning(Driver driver) throws MojoExecutionException {
-        String checksum = calculateChecksum(tempDirectory);
-        getLog().warn("Skipped " + driver.getId() + " version " + driver.getVersion() + ", please set checksum to " + checksum + " to install the driver");
-    }
-
-    void downloadDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Downloading " + driver.getUrl() + " -> " + tempDirectory + "/" + driver.getId());
-        downloadFile(driver.getUrl(), tempDirectory + "/" + driver.getId(), getLog(), getProxyFromSettings(settings, proxyId));
-    }
-
-    private void extractDriver(Driver driver) throws MojoExecutionException {
-
-        String downloadFileLocation= tempDirectory + "/" + driver.getId();
-        Path path = Paths.get(downloadFileLocation);
-        String tempLocation = downloadFileLocation + ".temp";
-        File tempFile = new File(tempLocation);
-
-        try {
-            String contentType = Files.probeContentType(path);
-            getLog().debug("handling type:" + contentType);
-            switch (contentType) {
-                case "application/x-bzip":
-                    BZip2CompressorInputStream bZip2CompressorInputStream = new BZip2CompressorInputStream(new BufferedInputStream(new FileInputStream(downloadFileLocation)));
-
-                    FileUtils.copyInputStreamToFile(bZip2CompressorInputStream, tempFile);
-                    if (!tempFile.renameTo(new File(downloadFileLocation))) {
-                        throw new MojoExecutionException("renaming failed, from " + tempLocation + " -> " + downloadFileLocation);
-                    }
-                    extractDriver(driver);
-                    break;
-                case "application/x-tar":
-                    TarArchiveInputStream tarStream = null;
-                    try {
-                        tarStream = (TarArchiveInputStream) new ArchiveStreamFactory().createArchiveInputStream("tar", new BufferedInputStream(new FileInputStream(downloadFileLocation)));
-                        TarArchiveEntry entry;
-
-                        String fileMatchInside = driver.getFileMatchInside();
-                        if ( fileMatchInside == null){
-                            throw new MojoExecutionException("tar needs fileMatchInside-configuration");
-                        }
-
-                        Pattern pattern = Pattern.compile(fileMatchInside);
-
-                        int matchCount = 0;
-                        while ((entry = (TarArchiveEntry) tarStream.getNextEntry()) != null) {
-                            boolean matches = pattern.matcher(entry.getName()).matches();
-
-                            if (matches) {
-                                if (!entry.isFile()) {
-                                    throw new MojoExecutionException("can only handle files");
-                                }
-
-                                matchCount++;
-                                if (matchCount > 1) {
-                                    throw new MojoExecutionException("at least two entries matches, this seems to be wrong");
-                                }
-
-                                getLog().debug("entry " + entry.getName() + " matches '" + fileMatchInside + "'");
-                                IOUtils.copy(tarStream, new BufferedOutputStream(new FileOutputStream(tempFile)));
-                                if (!tempFile.renameTo(new File(downloadFileLocation))) {
-                                    throw new MojoExecutionException("renaming failed, from " + tempLocation + " -> " + downloadFileLocation);
-                                }
-                            }
-                        }
-                    } catch (ArchiveException e) {
-                        throw new MojoExecutionException(e.getMessage(), e);
-                    } finally {
-                        if (tarStream != null) {
-                            tarStream.close();
-                        }
-                    }
-                    break;
-                case "application/x-executable":
-                case "application/x-ms-dos-executable":
-                    getLog().debug("finally extracted");
-                    break;
-                case "application/zip":
-                    getLog().info("  Unzipping " + tempDirectory + "/" + driver.getId());
-                    File file = new File(downloadFileLocation);
-                    try {
-                        ZipFile zipFile = new ZipFile(file);
-                        zipFile.extractAll(tempDirectory);
-                    } catch (ZipException ex) {
-                        throw new MojoExecutionException("Error when extracting zip file " + quote(downloadFileLocation), ex);
-                    }
-                    FileUtils.deleteQuietly(file);
-                    break;
-                default:
-                    throw new MojoExecutionException("unhandled content-type:" + contentType);
-            }
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(),e);
-        }
-    }
-
-    void verifyChecksum(Driver driver) throws MojoExecutionException {
-        getLog().info("  Verifying checksum");
-        String checksum = calculateChecksum(tempDirectory);
-        if (!checksum.equals(driver.getChecksum())) {
-            throw new MojoExecutionException("Error checksum is " + quote(checksum) + " for downloaded driver, when it should be "
-                    + quote(driver.getChecksum()));
-        }
-    }
-
-    void installDriver(Driver driver) throws MojoExecutionException {
-        getLog().info("  Installing");
-        if (directoryContainsSingleDirectory(tempDirectory)) {
-            moveDirectoryInDirectory(tempDirectory, installationDirectory + "/" + driver.getId());
-        } else if (directoryContainsSingleFile(tempDirectory)) {
-            moveFileInDirectory(tempDirectory, installationDirectory + "/" + driver.getFileName());
-            makeExecutable(installationDirectory + "/" + driver.getFileName());
+    private void cleanup() throws MojoExecutionException {
+        if (keepDownloadedWebdrivers) {
+            getLog().debug("skip cleanup, keep downloaded webdrivers");
         } else {
-            moveAllFilesInDirectory(tempDirectory, installationDirectory + "/" + driver.getId());
-        }
-    }
-
-    void cleanup() throws MojoExecutionException {
-        getLog().debug("  Cleaning up temp directory: " + tempDirectory);
-        try {
-            org.codehaus.plexus.util.FileUtils.deleteDirectory(tempDirectory);
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when deleting directory " + quote(tempDirectory), ex);
+            getLog().debug("Cleaning up temp directory: " + tempDirectory);
+            try {
+                FileUtils.deleteDirectory(new File(tempDirectory));
+            } catch (IOException ex) {
+                throw new MojoExecutionException("Error when deleting directory " + Utils.quote(tempDirectory), ex);
+            }
         }
     }
 }

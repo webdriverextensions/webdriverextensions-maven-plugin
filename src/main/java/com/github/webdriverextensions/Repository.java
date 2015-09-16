@@ -6,20 +6,26 @@ import static ch.lambdaj.Lambda.on;
 import static ch.lambdaj.Lambda.select;
 import static ch.lambdaj.Lambda.selectDistinct;
 import static ch.lambdaj.Lambda.selectMax;
-import static com.github.webdriverextensions.Utils.downloadAsString;
+import static ch.lambdaj.Lambda.sort;
+import ch.lambdaj.function.compare.ArgumentComparator;
 import static com.github.webdriverextensions.Utils.is64Bit;
 import static com.github.webdriverextensions.Utils.isLinux;
 import static com.github.webdriverextensions.Utils.isMac;
-import static com.github.webdriverextensions.Utils.quote;
-import static com.github.webdriverextensions.Utils.sortDrivers;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.io.IOUtils;
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.CharEncoding.UTF_8;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
@@ -34,7 +40,7 @@ public class Repository {
         try {
             repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
         } catch (IOException ex) {
-            throw new MojoExecutionException("ERROR: Could not download repository from url " + quote(repositoryUrl), ex);
+            throw new MojoExecutionException("ERROR: Could not download repository from url " + Utils.quote(repositoryUrl), ex);
         }
 
         Repository repository;
@@ -47,6 +53,32 @@ public class Repository {
         repository.drivers = sortDrivers(repository.drivers);
 
         return repository;
+    }
+
+    private static List<Driver> sortDrivers(List<Driver> drivers) {
+        Comparator byId = new ArgumentComparator(on(Driver.class).getId());
+        Comparator byVersion = new ArgumentComparator(on(Driver.class).getVersion());
+        Comparator orderByIdAndVersion = ComparatorUtils.chainedComparator(byId, byVersion);
+
+        return sort(drivers, on(Driver.class), orderByIdAndVersion);
+    }
+
+    private static String downloadAsString(URL url, Proxy proxySettings) throws IOException {
+        URLConnection connection;
+        if (proxySettings != null) {
+            java.net.Proxy proxy = new java.net.Proxy(java.net.Proxy.Type.HTTP,
+                    new InetSocketAddress(proxySettings.getHost(), proxySettings.getPort()));
+            if (proxySettings.getUsername() != null) {
+                ProxyUtils.setProxyAuthenticator(proxySettings);
+            }
+            connection = url.openConnection(proxy);
+        } else {
+            connection = url.openConnection();
+        }
+
+        try (InputStream inputStream = connection.getInputStream()) {
+            return IOUtils.toString(inputStream, UTF_8);
+        }
     }
 
     public List<Driver> getDrivers() {
@@ -70,7 +102,7 @@ public class Repository {
         return drivers;
     }
 
-    public Driver getDriver(Driver driver) throws MojoExecutionException {
+    public Driver enrichDriver(Driver driver) throws MojoExecutionException {
         if (isBlank(driver.getName())) {
             throw new MojoExecutionException("Driver name must be set, driver = " + driver.toString());
         }
@@ -103,7 +135,7 @@ public class Repository {
         try {
             return getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).get(0);
         } catch (IndexOutOfBoundsException ex) {
-            return null;
+                throw new MojoExecutionException("could not found driver: " + driver);
         }
     }
 

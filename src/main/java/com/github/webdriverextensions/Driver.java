@@ -1,6 +1,8 @@
 package com.github.webdriverextensions;
 
 import com.google.gson.Gson;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class Driver {
 
@@ -9,7 +11,6 @@ public class Driver {
     private String bit;
     private String version;
     private String url;
-    private String checksum;
     private String fileMatchInside;
 
     public String getId() {
@@ -62,15 +63,20 @@ public class Driver {
         this.url = url;
     }
 
-    public String getChecksum() {
-        return checksum;
-    }
-
     public String getFileName() {
         if ("windows".equalsIgnoreCase(platform)) {
             return getId() + ".exe";
         } else {
             return getId();
+        }
+    }
+
+    public String getFilenameFromUrl(){
+        try {
+            String file = new URL(url).getFile();
+            return name + "_"+ version + "_" + file.replaceAll("\\/", "_");
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(e);
         }
     }
 

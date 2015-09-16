@@ -20,8 +20,6 @@ public class RepositoryTest {
         assertThat(driver.getBit(), is("32"));
         assertThat(driver.getComparableVersion(), is(new ComparableVersion("2.9")));
         assertThat(driver.getUrl(), is("http://chromedriver.storage.googleapis.com/2.9/chromedriver_linux32.zip"));
-        assertThat(driver.getChecksum(), is("1047354165f02aec8ac05f0b0316fe57"));
-
     }
 
 }
