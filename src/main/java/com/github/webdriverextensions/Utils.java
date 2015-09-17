@@ -1,10 +1,15 @@
 package com.github.webdriverextensions;
 
-import java.io.File;
-import java.net.URL;
 import org.openqa.selenium.Platform;
 
+import java.io.File;
+import java.net.URL;
+
 public class Utils {
+
+    public static final String FAKED_OS_NAME_PROPERTY_KEY = "webdriverextensions.faked.os.name";
+    public static final String FAKED_BIT_PROPERTY_KEY = "webdriverextensions.faked.bit";
+
     public static String quote(String text) {
         return "\"" + text + "\"";
     }
@@ -18,18 +23,35 @@ public class Utils {
     }
 
     public static boolean isWindows() {
-        return Platform.WINDOWS.is(Platform.getCurrent());
+        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {
+            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals("windows");
+        }
+        return Platform.getCurrent().is(Platform.WINDOWS);
     }
 
     public static boolean isMac() {
-        return Platform.MAC.is(Platform.getCurrent());
+        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {
+            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals("mac");
+        }
+        return Platform.getCurrent().is(Platform.MAC);
     }
 
     public static boolean isLinux() {
-        return System.getProperty("os.name").toLowerCase().equals("linux");
+        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {
+            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals("linux");
+        }
+        return Platform.getCurrent().is(Platform.LINUX);
     }
 
     public static boolean is64Bit() {
+        if (System.getProperty(FAKED_BIT_PROPERTY_KEY) != null) {
+            switch (System.getProperty(FAKED_BIT_PROPERTY_KEY)) {
+                case "64":
+                    return true;
+                case "32":
+                    return false;
+            }
+        }
         return com.sun.jna.Platform.is64Bit();
     }
 }

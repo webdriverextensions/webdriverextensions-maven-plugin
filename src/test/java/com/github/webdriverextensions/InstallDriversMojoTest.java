@@ -2,10 +2,7 @@ package com.github.webdriverextensions;
 
 import static com.github.webdriverextensions.TestUtils.assertDriverIsInstalled;
 import static com.github.webdriverextensions.TestUtils.assertDriverIsNotInstalled;
-import static com.github.webdriverextensions.Utils.is64Bit;
-import static com.github.webdriverextensions.Utils.isLinux;
-import static com.github.webdriverextensions.Utils.isMac;
-import static com.github.webdriverextensions.Utils.isWindows;
+
 import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -15,6 +12,9 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
+
+import static com.github.webdriverextensions.TestUtils.fakePlatformToBeLinux;
+import static com.github.webdriverextensions.Utils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstallDriversMojoTest extends AbstractMojoTestCase {
@@ -112,7 +112,7 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        System.setProperty("os.name","Linux");
+        fakePlatformToBeLinux();
 
         // When
         mojo.execute();
