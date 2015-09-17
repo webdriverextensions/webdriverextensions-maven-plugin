@@ -26,7 +26,7 @@ public class Utils {
     }
 
     public static boolean isLinux() {
-        return Platform.LINUX.is(Platform.getCurrent());
+        return System.getProperty("os.name").toLowerCase().equals("linux");
     }
 
     public static boolean is64Bit() {

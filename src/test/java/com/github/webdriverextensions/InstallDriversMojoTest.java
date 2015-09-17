@@ -78,6 +78,11 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
+        if ( isLinux()){
+             mojo.getLog().info("skipping test, because there is some special test for this platform");
+            return;
+        }
+
         // When
         mojo.execute();
 
@@ -91,15 +96,7 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
             assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
             assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
         }
-        if (isLinux()) {
-            assertDriverIsInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
-            assertDriverIsInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
-            assertDriverIsInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
-            assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
-            assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-            assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-            assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
-        }
+
         if (isWindows()) {
             assertDriverIsInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
             assertDriverIsInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
@@ -109,6 +106,24 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
             assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
             assertDriverIsNotInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
         }
+    }
+
+    public void test_that_driver_configuration_with_no_platform_downloads_the_drivers_only_for_the_LINUX_platform() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+        System.setProperty("os.name","Linux");
+
+        // When
+        mojo.execute();
+
+        assertDriverIsInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
+        assertDriverIsInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
+        assertDriverIsInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
     }
 
     public void test_random_configuration() throws Exception {
