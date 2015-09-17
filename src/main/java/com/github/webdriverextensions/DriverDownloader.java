@@ -31,7 +31,7 @@ public class DriverDownloader {
 
     public DriverDownloader(Settings settings, String proxyId, Log log) throws MojoExecutionException {
         this.log = log;
-        this.proxySettings = Utils.getProxyFromSettings(settings, proxyId);
+        this.proxySettings = ProxyUtils.getProxyFromSettings(settings, proxyId);
     }
 
     public Path downloadFile(Driver driver, String tempdirectory) throws MojoExecutionException {
