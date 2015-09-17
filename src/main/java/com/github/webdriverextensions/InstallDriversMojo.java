@@ -1,6 +1,6 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.getProxyFromSettings;
+import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
