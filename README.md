@@ -130,7 +130,6 @@ E.g. to install the PhanthomJS driver
     <bit>32</bit>
     <version>1.9.7</version>
     <url>http://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-macosx.zip</url>
-    <checksum>0f4a64db9327d19a387446d43bbf5186</checksum>
 </driver>
 ```
 
