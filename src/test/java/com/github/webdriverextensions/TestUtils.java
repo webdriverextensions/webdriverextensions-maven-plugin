@@ -17,7 +17,7 @@ public class TestUtils {
             if (file.getName().equals(driverFileName)) {
                 foundDriverFile = true;
             }
-            if (file.getName().equals(driverFileName + ".version")) {
+            if (file.getName().equals(driverFileName.replace(".exe", "") + ".version")) {
                 foundDriverVersionFile = true;
             }
         }

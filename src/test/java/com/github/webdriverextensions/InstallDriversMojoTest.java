@@ -40,9 +40,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
 
     public void test_that_no_configuration_downloads_the_latest_driver_for_the_current_platform_when_current_platform_is_LINUX_32_BIT() throws Exception {
@@ -60,9 +60,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         assertDriverIsInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
 
     public void test_that_no_configuration_downloads_the_latest_driver_for_the_current_platform_when_current_platform_is_LINUX_64_BIT() throws Exception {
@@ -80,9 +80,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
 
     public void test_that_no_configuration_downloads_the_latest_driver_for_the_current_platform_when_current_platform_is_WINDOWS() throws Exception {
@@ -95,9 +95,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
@@ -123,9 +123,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform_when_current_platform_is_LINUX() throws Exception {
@@ -141,9 +141,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         assertDriverIsInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
         assertDriverIsInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform_when_current_platform_is_WINDOWS() throws Exception {
@@ -156,9 +156,9 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsInstalled("internetexplorerdriver-windows-32bit", mojo.installationDirectory);
-        assertDriverIsInstalled("internetexplorerdriver-windows-64bit", mojo.installationDirectory);
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
+        assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-mac-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
