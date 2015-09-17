@@ -115,33 +115,33 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
         FileUtils.deleteDirectory(installDriversMojo.installationDirectory);
     }
 
-    public void testConfiguration() throws Exception {
+    public void test_random_configuration() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-pom.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
         installDriversMojo.getLog().info("");
         installDriversMojo.getLog().info("");
-        installDriversMojo.getLog().info("## TEST: testConfiguration");
+        installDriversMojo.getLog().info("## TEST: test_random_configuration");
 
         installDriversMojo.execute();
     }
 
-    public void testConfigurationInstallAllLatestDrivers() throws Exception {
+    public void test_configuration_install_all_latest_drivers() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-install-all-latest-drivers-pom.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
         installDriversMojo.getLog().info("");
         installDriversMojo.getLog().info("");
-        installDriversMojo.getLog().info("## TEST: testConfigurationInstallAllLatestDrivers");
+        installDriversMojo.getLog().info("## TEST: test_configuration_install_all_latest_drivers");
         installDriversMojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         installDriversMojo.execute();
     }
 
-    public void testRaiseErrorWhenDriverWasNotFoundInConfiguration() throws Exception {
+    public void test_raise_error_when_driver_was_not_found_in_configuration() throws Exception {
         MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-pom_not_found_driver.xml");
         InstallDriversMojo installDriversMojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
         installDriversMojo.getLog().info("");
         installDriversMojo.getLog().info("");
-        installDriversMojo.getLog().info("## TEST: testRaiseErrorWhenDriverWasNotFoundInConfiguration");
+        installDriversMojo.getLog().info("## TEST: test_raise_error_when_driver_was_not_found_in_configuration");
         installDriversMojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         try {
@@ -153,12 +153,12 @@ public class InstallDriversMojoTest extends AbstractMojoTestCase {
     }
 
 
-    public void testConfigurationExtractPhantomJSDriverFromTarBz2() throws Exception {
+    public void test_configuration_extract_phantom_j_s_driver_from_tar_bz_() throws Exception {
         File dir = new File("src/test/resources/target_phantomjs-extract-test");
         try {
             MavenProject project = getMavenProject("src/test/resources/test-mojo-configuration-pom_phantomjs-extract.xml");
             InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
-            mojo.getLog().info("## TEST: testConfigurationExtractPhantomJSDriverFromTarBz2");
+            mojo.getLog().info("## TEST: test_configuration_extract_phantom_j_s_driver_from_tar_bz_");
             mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
             mojo.execute();
