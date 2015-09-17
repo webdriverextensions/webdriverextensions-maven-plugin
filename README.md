@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.webdriverextensions/webdriverextensions-maven-plugin.svg)]()
+
 WebDriver Extensions Maven Plugin
 ===================
 
