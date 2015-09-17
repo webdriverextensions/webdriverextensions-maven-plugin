@@ -16,11 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstallDriversMojoTest extends AbstractMojoTestCase {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
     public void test_that_no_configuration_downloads_the_latest_driver_for_the_current_platform() throws Exception {
         // Given
         MavenProject project = getMavenProject("src/test/resources/test-mojo-no-configuration-pom.xml");
