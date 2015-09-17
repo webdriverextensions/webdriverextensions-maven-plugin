@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/webdriverextensions/webdriverextensions-maven-plugin.svg?branch=master)]
+
 WebDriver Extensions Maven Plugin
 ===================
 
