@@ -158,6 +158,9 @@ public class InstallDriversMojo extends AbstractMojo {
 
             for (Driver _driver : drivers) {
                 Driver driver = repository.enrichDriver(_driver);
+                if (driver == null) {
+                    continue;
+                }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverInstaller.needInstallation(driver)) {
                     Path downloadLocation = driverDownloader.downloadFile(driver, tempDirectory);

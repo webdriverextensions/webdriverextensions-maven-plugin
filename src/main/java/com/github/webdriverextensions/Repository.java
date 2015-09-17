@@ -28,6 +28,8 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.CharEncoding.UTF_8;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
+
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.is;
 
@@ -109,6 +111,13 @@ public class Repository {
         if (!isBlank(driver.getUrl())) {
             return driver;
         }
+        if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {
+            // Explicit driver config make sure it exists in repo
+            if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).size() == 0) {
+                throw new MojoExecutionException("Could not find driver: " + driver);
+            }
+        }
+
         if (isBlank(driver.getPlatform())) {
             String platform;
             if (isMac()) {
@@ -132,10 +141,12 @@ public class Repository {
         if (isBlank(driver.getVersion())) {
             driver.setVersion(getLatestDriverVersion(driver.getId()));
         }
+
         try {
             return getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).get(0);
         } catch (IndexOutOfBoundsException ex) {
-                throw new MojoExecutionException("could not found driver: " + driver);
+            // Could not find any driver for the current platform/bit/version in repo
+            return null;
         }
     }
 
