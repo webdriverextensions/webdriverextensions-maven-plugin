@@ -12,6 +12,7 @@ import org.junit.Assert;
 import java.io.File;
 
 import static com.github.webdriverextensions.Utils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase {
 
@@ -67,7 +68,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         return is64Bit() ? "64" : "32";
     }
 
-    public void assertDriverIsInstalled(String driverFileName, File installationDirectory) {
+    public void assertDriverIsInstalled(String driverFileName) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
         for (File file : installationDirectory.listFiles()) {
@@ -86,7 +87,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         }
     }
 
-    public void assertDriverIsNotInstalled(String driverFileName, File installationDirectory) {
+    public void assertDriverIsNotInstalled(String driverFileName) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
         for (File file : installationDirectory.listFiles()) {
@@ -103,6 +104,10 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         if (foundDriverVersionFile) {
             Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been");
         }
+    }
+
+    public void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
+        assertThat(installationDirectory.listFiles()).hasSize(numberOfDrivers * 2);
     }
 
     public void fakePlatformToBeLinux() {
