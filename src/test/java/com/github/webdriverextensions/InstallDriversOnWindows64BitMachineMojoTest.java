@@ -1,7 +1,5 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.TestUtils.*;
-
 public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstallDriverMojoTest {
 
     @Override
@@ -15,7 +13,6 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-configuration-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeWindows();
 
         // When
         mojo.execute();
@@ -34,7 +31,6 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeWindows();
 
         // When
         mojo.execute();
@@ -48,5 +44,4 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
     }
-
 }

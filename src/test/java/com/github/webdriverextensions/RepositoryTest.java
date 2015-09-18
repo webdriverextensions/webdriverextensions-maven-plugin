@@ -1,11 +1,13 @@
 package com.github.webdriverextensions;
 
+import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Test;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.apache.maven.plugin.MojoExecutionException;
+
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import static org.junit.Assert.assertThat;
 
 public class RepositoryTest {
 
@@ -21,5 +23,4 @@ public class RepositoryTest {
         assertThat(driver.getComparableVersion(), is(new ComparableVersion("2.9")));
         assertThat(driver.getUrl(), is("http://chromedriver.storage.googleapis.com/2.9/chromedriver_linux32.zip"));
     }
-
 }

@@ -1,20 +1,5 @@
 package com.github.webdriverextensions;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingRequest;
-
-import java.io.File;
-
-import static com.github.webdriverextensions.TestUtils.*;
-import static com.github.webdriverextensions.Utils.isLinux;
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstallDriverMojoTest {
 
     @Override
@@ -28,7 +13,6 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-configuration-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeWindows();
 
         // When
         mojo.execute();
@@ -47,7 +31,6 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeWindows();
 
         // When
         mojo.execute();
@@ -61,5 +44,4 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         assertDriverIsNotInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
         assertDriverIsNotInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
     }
-
 }

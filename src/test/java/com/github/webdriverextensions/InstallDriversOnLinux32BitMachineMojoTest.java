@@ -1,7 +1,5 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.TestUtils.*;
-
 public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDriverMojoTest {
 
     @Override
@@ -15,8 +13,6 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-configuration-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeLinux();
-        fakeBitToBe32();
 
         // When
         mojo.execute();
@@ -35,11 +31,11 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeLinux();
 
         // When
         mojo.execute();
 
+        // Then
         assertDriverIsInstalled("chromedriver-linux-32bit", mojo.installationDirectory);
         assertDriverIsInstalled("chromedriver-linux-64bit", mojo.installationDirectory);
         assertDriverIsInstalled("phantomjs-linux-32bit", mojo.installationDirectory);
@@ -48,5 +44,4 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
         assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
-
 }

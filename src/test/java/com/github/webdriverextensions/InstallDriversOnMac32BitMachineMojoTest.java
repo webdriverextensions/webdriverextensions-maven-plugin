@@ -1,8 +1,5 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.TestUtils.*;
-import static com.github.webdriverextensions.Utils.isLinux;
-
 public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriverMojoTest {
 
     @Override
@@ -16,7 +13,6 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-configuration-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeMac();
 
         // When
         mojo.execute();
@@ -35,12 +31,6 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-no-platform-pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-        fakePlatformToBeMac();
-
-        if (isLinux()) {
-            mojo.getLog().info("skipping test, because there is some special test for this platform");
-            return;
-        }
 
         // When
         mojo.execute();
@@ -54,5 +44,4 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe", mojo.installationDirectory);
         assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe", mojo.installationDirectory);
     }
-
 }
