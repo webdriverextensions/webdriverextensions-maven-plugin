@@ -48,6 +48,6 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
         // Then
         assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(3);
+        assertNumberOfInstalledDriverIs(2);
     }
 }
