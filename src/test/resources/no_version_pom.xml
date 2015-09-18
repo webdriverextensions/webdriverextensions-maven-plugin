@@ -42,6 +42,11 @@
                             <platform>windows</platform>
                             <bit>64</bit>
                         </driver>
+                        <driver>
+                            <name>phantomjs</name>
+                            <platform>linux</platform>
+                            <bit>32</bit>
+                        </driver>
                     </drivers>
                 </configuration>
             </plugin>

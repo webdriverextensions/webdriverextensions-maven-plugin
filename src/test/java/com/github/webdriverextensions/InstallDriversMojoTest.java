@@ -14,13 +14,6 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         mojo.execute();
     }
 
-    public void test_configuration_install_all_latest_drivers() throws Exception {
-        InstallDriversMojo mojo = getMojo("src/test/resources/install_all_latest_drivers_pom.xml", "install-drivers");
-        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
-
-        mojo.execute();
-    }
-
     public void test_raise_error_when_driver_was_not_found_in_repository() throws Exception {
         InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_found_in_repositoy_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");

@@ -106,7 +106,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
     }
 
     public void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
-        if (installationDirectory.listFiles().length != numberOfDrivers) {
+        if (installationDirectory.listFiles().length != numberOfDrivers * 2) {
             String installedFiles = "";
             for (File file : installationDirectory.listFiles()) {
                 installedFiles += "  " + file.getName() + "\n";
