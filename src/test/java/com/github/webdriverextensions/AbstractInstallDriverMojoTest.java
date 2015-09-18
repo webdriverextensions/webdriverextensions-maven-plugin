@@ -12,7 +12,6 @@ import org.junit.Assert;
 import java.io.File;
 
 import static com.github.webdriverextensions.Utils.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase {
 
@@ -107,7 +106,14 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
     }
 
     public void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
-        assertThat(installationDirectory.listFiles()).hasSize(numberOfDrivers * 2);
+        if (installationDirectory.listFiles().length != numberOfDrivers) {
+            String installedFiles = "";
+            for (File file : installationDirectory.listFiles()) {
+                installedFiles += "  " + file.getName() + "\n";
+            }
+            fail("Number of drivers installed is not " + numberOfDrivers +
+                    "\nFiles in installation folder:\n" + installedFiles);
+        }
     }
 
     public void fakePlatformToBeLinux() {

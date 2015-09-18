@@ -19,12 +19,7 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
-        assertDriverIsNotInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(1);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
@@ -37,12 +32,7 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
-        assertDriverIsNotInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(1);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
@@ -59,7 +49,6 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(5);
     }
 }

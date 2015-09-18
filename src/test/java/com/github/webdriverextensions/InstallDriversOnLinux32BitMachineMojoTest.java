@@ -1,7 +1,5 @@
 package com.github.webdriverextensions;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDriverMojoTest {
 
     @Override
@@ -22,11 +20,7 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         // Then
         assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
-        assertDriverIsNotInstalled("chromedriver-mac-32bit");
-        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(2);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
@@ -41,10 +35,7 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-mac-32bit");
-        assertDriverIsNotInstalled("chromedriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(3);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
@@ -61,7 +52,6 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(2);
     }
 }

@@ -20,11 +20,7 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         // Then
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
-        assertDriverIsNotInstalled("chromedriver-mac-32bit");
-        assertDriverIsNotInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
+        assertNumberOfInstalledDriverIs(2);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
@@ -39,10 +35,7 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-        assertDriverIsNotInstalled("chromedriver-mac-32bit");
-        assertDriverIsNotInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
+        assertNumberOfInstalledDriverIs(3);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
@@ -59,7 +52,6 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsNotInstalled("chromedriver-linux-64bit");
-        assertDriverIsNotInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(5);
     }
 }
