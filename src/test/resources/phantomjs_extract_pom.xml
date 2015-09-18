@@ -12,7 +12,6 @@
                 <artifactId>webdriverextensions-maven-plugin</artifactId>
                 <configuration>
                     <installationDirectory>target_phantomjs-extract-test</installationDirectory>
-                    <!--<skip>true</skip>-->
                     <drivers>
                         <driver>
                             <name>phantomjs</name>

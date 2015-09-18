@@ -11,8 +11,6 @@
                 <groupId>com.github.webdriverextensions</groupId>
                 <artifactId>webdriverextensions-maven-plugin</artifactId>
                 <configuration>
-                    <!--<installationDirectory>${basedir}/drivers</installationDirectory>-->
-                    <!--<skip>true</skip>-->
                     <drivers>
                         <driver>
                             <name>chromedriver</name>

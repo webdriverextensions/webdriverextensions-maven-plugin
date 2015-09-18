@@ -9,20 +9,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
 
     public void test_random_configuration() throws Exception {
-        InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-configuration-pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/random_configuration_pom.xml", "install-drivers");
 
         mojo.execute();
     }
 
     public void test_configuration_install_all_latest_drivers() throws Exception {
-        InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-configuration-install-all-latest-drivers-pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/install_all_latest_drivers_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         mojo.execute();
     }
 
-    public void test_raise_error_when_driver_was_not_found_in_configuration() throws Exception {
-        InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-configuration-pom_not_found_driver.xml", "install-drivers");
+    public void test_raise_error_when_driver_was_not_found_in_repository() throws Exception {
+        InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_found_in_repositoy_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         try {
@@ -34,7 +34,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
     }
 
     public void test_configuration_extract_phantom_j_s_driver_from_tar_bz_() throws Exception {
-        InstallDriversMojo mojo = getMojo("src/test/resources/test-mojo-configuration-pom_phantomjs-extract.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/phantomjs_extract_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         mojo.execute();
