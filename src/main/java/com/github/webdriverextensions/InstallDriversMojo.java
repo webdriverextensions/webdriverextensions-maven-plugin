@@ -33,7 +33,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * json file containing information of available drivers and their
      * locations, checksums, etc.
      */
-    @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository.json")
+    @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0/master/repository.json")
     URL repositoryUrl;
 
     /**
