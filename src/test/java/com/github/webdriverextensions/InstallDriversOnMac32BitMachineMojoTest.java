@@ -51,4 +51,23 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("phantomjs-linux-32bit");
         assertNumberOfInstalledDriverIs(5);
     }
+
+    public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/no_version_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chromedriver-linux-32bit");
+        assertDriverIsInstalled("chromedriver-linux-64bit");
+        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertNumberOfInstalledDriverIs(7);
+    }
 }
