@@ -11,8 +11,7 @@ import org.junit.Assert;
 
 import java.io.File;
 
-import static com.github.webdriverextensions.Utils.FAKED_BIT_PROPERTY_KEY;
-import static com.github.webdriverextensions.Utils.FAKED_OS_NAME_PROPERTY_KEY;
+import static com.github.webdriverextensions.Utils.*;
 
 public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase {
 
@@ -49,7 +48,23 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
     public void logTestName(InstallDriversMojo mojo) {
         mojo.getLog().info("");
         mojo.getLog().info("");
-        mojo.getLog().info("## TEST: " + new Exception().getStackTrace()[2].getMethodName());
+        mojo.getLog().info("## TEST: " + new Exception().getStackTrace()[2].getMethodName() + " on platform "
+                + currentPlatform() + " " + currentBit() + "BIT");
+    }
+
+    private String currentPlatform() {
+        if (isMac()) {
+            return "MAC";
+        } else if (isWindows()) {
+            return "WINDOWS";
+        } else if (isLinux()) {
+            return "LINUX";
+        }
+        throw new IllegalStateException("Fatal error");
+    }
+
+    private String currentBit() {
+        return is64Bit() ? "64" : "32";
     }
 
     public void assertDriverIsInstalled(String driverFileName, File installationDirectory) {
