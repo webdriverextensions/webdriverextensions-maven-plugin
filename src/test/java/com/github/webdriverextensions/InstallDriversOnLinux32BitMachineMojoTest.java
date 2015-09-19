@@ -35,7 +35,8 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertNumberOfInstalledDriverIs(3);
+        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertNumberOfInstalledDriverIs(4);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
