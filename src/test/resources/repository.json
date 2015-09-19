@@ -406,6 +406,22 @@
             "version": "1.9.8",
             "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.8-windows.zip",
             "fileMatchInside": ".*phantomjs.exe$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "mac",
+            "bit": "64",
+            "version": "2.0.0",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.0.0-macosx.zip",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.0.0",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.0.0-windows.zip",
+            "fileMatchInside": ".*phantomjs.exe$"
         }
     ]
 }
