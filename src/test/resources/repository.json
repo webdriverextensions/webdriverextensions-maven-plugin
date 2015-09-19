@@ -345,6 +345,14 @@
         },
         {
             "name": "phantomjs",
+            "platform": "mac",
+            "bit": "64",
+            "version": "1.9.7",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-macosx.zip",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
             "platform": "linux",
             "bit": "64",
             "version": "1.9.7",
