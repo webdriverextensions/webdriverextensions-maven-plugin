@@ -19,7 +19,8 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
 
         // Then
         assertDriverIsInstalled("chromedriver-linux-64bit");
-        assertNumberOfInstalledDriverIs(1);
+        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertNumberOfInstalledDriverIs(2);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
@@ -48,7 +49,8 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
         // Then
         assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(2);
+        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertNumberOfInstalledDriverIs(3);
     }
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
