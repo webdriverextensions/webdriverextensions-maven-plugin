@@ -88,7 +88,7 @@ public class DriverInstaller {
     }
 
     private boolean isInstalled(Driver driver) {
-        Path path = Paths.get(installationDirectory.getPath(), driver.getId());
+        Path path = Paths.get(installationDirectory.getPath(), driver.getFileName());
         return path.toFile().exists();
     }
 

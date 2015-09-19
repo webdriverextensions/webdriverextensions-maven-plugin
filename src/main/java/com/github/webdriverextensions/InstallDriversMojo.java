@@ -131,7 +131,7 @@ public class InstallDriversMojo extends AbstractMojo {
     boolean skip;
 
     /**
-     * keep downloaded files as local cache
+     * Keep downloaded files as local cache
      */
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;

@@ -10,6 +10,10 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 
 import static com.github.webdriverextensions.Utils.*;
 
@@ -65,6 +69,24 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
 
     private static String currentBit() {
         return is64Bit() ? "64" : "32";
+    }
+
+    public FileTime getDriverCreationTime(String driver) {
+        for (File file : installationDirectory.listFiles()) {
+            if (file.getName().equals(driver)) {
+                BasicFileAttributes attr = null;
+                try {
+                    attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                } catch (IOException e) {
+                    fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
+                            + "\n" + filesInInstallationFolderAsString());
+                }
+                return attr.creationTime();
+            }
+        }
+        fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
+                + "\n" + filesInInstallationFolderAsString());
+        return null;
     }
 
     public void assertDriverIsInstalled(String driverFileName) {

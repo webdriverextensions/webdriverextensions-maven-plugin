@@ -3,6 +3,7 @@ package com.github.webdriverextensions;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
+import java.nio.file.attribute.FileTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,7 +46,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("phantomjs-windows-32bit.exe");
+        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
         assertNumberOfInstalledDriverIs(1);
     }
 
@@ -103,5 +104,22 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         // Then
         assertDriverIsInstalled("customdriver-filematchinside-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(1);
+    }
+
+    public void test_that_driver_already_downloaded_is_not_downloaded_again() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/a_driver_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+        mojo.execute();
+        FileTime creationTimeFirstInstallation = getDriverCreationTime("phantomjs-windows-64bit.exe");
+
+        // When
+        mojo.execute();
+
+        // Then
+        FileTime creationTimeAfterSecondInstallation = getDriverCreationTime("phantomjs-windows-64bit.exe");
+        assertTrue("Driver already downloaded was downloaded again the second time the plugin ran",
+                creationTimeFirstInstallation.compareTo(creationTimeAfterSecondInstallation) == 0);
+
     }
 }
