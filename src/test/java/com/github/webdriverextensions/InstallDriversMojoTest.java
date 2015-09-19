@@ -9,21 +9,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
 
     public void test_raise_error_when_driver_was_not_found_in_repository() throws Exception {
-        InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_found_in_repositoy_pom.xml", "install-drivers");
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_in_repositoy_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         try {
+            // When
             mojo.execute();
             fail("should raise an exception");
         } catch (MojoExecutionException e) {
+            // Then
             assertEquals("Could not find driver: {\"name\":\"phantooomjs\",\"platform\":\"linux\",\"bit\":\"32\",\"version\":\"1.9.7\"}", e.getMessage());
         }
     }
 
     public void test_configuration_extract_phantom_j_s_driver_from_tar_bz2() throws Exception {
+        // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/phantomjs_extract_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
+        // When
         mojo.execute();
 
         assertDriverIsInstalled("phantomjs-linux-32bit");
