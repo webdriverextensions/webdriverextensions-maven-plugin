@@ -35,6 +35,17 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         assertNumberOfInstalledDriverIs(1);
     }
 
+    public void test_skip_configuration_does_not_install_configured_drivers() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+        // When
+        mojo.execute();
+
+        assertThat(installationDirectory.listFiles()).isNullOrEmpty();;;
+    }
+
     public void test_configuration_with_custom_driver_not_in_repository() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_pom.xml", "install-drivers");

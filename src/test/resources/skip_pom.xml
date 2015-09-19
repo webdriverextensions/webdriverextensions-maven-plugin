@@ -1,3 +1,4 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -11,11 +12,30 @@
                 <groupId>com.github.webdriverextensions</groupId>
                 <artifactId>webdriverextensions-maven-plugin</artifactId>
                 <configuration>
-                    <installationDirectory>target_phantomjs-extract-test</installationDirectory>
+                    <skip>true</skip>
                     <drivers>
                         <driver>
+                            <name>chromedriver</name>
+                            <bit>32</bit>
+                            <version>2.9.0</version>
+                        </driver>
+                        <driver>
+                            <name>chromedriver</name>
+                            <bit>64</bit>
+                            <version>2.9.0</version>
+                        </driver>
+                        <driver>
+                            <name>internetexplorerdriver</name>
+                            <bit>32</bit>
+                            <version>2.41.0</version>
+                        </driver>
+                        <driver>
+                            <name>internetexplorerdriver</name>
+                            <bit>64</bit>
+                            <version>2.41.0</version>
+                        </driver>
+                        <driver>
                             <name>phantomjs</name>
-                            <platform>linux</platform>
                             <bit>32</bit>
                             <version>1.9.7</version>
                         </driver>
