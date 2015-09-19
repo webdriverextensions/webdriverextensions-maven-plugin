@@ -108,7 +108,7 @@ public class Repository {
         if (isBlank(driver.getName())) {
             throw new MojoExecutionException("Driver name must be set, driver = " + driver.toString());
         }
-        if (!isBlank(driver.getUrl())) {
+        if (isNotBlank(driver.getUrl())) {
             return driver;
         }
         if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {
