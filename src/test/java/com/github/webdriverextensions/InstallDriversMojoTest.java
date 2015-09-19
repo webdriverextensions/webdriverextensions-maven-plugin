@@ -1,5 +1,7 @@
 package com.github.webdriverextensions;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -32,9 +34,37 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
 
         mojo.execute();
 
-        File[] files = installationDirectory.listFiles();
-        assertThat(files).hasSize(2);
-        assertThat(files[0]).isFile();
-        assertThat(files[1]).isFile();
+        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
+    public void test_configuration_with_custon_driver_not_in_repository() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("customdriver-windows-32bit");
+        assertNumberOfInstalledDriverIs(1);
+        File[] installedFiles = installationDirectory.listFiles();
+        assertThat(installedFiles[0]).isDirectory();
+        assertThat(installedFiles[0].listFiles()).hasSize(6);
+        assertThat(installedFiles[1]).isFile();
+    }
+
+    public void test_configuration_with_custon_driver_not_in_repository_with_file_match_inside() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_file_match_inside_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("customdriver-filematchinside-windows-32bit.exe");
+        assertNumberOfInstalledDriverIs(1);
     }
 }

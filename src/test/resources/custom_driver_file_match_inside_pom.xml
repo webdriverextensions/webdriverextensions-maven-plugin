@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>test-install-drivers-mojo</artifactId>
+    <packaging>war</packaging>
+    <version>1.0.1-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.webdriverextensions</groupId>
+                <artifactId>webdriverextensions-maven-plugin</artifactId>
+                <configuration>
+                    <drivers>
+                        <driver>
+                            <name>customdriver-filematchinside</name>
+                            <platform>windows</platform>
+                            <bit>32</bit>
+                            <version>1.9.7</version>
+                            <url>https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-windows.zip</url>
+                            <fileMatchInside>.*/phantomjs.exe$</fileMatchInside>
+                        </driver>
+                    </drivers>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

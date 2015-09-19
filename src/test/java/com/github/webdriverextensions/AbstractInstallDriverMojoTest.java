@@ -79,10 +79,12 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
             }
         }
         if (!foundDriverFile) {
-            Assert.fail("Driver with file name " + driverFileName + " was not found in the installation directory");
+            Assert.fail("Driver with file name " + driverFileName + " was not found in the installation directory"
+                    + "\n" + filesInInstallationFolderAsString());
         }
         if (!foundDriverVersionFile) {
-            Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory");
+            Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
+                    + "\n" + filesInInstallationFolderAsString());
         }
     }
 
@@ -98,22 +100,29 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
             }
         }
         if (foundDriverFile) {
-            Assert.fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been");
+            Assert.fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
+                    + "\n" + filesInInstallationFolderAsString());
         }
         if (foundDriverVersionFile) {
-            Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been");
+            Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
+                    + "\n" + filesInInstallationFolderAsString());
         }
     }
 
     public void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
         if (installationDirectory.listFiles().length != numberOfDrivers * 2) {
-            String installedFiles = "";
-            for (File file : installationDirectory.listFiles()) {
-                installedFiles += "  " + file.getName() + "\n";
-            }
             fail("Number of drivers installed is not " + numberOfDrivers +
-                    "\nFiles in installation folder:\n" + installedFiles);
+                    "\n" + filesInInstallationFolderAsString());
         }
+    }
+
+
+    public String filesInInstallationFolderAsString() {
+        String installedFiles = "";
+        for (File file : installationDirectory.listFiles()) {
+            installedFiles += "  " + file.getName() + "\n";
+        }
+        return "Files in installation folder:\n" + installedFiles;
     }
 
     public void fakePlatformToBeLinux() {
