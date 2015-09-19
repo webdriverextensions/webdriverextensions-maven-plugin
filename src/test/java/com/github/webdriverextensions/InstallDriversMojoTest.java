@@ -122,4 +122,25 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
                 creationTimeFirstInstallation.compareTo(creationTimeAfterSecondInstallation) == 0);
 
     }
+
+    public void test_that_driver_configuration_with_no_version_downloads_latest_drivers_from_remote_repository() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/no_version_pom.xml", "install-drivers");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chromedriver-linux-32bit");
+        assertDriverIsInstalled("chromedriver-linux-64bit");
+        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertDriverIsInstalled("phantomjs-mac-64bit");
+        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(10);
+    }
 }
