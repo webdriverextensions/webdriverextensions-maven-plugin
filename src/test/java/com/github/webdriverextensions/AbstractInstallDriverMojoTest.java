@@ -1,5 +1,6 @@
 package com.github.webdriverextensions;
 
+import org.junit.Assert;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -7,7 +8,6 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
-import org.junit.Assert;
 
 import java.io.File;
 
@@ -52,7 +52,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
                 + currentPlatform() + " " + currentBit() + "BIT");
     }
 
-    private String currentPlatform() {
+    private static String currentPlatform() {
         if (isMac()) {
             return "MAC";
         } else if (isWindows()) {
@@ -63,7 +63,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         throw new IllegalStateException("Fatal error");
     }
 
-    private String currentBit() {
+    private static String currentBit() {
         return is64Bit() ? "64" : "32";
     }
 
@@ -79,11 +79,11 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
             }
         }
         if (!foundDriverFile) {
-            Assert.fail("Driver with file name " + driverFileName + " was not found in the installation directory"
+            fail("Driver with file name " + driverFileName + " was not found in the installation directory"
                     + "\n" + filesInInstallationFolderAsString());
         }
         if (!foundDriverVersionFile) {
-            Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
+            fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
                     + "\n" + filesInInstallationFolderAsString());
         }
     }
@@ -100,11 +100,11 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
             }
         }
         if (foundDriverFile) {
-            Assert.fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
+            fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
                     + "\n" + filesInInstallationFolderAsString());
         }
         if (foundDriverVersionFile) {
-            Assert.fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
+            fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
                     + "\n" + filesInInstallationFolderAsString());
         }
     }
@@ -143,5 +143,10 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
 
     public void fakeBitToBe32() {
         System.setProperty(FAKED_BIT_PROPERTY_KEY, "32");
+    }
+
+
+    public static void fail(String message) {
+        Assert.fail("[" + currentPlatform() + " " + currentBit() + "BIT] " + message);
     }
 }
