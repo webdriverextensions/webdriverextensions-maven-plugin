@@ -4,6 +4,42 @@
             "name": "chromedriver",
             "platform": "linux",
             "bit": "64",
+            "version": "2.19.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.19/chromedriver_linux64.zip"
+        }, {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.19.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.19/chromedriver_mac32.zip"
+        }, {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.19.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.19/chromedriver_win32.zip"
+        }, {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "2.18.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.18/chromedriver_linux64.zip"
+        }, {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.18.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.18/chromedriver_mac32.zip"
+        }, {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.18.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.18/chromedriver_win32.zip"
+        }, {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "64",
             "version": "2.17.0",
             "url": "http://chromedriver.storage.googleapis.com/2.17/chromedriver_linux64.zip"
         }, {
@@ -294,13 +330,30 @@
             "bit": "64",
             "version": "2.41.0",
             "url": "http://selenium-release.storage.googleapis.com/2.41/IEDriverServer_x64_2.41.0.zip"
-        }, {
-           "name": "phantomjs",
-           "platform": "linux",
-           "bit": "32",
-           "version": "1.9.7",
-           "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-i686.tar.bz2",
-           "fileMatchInside" : ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "linux",
+            "bit": "64",
+            "version": "1.9.7",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "linux",
+            "bit": "32",
+            "version": "1.9.7",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-i686.tar.bz2",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "windows",
+            "bit": "64",
+            "version": "1.9.7",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-windows.zip",
+            "fileMatchInside": ".*/phantomjs.exe$"
         }
     ]
 }
