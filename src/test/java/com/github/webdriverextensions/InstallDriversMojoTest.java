@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
 
-    public void test_raise_error_when_driver_was_not_found_in_repository() throws Exception {
+    public void test_that_configuration_with_explicit_driver_that_is_not_available_in_the_repository_fails_with_error_message_could_not_find_driver() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_in_repositoy_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
@@ -23,19 +23,33 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         }
     }
 
-    public void test_configuration_extract_phantom_j_s_driver_from_tar_bz2() throws Exception {
+    public void test_that_driver_compressed_with_tar_bz2_is_supported() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/phantomjs_extract_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/extract_tar_bz2_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
 
         // When
         mojo.execute();
 
+        // Then
         assertDriverIsInstalled("phantomjs-linux-32bit");
         assertNumberOfInstalledDriverIs(1);
     }
 
-    public void test_skip_configuration_does_not_install_configured_drivers() throws Exception {
+    public void test_that_driver_compressed_with_zip_is_supported() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/extract_zip_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("phantomjs-windows-32bit.exe");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
+    public void test_that_skip_configuration_does_not_install_configured_drivers() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
@@ -43,10 +57,25 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         // When
         mojo.execute();
 
+        // Then
         assertThat(installationDirectory.listFiles()).isNullOrEmpty();;;
     }
 
-    public void test_configuration_with_custom_driver_not_in_repository() throws Exception {
+    public void test_that_installation_directory_configuration_installs_driver_into_custom_directory() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/installation_directory_pom.xml", "install-drivers");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertTrue(installationDirectory.toString().endsWith("target_phantomjs-extract-test"));
+        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
+    public void test_that_configuration_with_custom_driver_not_in_repository_works() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
@@ -63,7 +92,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         assertThat(installedFiles[1]).isFile();
     }
 
-    public void test_configuration_with_custom_driver_not_in_repository_with_file_match_inside() throws Exception {
+    public void test_that_configuration_with_custom_driver_not_in_repository_with_file_match_inside_works() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_file_match_inside_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
