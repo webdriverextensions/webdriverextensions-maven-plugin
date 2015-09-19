@@ -63,7 +63,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
         assertThat(installedFiles[1]).isFile();
     }
 
-    public void test_configuration_with_custon_driver_not_in_repository_with_file_match_inside() throws Exception {
+    public void test_configuration_with_custom_driver_not_in_repository_with_file_match_inside() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_file_match_inside_pom.xml", "install-drivers");
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
