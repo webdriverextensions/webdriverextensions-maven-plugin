@@ -15,15 +15,17 @@ The following drivers are currently maintained and available for installation:
 - chromedriver, mac, 32bit
 - chromedriver, linux, 32bit
 - chromedriver, linux, 64bit
+- phantomjs, windows, 64bit
+- phantomjs, mac, 64bit
+- phantomjs, linux, 32bit
+- phantomjs, linux, 64bit
 
-The latest driver versions should be available at least one day after the
-release of the driver. Since the drivers repository is maintained manually
-sometime it may take longer than that. If you want to help to keep the drivers
-updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository).
+I try to update the drivers as soon as I notice they are updated. If you want to help to keep the drivers
+updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0).
 To verify that a version is available for installation check that it exists in the
-[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository.json).
+[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0/blob/master/repository.json).
 
-However drivers can also be installed by providing an URL to the download
+However if the driver is not yet available in the repo it can also be installed by providing an URL to the download
 location, see the [section below](#installing-a-driver-from-an-url) for
 more details on how.
 
@@ -46,7 +48,7 @@ version add the plugin configured to execute the install-drivers goal.
 </plugin>
 ```
 The installed driver's bit version will be 32 bit if you are running the plugin
-from a windows or mac platform. However on lunux platforms the OS bit version
+from a windows or mac platform. However on linux platforms the OS bit version
 will determine the bit version of the installed driver.
 
 Note that the plugin will automatically update the driver if a newer driver
@@ -117,23 +119,35 @@ the version of the driver. For more detailed driver configuration possibilities
 see the [plugin goal documentation](http://webdriverextensions.github.io/webdriverextensions-maven-plugin/install-drivers-mojo.html#drivers).
 
 ### Installing a Driver from an URL
-If the driver is not available amongst the
-[available drivers list](#available-drivers) you can install a driver by
-providing an URL to the download location together with a checksum (to retrieve
-the checksum run the plugin without providing a checksum once, the plugin will
-then calculate and print the checksum for you).
+If the driver is not available in the
+[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0/blob/master/repository.json) you can install the driver by also
+providing an URL to the download location.
 
-E.g. to install the PhanthomJS driver
+E.g. to install an old Chrome Driver for windows
 ```xml
 <driver>
-    <name>phanthomjs</name>
-    <platform>mac</platform>
+    <name>chromedriver</name>
+    <platform>windows</platform>
     <bit>32</bit>
-    <version>1.9.7</version>
-    <url>http://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-macosx.zip</url>
+    <version>2.10</version>
+    <url>http://chromedriver.storage.googleapis.com/2.10/chromedriver_win32.zip</url>
 </driver>
 ```
 
+### Selecting files to extract
+When installing a custom driver you can select what files should be extracted from 
+the downloaded zip/bz2 file. This is done by providing a regex pattern in a tag named
+`<fileMatchInside>`.
+```xml
+<driver>
+    <name>phantomjs</name>
+    <platform>linux</platform>
+    <bit>32</bit>
+    <version>1.9.6</version>
+    <url>https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.6-linux-i686.tar.bz2</url>
+    <fileMatchInside>.*/bin/phantomjs$</fileMatchInside>
+</driver>
+```
 
 ### Changing the Installation Directory
 By default the drivers are installed a directory called `drivers` in the maven
@@ -153,10 +167,36 @@ path through the configuration parameter named `installationDirectory`.
     </executions>
     <configuration>
         <installationDirectory>/Users/andidev/drivers</installationDirectory>
+        <drivers>
+            ... drivers to install
+        </drivers>
     </configuration>
 </plugin>
 ```
 
+### Keeping downloaded data in the cache
+To avoid downloading the drivers more than once if you switch between 
+driver versions or something similar you could set `<keepDownloadedWebdrivers>true</keepDownloadedWebdrivers>` configuration paramter.
+```xml
+<plugin>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>webdriverextensions-maven-plugin</artifactId>
+    <version>1.1.0</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>install-drivers</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <keepDownloadedWebdrivers>true</keepDownloadedWebdrivers>
+        <drivers>
+            ... drivers to install
+        </drivers>
+    </configuration>
+</plugin>
+```
 
 ### Using a proxy
 If you have configured a proxy in the settings.xml file the first encountered active proxy
@@ -180,7 +220,28 @@ in the configuration.
 </plugin>
 ```
 
-
+### Skipping the driver installation 
+To skip the installation you can add `<skip>true</skip>` in the configuration tag.
+```xml
+<plugin>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>webdriverextensions-maven-plugin</artifactId>
+    <version>1.1.0</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>install-drivers</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <skip>true</skip>
+        <drivers>
+            ... drivers to install
+        </drivers>
+    </configuration>
+</plugin>
+```
 
 ### Further Configurations
 For more details on how to further configure this plugin please see the
@@ -189,6 +250,13 @@ For more details on how to further configure this plugin please see the
 
 
 ## Changelog
+
+#### 2.0.0 (2015 September 20)
+- FEATURE Added support for extracting bz2 files (Thanks to [@lkwg82](https://github.com/lkwg82))
+- FEATURE Added support for only extracting specific files with the `fileMatchInside` driver configuration parameter (Thanks to [@lkwg82](https://github.com/lkwg82))
+- FEATURE Added support to cache downloaded drivers with the `keepDownloadedWebdrivers` plugin configuration parameter (Thanks to [@lkwg82](https://github.com/lkwg82))
+- PHANTOMJS Added official support for phantomjs (Thanks to [@lkwg82](https://github.com/lkwg82))
+- JAVA 7 REQUIREMENT Now compiled with java 7
 
 #### 1.1.0 (2015 April 2)
 - FEATURE Added support for using proxy configured in settings.xml
