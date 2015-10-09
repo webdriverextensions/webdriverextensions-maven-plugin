@@ -102,7 +102,7 @@
         <httpclient.version>4.5.1</httpclient.version>
         <junit.version>4.12</junit.version>
         <lambdaj.version>2.3.3</lambdaj.version>
-        <selenium.version>2.47.1</selenium.version>
+        <selenium.version>2.48.1</selenium.version>
 
         <!-- Plugin Versions -->
         <github-site-maven-plugin.version>0.12</github-site-maven-plugin.version>
