@@ -23,10 +23,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 public class DriverExtractor {
-    private final String tempDirectory;
+    private final File tempDirectory;
     private final Log log;
 
-    public DriverExtractor(String tempDirectory, Log log) {
+    public DriverExtractor(File tempDirectory, Log log) {
         this.tempDirectory = tempDirectory;
         this.log = log;
     }
@@ -58,7 +58,7 @@ public class DriverExtractor {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
 
-                                Path extractToDirectory = Paths.get(tempDirectory, driver.getId());
+                                Path extractToDirectory = Paths.get(tempDirectory.getAbsolutePath(), driver.getId());
                                 if (extractToDirectory.toFile().exists()) {
                                     FileUtils.deleteDirectory(extractToDirectory.toFile());
                                 }

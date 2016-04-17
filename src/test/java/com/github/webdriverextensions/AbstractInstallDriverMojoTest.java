@@ -42,7 +42,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, goal);
 
         // some global test preparations
-        tempDirectory = new File(mojo.tempDirectory);
+        tempDirectory = mojo.tempDirectory;
         installationDirectory = mojo.installationDirectory;
 
         // delete download directories before running test

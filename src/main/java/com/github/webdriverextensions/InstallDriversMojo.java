@@ -136,7 +136,7 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
-    String tempDirectory = createTempPath();
+    File tempDirectory = createTempPath();
 
     public void execute() throws MojoExecutionException {
 
@@ -174,21 +174,21 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    private static String createTempPath() {
+    private static File createTempPath() {
         String systemTemporaryDestination = System.getProperty("java.io.tmpdir");
         String folderIdentifier = InstallDriversMojo.class.getSimpleName();
-        return Paths.get(systemTemporaryDestination, folderIdentifier).toString();
+        return new File(Paths.get(systemTemporaryDestination, folderIdentifier).toString());
     }
 
     private void cleanup() throws MojoExecutionException {
         if (keepDownloadedWebdrivers) {
             getLog().debug("Skip cleanup, keep downloaded webdrivers");
         } else {
-            getLog().debug("Cleaning up temp directory: " + tempDirectory);
+            getLog().debug("Cleaning up temp directory: " + tempDirectory.getAbsolutePath());
             try {
-                FileUtils.deleteDirectory(new File(tempDirectory));
+                FileUtils.deleteDirectory(tempDirectory);
             } catch (IOException ex) {
-                throw new MojoExecutionException("Error when deleting directory " + Utils.quote(tempDirectory), ex);
+                throw new MojoExecutionException("Error when deleting temp directory:" + tempDirectory.getAbsolutePath(), ex);
             }
         }
     }
