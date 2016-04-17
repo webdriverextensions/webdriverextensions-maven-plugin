@@ -182,7 +182,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
     private void cleanup() throws MojoExecutionException {
         if (keepDownloadedWebdrivers) {
-            getLog().debug("skip cleanup, keep downloaded webdrivers");
+            getLog().debug("Skip cleanup, keep downloaded webdrivers");
         } else {
             getLog().debug("Cleaning up temp directory: " + tempDirectory);
             try {
