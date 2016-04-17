@@ -118,8 +118,10 @@ public class DriverExtractor {
                     throw new MojoExecutionException("Unsupported file type, file extension: " + filextension + "\ndriver:\n" + driver);
             }
         } catch (MojoExecutionException e) {
+            log.info("Failed to extract driver: " + e.getMessage() + "\ndriver:\n" + driver, e);
             throw e;
         } catch (Exception e) {
+            log.info("Failed to extract driver: " + e.getMessage() + "\ndriver:\n" + driver, e);
             throw new MojoExecutionException("Failed to extract driver: " + e.getMessage() + "\ndriver:\n" + driver, e);
         }
     }
