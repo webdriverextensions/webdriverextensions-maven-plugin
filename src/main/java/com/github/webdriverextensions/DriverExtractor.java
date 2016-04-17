@@ -110,15 +110,17 @@ public class DriverExtractor {
                                 }
                                 return extractToDirectory;
                             } catch (ArchiveException e) {
-                                throw new MojoExecutionException(e.getMessage(), e);
+                                throw new MojoExecutionException(e.getMessage() + "\ndriver:\n" + driver, e);
                             }
                         }
                     }
                 default:
-                    throw new MojoExecutionException("unhandled type:" + filextension);
+                    throw new MojoExecutionException("Unsupported file type, file extension: " + filextension + "\ndriver:\n" + driver);
             }
-        } catch (IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
+        } catch (MojoExecutionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new MojoExecutionException("Failed to extract driver: " + e.getMessage() + "\ndriver:\n" + driver, e);
         }
     }
 }
