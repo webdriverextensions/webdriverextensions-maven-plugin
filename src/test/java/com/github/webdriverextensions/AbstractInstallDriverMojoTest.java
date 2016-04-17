@@ -52,7 +52,8 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
     public void logTestName(InstallDriversMojo mojo) {
         mojo.getLog().info("");
         mojo.getLog().info("");
-        mojo.getLog().info("## TEST: " + new Exception().getStackTrace()[2].getMethodName() + " on platform "
+        StackTraceElement[] stackTrace = new Exception().getStackTrace();
+        mojo.getLog().info("## TEST: " + stackTrace[2].getFileName().replace(".java", "") + "." + stackTrace[2].getMethodName() + " on platform "
                 + currentPlatform() + " " + currentBit() + "BIT");
     }
 
