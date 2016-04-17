@@ -19,15 +19,14 @@ import static com.github.webdriverextensions.Utils.*;
 
 public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase {
 
+    public File tempDirectory;
     public File installationDirectory;
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-
-        if (installationDirectory != null) {
-            FileUtils.deleteDirectory(installationDirectory);
-        }
+        deleteTempDirectory();
+        deleteInstallationDirectory();
     }
 
     public MavenProject getMavenProject(String pomPath) throws Exception {
@@ -43,10 +42,28 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, goal);
 
         // some global test preparations
+        tempDirectory = new File(mojo.tempDirectory);
         installationDirectory = mojo.installationDirectory;
+
+        // delete download directories before running test
+        deleteTempDirectory();
+        deleteInstallationDirectory();
+
         logTestName(mojo);
 
         return mojo;
+    }
+
+    private void deleteTempDirectory() throws IOException {
+        if (tempDirectory != null) {
+            FileUtils.deleteDirectory(tempDirectory);
+        }
+    }
+
+    private void deleteInstallationDirectory() throws IOException {
+        if (installationDirectory != null) {
+            FileUtils.deleteDirectory(installationDirectory);
+        }
     }
 
     public void logTestName(InstallDriversMojo mojo) {

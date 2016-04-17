@@ -136,7 +136,7 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
-    private String tempDirectory = createTempPath();
+    String tempDirectory = createTempPath();
 
     public void execute() throws MojoExecutionException {
 
