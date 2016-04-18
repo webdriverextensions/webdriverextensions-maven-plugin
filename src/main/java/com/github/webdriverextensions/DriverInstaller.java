@@ -96,6 +96,6 @@ public class DriverInstaller {
     }
 
     public boolean needInstallation(Driver driver) throws MojoExecutionException {
-        return ! isInstalled(driver) || !versionHandler.isSameVersion(driver);
+        return !isInstalled(driver) || !versionHandler.isSameVersion(driver);
     }
 }
