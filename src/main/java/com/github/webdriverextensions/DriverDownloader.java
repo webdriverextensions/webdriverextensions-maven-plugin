@@ -34,16 +34,16 @@ public class DriverDownloader {
         this.proxySettings = ProxyUtils.getProxyFromSettings(settings, proxyId);
     }
 
-    public Path downloadFile(Driver driver, File tempDirectory) throws MojoExecutionException {
+    public Path downloadFile(Driver driver, File downloadPath) throws MojoExecutionException {
 
         String url = driver.getUrl();
-        Path downloadLocation = Paths.get(tempDirectory.getPath(), "downloads", driver.getIdWithVersion(), driver.getFilenameFromUrl());
+        Path downloadLocation = Paths.get(downloadPath.getPath(), driver.getFilenameFromUrl());
 
-        log.info("  Downloading " + url + " -> " + downloadLocation);
         File fileToDownload = downloadLocation.toFile();
         if (fileToDownload.exists()) {
-            log.info("file " + downloadLocation + " already downloaded");
+            log.info("  Already downloaded to " + downloadLocation);
         } else {
+            log.info("  Downloading " + url + " -> " + downloadLocation);
             HttpClientBuilder httpClientBuilder = prepareHttpClientBuilderWithTimeoutsAndProxySettings(proxySettings);
             httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(FILE_DOWNLOAD_RETRY_ATTEMPTS, true));
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
@@ -52,7 +52,7 @@ public class DriverDownloader {
                     copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
                 }
             } catch (IOException ex) {
-                log.info("Problem downloading file from " + url + " cause of " + ex.getCause());
+                log.info("  Problem downloading file from " + url + " cause of " + ex.getCause());
                 throw new MojoExecutionException("Failed to download driver" + ex.getMessage() + "\ndriver:\n" + driver, ex);
             }
         }

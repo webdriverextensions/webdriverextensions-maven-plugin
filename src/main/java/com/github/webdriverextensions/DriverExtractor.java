@@ -34,16 +34,15 @@ public class DriverExtractor {
 
         String filextension = FilenameUtils.getExtension(path.getFileName().toString());
 
-        String extractedFilename = FilenameUtils.getBaseName(path.toString());
-
         try {
             switch (filextension) {
                 case "bz2":
                     try (FileInputStream fin = new FileInputStream(path.toFile())) {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (BZip2CompressorInputStream input = new BZip2CompressorInputStream(bin)) {
-                                Path extractedPath = Paths.get(tempDirectory.getAbsolutePath(), "extracted", driver.getIdWithVersion(), extractedFilename);
-                                log.info("  Extracting " + path + " -> " + extractedPath);
+                                String extractedFilename = FilenameUtils.getBaseName(path.toString());
+                                Path extractedPath = Paths.get(tempDirectory.getAbsolutePath(), extractedFilename);
+                                log.info("  Extracting " + path);
                                 FileUtils.copyInputStreamToFile(input, extractedPath.toFile());
                                 return extractDriver(driver, extractedPath);
                             }
@@ -55,8 +54,8 @@ public class DriverExtractor {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
 
-                                Path extractToDirectory = Paths.get(tempDirectory.getPath(), "extracted", driver.getIdWithVersion());
-                                log.info("  Extracting " + path + " -> " + extractToDirectory);
+                                Path extractToDirectory = Paths.get(tempDirectory.getPath());
+                                log.info("  Extracting " + path);
                                 if (extractToDirectory.toFile().exists()) {
                                     FileUtils.deleteDirectory(extractToDirectory.toFile());
                                 }

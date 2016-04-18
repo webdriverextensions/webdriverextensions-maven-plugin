@@ -136,6 +136,7 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
+    File cacheDirectory = createCachePath();
     File tempDirectory = createTempPath();
 
     public void execute() throws MojoExecutionException {
@@ -164,39 +165,37 @@ public class InstallDriversMojo extends AbstractMojo {
                 }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverInstaller.needInstallation(driver)) {
-                    Path downloadLocation = driverDownloader.downloadFile(driver, tempDirectory);
+                    File downloadPath = keepDownloadedWebdrivers ? Paths.get(cacheDirectory.getPath(), driver.getIdWithVersion()).toFile() : tempDirectory;
+                    Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
                     Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
                     driverInstaller.install(driver, extractLocation);
+                    cleanupTempDirectory();
                 } else {
                     getLog().info("  Already installed");
                 }
             }
-            cleanupTempDirectory();
         }
-    }
-
-    private static File createTempPath() {
-        String systemTemporaryDestination = System.getProperty("java.io.tmpdir");
-        String folderIdentifier = InstallDriversMojo.class.getSimpleName();
-        return new File(Paths.get(systemTemporaryDestination, folderIdentifier).toString());
     }
 
     private void cleanupTempDirectory() throws MojoExecutionException {
-        if (keepDownloadedWebdrivers) {
-            Path tempExtractedDirectory = Paths.get(tempDirectory.getPath(), "extraxted");
-            getLog().debug("Cleaning up extracted files in temp directory: " + tempExtractedDirectory);
-            try {
-                FileUtils.deleteDirectory(tempExtractedDirectory.toFile());
-            } catch (IOException ex) {
-                throw new MojoExecutionException("Failed to delete extracted files in temp directory:" + tempExtractedDirectory, ex);
-            }
-        } else {
-            getLog().debug("Cleaning up temp directory: " + tempDirectory);
-            try {
-                FileUtils.deleteDirectory(tempDirectory);
-            } catch (IOException ex) {
-                throw new MojoExecutionException("Failed to delete downloaded and extracted files in temp directory:" + tempDirectory, ex);
-            }
+        try {
+            FileUtils.deleteDirectory(tempDirectory);
+        } catch (IOException ex) {
+            throw new MojoExecutionException("Failed to delete temp directory:" + tempDirectory, ex);
         }
     }
+
+    private static File createCachePath() {
+        return Paths.get(getPluginWorkingDirectory(), "cache").toFile();
+    }
+
+    private static File createTempPath() {
+        return new File(getPluginWorkingDirectory(), "temp");
+    }
+
+    private static String getPluginWorkingDirectory() {
+        String systemTempDirectory = System.getProperty("java.io.tmpdir");
+        return Paths.get(systemTempDirectory, "webdriverextensions-maven-plugin").toString();
+    }
+
 }
