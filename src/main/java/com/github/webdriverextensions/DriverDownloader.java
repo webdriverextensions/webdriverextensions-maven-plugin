@@ -34,10 +34,10 @@ public class DriverDownloader {
         this.proxySettings = ProxyUtils.getProxyFromSettings(settings, proxyId);
     }
 
-    public Path downloadFile(Driver driver, File tempdirectory) throws MojoExecutionException {
+    public Path downloadFile(Driver driver, File tempDirectory) throws MojoExecutionException {
 
         String url = driver.getUrl();
-        Path downloadLocation = Paths.get(tempdirectory.getPath(), driver.getFilenameFromUrl());
+        Path downloadLocation = Paths.get(tempDirectory.getPath(), "downloads", driver.getIdWithVersion(), driver.getFilenameFromUrl());
 
         log.info("  Downloading " + url + " -> " + downloadLocation);
         File fileToDownload = downloadLocation.toFile();

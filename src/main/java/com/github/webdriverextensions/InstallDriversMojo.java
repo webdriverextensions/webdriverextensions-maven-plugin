@@ -156,6 +156,7 @@ public class InstallDriversMojo extends AbstractMojo {
             DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, getLog());
             DriverInstaller driverInstaller = new DriverInstaller(installationDirectory, getLog());
 
+            cleanupTempDirectory();
             for (Driver _driver : drivers) {
                 Driver driver = repository.enrichDriver(_driver);
                 if (driver == null) {
@@ -166,11 +167,11 @@ public class InstallDriversMojo extends AbstractMojo {
                     Path downloadLocation = driverDownloader.downloadFile(driver, tempDirectory);
                     Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
                     driverInstaller.install(driver, extractLocation);
-                    cleanup();
                 } else {
                     getLog().info("  Already installed");
                 }
             }
+            cleanupTempDirectory();
         }
     }
 
@@ -180,15 +181,21 @@ public class InstallDriversMojo extends AbstractMojo {
         return new File(Paths.get(systemTemporaryDestination, folderIdentifier).toString());
     }
 
-    private void cleanup() throws MojoExecutionException {
+    private void cleanupTempDirectory() throws MojoExecutionException {
         if (keepDownloadedWebdrivers) {
-            getLog().debug("Skip cleanup, keep downloaded webdrivers");
+            Path tempExtractedDirectory = Paths.get(tempDirectory.getPath(), "extraxted");
+            getLog().debug("Cleaning up extracted files in temp directory: " + tempExtractedDirectory);
+            try {
+                FileUtils.deleteDirectory(tempExtractedDirectory.toFile());
+            } catch (IOException ex) {
+                throw new MojoExecutionException("Failed to delete extracted files in temp directory:" + tempExtractedDirectory, ex);
+            }
         } else {
             getLog().debug("Cleaning up temp directory: " + tempDirectory);
             try {
                 FileUtils.deleteDirectory(tempDirectory);
             } catch (IOException ex) {
-                throw new MojoExecutionException("Error when deleting temp directory:" + tempDirectory, ex);
+                throw new MojoExecutionException("Failed to delete downloaded and extracted files in temp directory:" + tempDirectory, ex);
             }
         }
     }

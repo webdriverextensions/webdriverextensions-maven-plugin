@@ -19,6 +19,12 @@ public class Driver {
                 + (bit != null ? "-" + bit + "bit" : "");
     }
 
+    public String getIdWithVersion() {
+        return name
+                + (platform != null ? "-" + platform : "")
+                + (bit != null ? "-" + bit + "bit" : "")
+                + (version != null ? "-" + version : "");
+    }
     public String getName() {
         return name;
     }
@@ -74,7 +80,7 @@ public class Driver {
     public String getFilenameFromUrl(){
         try {
             String file = new URL(url).getFile();
-            return name + "_"+ version + "_" + file.replaceAll("\\/", "_");
+            return file.replaceAll(".*\\/", "");
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }

@@ -4,6 +4,7 @@ import org.openqa.selenium.Platform;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
 
 public class Utils {
 
@@ -12,6 +13,10 @@ public class Utils {
 
     public static String quote(String text) {
         return "\"" + text + "\"";
+    }
+
+    public static String quote(Path path) {
+        return quote(path.toString());
     }
 
     public static String quote(File file) {

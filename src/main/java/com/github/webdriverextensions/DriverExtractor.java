@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,13 +32,9 @@ public class DriverExtractor {
 
     public Path extractDriver(Driver driver, Path path) throws MojoExecutionException {
 
-        String filename = path.toString();
-        String filextension = FilenameUtils.getExtension(filename);
+        String filextension = FilenameUtils.getExtension(path.getFileName().toString());
 
-        String extractedFilename = FilenameUtils.getName(path.toString()).replaceFirst("\\." + filextension + "$", "");
-        Path extractPath = Paths.get(path.getParent().toString(), extractedFilename);
-
-        log.debug("handling type:" + filextension + "(" + filename + ")");
+        String extractedFilename = FilenameUtils.getBaseName(path.toString());
 
         try {
             switch (filextension) {
@@ -47,8 +42,10 @@ public class DriverExtractor {
                     try (FileInputStream fin = new FileInputStream(path.toFile())) {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (BZip2CompressorInputStream input = new BZip2CompressorInputStream(bin)) {
-                                FileUtils.copyInputStreamToFile(input, extractPath.toFile());
-                                return extractDriver(driver, extractPath);
+                                Path extractedPath = Paths.get(tempDirectory.getAbsolutePath(), "extracted", driver.getIdWithVersion(), extractedFilename);
+                                log.info("  Extracting " + path + " -> " + extractedPath);
+                                FileUtils.copyInputStreamToFile(input, extractedPath.toFile());
+                                return extractDriver(driver, extractedPath);
                             }
                         }
                     }
@@ -58,7 +55,8 @@ public class DriverExtractor {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
 
-                                Path extractToDirectory = Paths.get(tempDirectory.getPath(), driver.getId());
+                                Path extractToDirectory = Paths.get(tempDirectory.getPath(), "extracted", driver.getIdWithVersion());
+                                log.info("  Extracting " + path + " -> " + extractToDirectory);
                                 if (extractToDirectory.toFile().exists()) {
                                     FileUtils.deleteDirectory(extractToDirectory.toFile());
                                 }
