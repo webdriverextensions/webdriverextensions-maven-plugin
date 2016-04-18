@@ -184,11 +184,11 @@ public class InstallDriversMojo extends AbstractMojo {
         if (keepDownloadedWebdrivers) {
             getLog().debug("Skip cleanup, keep downloaded webdrivers");
         } else {
-            getLog().debug("Cleaning up temp directory: " + tempDirectory.getAbsolutePath());
+            getLog().debug("Cleaning up temp directory: " + tempDirectory);
             try {
                 FileUtils.deleteDirectory(tempDirectory);
             } catch (IOException ex) {
-                throw new MojoExecutionException("Error when deleting temp directory:" + tempDirectory.getAbsolutePath(), ex);
+                throw new MojoExecutionException("Error when deleting temp directory:" + tempDirectory, ex);
             }
         }
     }

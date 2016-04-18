@@ -37,7 +37,7 @@ public class DriverDownloader {
     public Path downloadFile(Driver driver, File tempdirectory) throws MojoExecutionException {
 
         String url = driver.getUrl();
-        Path downloadLocation = Paths.get(tempdirectory.getAbsolutePath(), driver.getFilenameFromUrl());
+        Path downloadLocation = Paths.get(tempdirectory.getPath(), driver.getFilenameFromUrl());
 
         log.info("  Downloading " + url + " -> " + downloadLocation);
         File fileToDownload = downloadLocation.toFile();

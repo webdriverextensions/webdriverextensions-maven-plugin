@@ -58,7 +58,7 @@ public class DriverExtractor {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
 
-                                Path extractToDirectory = Paths.get(tempDirectory.getAbsolutePath(), driver.getId());
+                                Path extractToDirectory = Paths.get(tempDirectory.getPath(), driver.getId());
                                 if (extractToDirectory.toFile().exists()) {
                                     FileUtils.deleteDirectory(extractToDirectory.toFile());
                                 }
