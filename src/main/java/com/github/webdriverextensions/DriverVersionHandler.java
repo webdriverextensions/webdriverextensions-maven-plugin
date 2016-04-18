@@ -2,6 +2,8 @@ package com.github.webdriverextensions;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+
 import org.apache.maven.plugin.MojoExecutionException;
 
 class DriverVersionHandler {
@@ -27,7 +29,7 @@ class DriverVersionHandler {
     }
 
     private File getVersionFile(Driver driver) {
-        return new File(installationDirectory + "/" + driver.getId() + ".version");
+        return Paths.get(installationDirectory.getPath(), driver.getId() + ".version").toFile();
     }
 
     public boolean isSameVersion(Driver driver) throws MojoExecutionException {

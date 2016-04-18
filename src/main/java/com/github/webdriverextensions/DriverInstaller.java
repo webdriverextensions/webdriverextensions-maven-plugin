@@ -74,7 +74,7 @@ public class DriverInstaller {
             moveDirectoryInDirectory(extractLocation, Paths.get(installationDirectory.getPath(), driver.getId()));
         } else if (directoryContainsSingleFile(extractLocation)) {
             moveFileInDirectory(extractLocation, Paths.get(installationDirectory.getPath(), driver.getFileName()));
-            makeExecutable(installationDirectory + "/" + driver.getFileName());
+            makeExecutable(Paths.get(installationDirectory.getPath(), driver.getFileName()));
         } else {
             moveAllFilesInDirectory(extractLocation, Paths.get(installationDirectory.getPath(), driver.getId()));
         }
@@ -83,8 +83,8 @@ public class DriverInstaller {
     }
 
 
-    private static void makeExecutable(String path) {
-        File file = new File(path);
+    private static void makeExecutable(Path path) {
+        File file = path.toFile();
         if (file.exists() && !file.canExecute()) {
             file.setExecutable(true);
         }
