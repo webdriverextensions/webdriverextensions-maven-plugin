@@ -23,49 +23,50 @@ import org.apache.maven.plugin.logging.Log;
 
 public class DriverExtractor {
     private final File tempDirectory;
+    private final boolean keepDownloadedWebdrivers;
     private final Log log;
 
-    public DriverExtractor(File tempDirectory, Log log) {
+    public DriverExtractor(File tempDirectory, boolean keepDownloadedWebdrivers, Log log) {
         this.tempDirectory = tempDirectory;
+        this.keepDownloadedWebdrivers = keepDownloadedWebdrivers;
         this.log = log;
     }
 
-    public Path extractDriver(Driver driver, Path path) throws MojoExecutionException {
+    public Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
 
-        String filextension = FilenameUtils.getExtension(path.getFileName().toString());
-
+        log.info("  Extracting " + fileToExtract);
+        String fileExtension = FilenameUtils.getExtension(fileToExtract.toString());
         try {
-            switch (filextension) {
+            switch (fileExtension) {
                 case "bz2":
-                    try (FileInputStream fin = new FileInputStream(path.toFile())) {
+                    String extractedFilename = FilenameUtils.getBaseName(fileToExtract.toString());
+                    Path extractedFile = Paths.get(tempDirectory.getPath(), extractedFilename);
+                    try (FileInputStream fin = new FileInputStream(fileToExtract.toFile())) {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (BZip2CompressorInputStream input = new BZip2CompressorInputStream(bin)) {
-                                String extractedFilename = FilenameUtils.getBaseName(path.toString());
-                                Path extractedPath = Paths.get(tempDirectory.getAbsolutePath(), extractedFilename);
-                                log.info("  Extracting " + path);
-                                FileUtils.copyInputStreamToFile(input, extractedPath.toFile());
-                                return extractDriver(driver, extractedPath);
+                                FileUtils.copyInputStreamToFile(input, extractedFile.toFile());
                             }
                         }
                     }
+                    if (keepDownloadedWebdrivers && !fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
+                        FileUtils.forceDelete(fileToExtract.toFile());
+                    }
+                    return extractDriver(driver, extractedFile);
                 case "tar":
                 case "zip":
-                    try (FileInputStream fin = new FileInputStream(path.toFile())) {
+                    Path extractToDirectory = Paths.get(tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
+                    if (!extractToDirectory.toFile().mkdirs()) {
+                        throw new MojoExecutionException("Failed create directory " + extractToDirectory + " for extracted files");
+                    }
+
+                    Pattern pattern = null;
+                    if (null != driver.getFileMatchInside()) {
+                        pattern = Pattern.compile(driver.getFileMatchInside());
+                    }
+
+                    try (FileInputStream fin = new FileInputStream(fileToExtract.toFile())) {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
-                            try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(filextension, bin)) {
-
-                                Path extractToDirectory = Paths.get(tempDirectory.getPath());
-                                log.info("  Extracting " + path);
-                                if (extractToDirectory.toFile().exists()) {
-                                    FileUtils.deleteDirectory(extractToDirectory.toFile());
-                                }
-                                extractToDirectory.toFile().mkdirs();
-
-                                Pattern pattern = null;
-                                if (null != driver.getFileMatchInside()) {
-                                    pattern = Pattern.compile(driver.getFileMatchInside());
-                                }
-
+                            try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(fileExtension, bin)) {
                                 ArchiveEntry entry;
                                 while ((entry = aiStream.getNextEntry()) != null) {
                                     String name = entry.getName();
@@ -74,7 +75,7 @@ public class DriverExtractor {
                                     } else if (entry.isDirectory()) {
                                         File directory = new File(extractToDirectory.toFile(), name);
                                         if (!directory.mkdirs()) {
-                                            throw new MojoExecutionException("failed to create " + directory);
+                                            throw new MojoExecutionException("Failed create extracted directory " + directory);
                                         }
                                     } else {
                                         File file = null;
@@ -92,7 +93,7 @@ public class DriverExtractor {
 
                                         if (pattern != null) {
                                             if (pattern.matcher(name).matches()) {
-                                                file = new File(extractToDirectory.toFile(), driver.getId());
+                                                file = new File(extractToDirectory.toFile(), FilenameUtils.getName(name));
                                             } else {
                                                 file = null;
                                             }
@@ -105,14 +106,17 @@ public class DriverExtractor {
                                         }
                                     }
                                 }
+                                if (keepDownloadedWebdrivers && !fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
+                                    FileUtils.forceDelete(fileToExtract.toFile());
+                                }
                                 return extractToDirectory;
                             } catch (ArchiveException e) {
-                                throw new MojoExecutionException(e.getMessage() + "\ndriver:\n" + driver, e);
+                                throw new MojoExecutionException(e.getMessage(), e);
                             }
                         }
                     }
                 default:
-                    throw new MojoExecutionException("Unsupported file type, file extension: " + filextension + "\ndriver:\n" + driver);
+                    throw new MojoExecutionException("Unsupported file type, file extension: " + fileExtension);
             }
         } catch (MojoExecutionException e) {
             log.info("Failed to extract driver: " + e.getMessage() + "\ndriver:\n" + driver, e);
