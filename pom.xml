@@ -99,7 +99,7 @@
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
         <gson.version>2.3.1</gson.version>
-        <httpclient.version>4.5.1</httpclient.version>
+        <httpclient.version>4.5.2</httpclient.version>
         <junit.version>4.12</junit.version>
         <lambdaj.version>2.3.3</lambdaj.version>
         <selenium.version>2.48.1</selenium.version>
