@@ -154,7 +154,7 @@ public class InstallDriversMojo extends AbstractMojo {
             }
 
             DriverDownloader driverDownloader = new DriverDownloader(settings, proxyId, getLog());
-            DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, keepDownloadedWebdrivers, getLog());
+            DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, getLog());
             DriverInstaller driverInstaller = new DriverInstaller(installationDirectory, getLog());
 
             cleanupTempDirectory();

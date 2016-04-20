@@ -23,12 +23,10 @@ import org.apache.maven.plugin.logging.Log;
 
 public class DriverExtractor {
     private final File tempDirectory;
-    private final boolean keepDownloadedWebdrivers;
     private final Log log;
 
-    public DriverExtractor(File tempDirectory, boolean keepDownloadedWebdrivers, Log log) {
+    public DriverExtractor(File tempDirectory, Log log) {
         this.tempDirectory = tempDirectory;
-        this.keepDownloadedWebdrivers = keepDownloadedWebdrivers;
         this.log = log;
     }
 
@@ -48,7 +46,7 @@ public class DriverExtractor {
                             }
                         }
                     }
-                    if (keepDownloadedWebdrivers && !fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
+                    if (!fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
                         FileUtils.forceDelete(fileToExtract.toFile());
                     }
                     return extractDriver(driver, extractedFile);
@@ -106,7 +104,7 @@ public class DriverExtractor {
                                         }
                                     }
                                 }
-                                if (keepDownloadedWebdrivers && !fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
+                                if (!fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
                                     FileUtils.forceDelete(fileToExtract.toFile());
                                 }
                                 return extractToDirectory;
