@@ -20,7 +20,7 @@ class DriverVersionHandler {
         try {
             org.apache.commons.io.FileUtils.writeStringToFile(file, versionString);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to create version file containing metadata about the installed driver" + "\ndriver:\n" + driver, e);
+            throw new MojoExecutionException("Failed to create version file containing metadata about the installed driver" + "\ndriver: " + driver, e);
         }
     }
 
@@ -42,7 +42,7 @@ class DriverVersionHandler {
             String currentVersion = createVersionString(driver);
             return savedVersion.equals(currentVersion);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to compare installed driver version with the driver version to install" + "\ndriver:\n" + driver, e);
+            throw new MojoExecutionException("Failed to compare installed driver version with the driver version to install" + "\ndriver: " + driver, e);
         }
     }
 }

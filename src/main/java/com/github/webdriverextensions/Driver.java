@@ -1,6 +1,7 @@
 package com.github.webdriverextensions;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -92,6 +93,6 @@ public class Driver {
 
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 }
