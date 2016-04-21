@@ -1,10 +1,5 @@
 package com.github.webdriverextensions;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CredentialsProvider;
@@ -20,6 +15,13 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 public class DriverDownloader {
 

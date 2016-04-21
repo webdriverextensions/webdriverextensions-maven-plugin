@@ -1,7 +1,5 @@
 package com.github.webdriverextensions;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -10,6 +8,9 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
+
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 
 public class ProxyUtils {
     public static HttpHost createProxyFromSettings(Proxy proxySettings) throws MojoExecutionException {

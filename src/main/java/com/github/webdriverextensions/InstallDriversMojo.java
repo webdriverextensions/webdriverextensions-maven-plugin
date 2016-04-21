@@ -1,13 +1,5 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -17,6 +9,16 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 
 // TODO: refactor exception messages
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)

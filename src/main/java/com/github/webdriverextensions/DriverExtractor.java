@@ -1,13 +1,5 @@
 package com.github.webdriverextensions;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -20,6 +12,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
+
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Pattern;
 
 public class DriverExtractor {
     private final File tempDirectory;

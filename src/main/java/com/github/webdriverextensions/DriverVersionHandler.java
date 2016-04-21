@@ -1,10 +1,10 @@
 package com.github.webdriverextensions;
 
+import org.apache.maven.plugin.MojoExecutionException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-
-import org.apache.maven.plugin.MojoExecutionException;
 
 class DriverVersionHandler {
     private final File installationDirectory;

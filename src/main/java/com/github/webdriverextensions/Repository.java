@@ -1,18 +1,13 @@
 package com.github.webdriverextensions;
 
-import static ch.lambdaj.Lambda.collect;
-import static ch.lambdaj.Lambda.having;
-import static ch.lambdaj.Lambda.on;
-import static ch.lambdaj.Lambda.select;
-import static ch.lambdaj.Lambda.selectDistinct;
-import static ch.lambdaj.Lambda.selectMax;
-import static ch.lambdaj.Lambda.sort;
 import ch.lambdaj.function.compare.ArgumentComparator;
-import static com.github.webdriverextensions.Utils.is64Bit;
-import static com.github.webdriverextensions.Utils.isLinux;
-import static com.github.webdriverextensions.Utils.isMac;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.settings.Proxy;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -22,13 +17,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import org.apache.commons.collections.ComparatorUtils;
-import org.apache.commons.io.IOUtils;
+
+import static ch.lambdaj.Lambda.*;
+import static com.github.webdriverextensions.Utils.*;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang3.CharEncoding.UTF_8;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.settings.Proxy;
-
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.is;
