@@ -26,6 +26,7 @@ public class Driver {
                 + (bit != null ? "-" + bit + "bit" : "")
                 + (version != null ? "-" + version : "");
     }
+
     public String getName() {
         return name;
     }
@@ -78,7 +79,7 @@ public class Driver {
         }
     }
 
-    public String getFilenameFromUrl(){
+    public String getFilenameFromUrl() {
         try {
             String file = new URL(url).getFile();
             return file.replaceAll(".*\\/", "");

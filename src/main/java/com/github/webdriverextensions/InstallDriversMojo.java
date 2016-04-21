@@ -187,15 +187,15 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    private static File createCachePath() {
+    private File createCachePath() {
         return Paths.get(getPluginWorkingDirectory(), "cache").toFile();
     }
 
-    private static File createTempPath() {
+    private File createTempPath() {
         return new File(getPluginWorkingDirectory(), "temp");
     }
 
-    private static String getPluginWorkingDirectory() {
+    private String getPluginWorkingDirectory() {
         String systemTempDirectory = System.getProperty("java.io.tmpdir");
         return Paths.get(systemTempDirectory, "webdriverextensions-maven-plugin").toString();
     }
