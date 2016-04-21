@@ -70,7 +70,7 @@ public class DriverInstaller {
             }
 
             File singleDirectory = new File(subDirectories.get(1));
-            log.info("  Moving " + singleDirectory + " -> " + to);
+            log.info("  Moving " + singleDirectory + " to " + to);
             org.apache.commons.io.FileUtils.moveDirectory(singleDirectory, to.toFile());
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when moving directory in directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);
@@ -82,7 +82,7 @@ public class DriverInstaller {
         try {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
             File singleFile = new File(files.get(0));
-            log.info("  Moving " + singleFile + " -> " + to);
+            log.info("  Moving " + singleFile + " to " + to);
             FileUtils.rename(singleFile, to.toFile());
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when moving file in directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);
@@ -93,7 +93,7 @@ public class DriverInstaller {
     private void moveAllFilesInDirectory(Path from, Path to) throws MojoExecutionException {
         try {
             List<String> subDirectories = FileUtils.getDirectoryNames(from.toFile(), null, null, true);
-            log.info("  Moving " + subDirectories.get(0) + " -> " + to);
+            log.info("  Moving " + subDirectories.get(0) + " to " + to);
             FileUtils.rename(new File(subDirectories.get(0)), to.toFile());
         } catch (IOException ex) {
             throw new MojoExecutionException("Error when moving directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);

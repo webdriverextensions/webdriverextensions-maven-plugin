@@ -45,7 +45,7 @@ public class DriverDownloader {
         if (fileToDownload.exists()) {
             log.info("  Using cached driver from " + downloadLocation);
         } else {
-            log.info("  Downloading " + url + " -> " + downloadLocation);
+            log.info("  Downloading " + url + " to " + downloadLocation);
             HttpClientBuilder httpClientBuilder = prepareHttpClientBuilderWithTimeoutsAndProxySettings(proxySettings);
             httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(FILE_DOWNLOAD_RETRY_ATTEMPTS, true));
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {

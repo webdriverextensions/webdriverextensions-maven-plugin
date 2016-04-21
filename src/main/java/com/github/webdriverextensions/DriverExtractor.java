@@ -29,7 +29,7 @@ public class DriverExtractor {
 
     public Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
 
-        log.info("  Extracting " + fileToExtract);
+        log.info("  Extracting " + fileToExtract + " to temp folder");
         String fileExtension = FilenameUtils.getExtension(fileToExtract.toString());
         try {
             switch (fileExtension) {
