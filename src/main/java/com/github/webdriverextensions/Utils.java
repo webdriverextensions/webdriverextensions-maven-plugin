@@ -68,28 +68,28 @@ public class Utils {
     }
 
     public static String debugInfo(InstallDriversMojo mojo) {
-        return  System.lineSeparator()
-                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory)
+        return System.lineSeparator()
                 + "cacheDirectory: " + System.lineSeparator() + directoryToString(mojo.cacheDirectory)
-                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory);
+                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory)
+                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory);
     }
 
     public static String debugInfo(Driver driver) {
-        return  System.lineSeparator()
+        return System.lineSeparator()
                 + "driver: " + driver;
     }
 
     public static String debugInfo(InstallDriversMojo mojo, Driver driver) {
-        return  System.lineSeparator() + System.lineSeparator()
+        return System.lineSeparator() + System.lineSeparator()
                 + "driver: " + driver + System.lineSeparator() + System.lineSeparator()
-                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory) + System.lineSeparator()
                 + "cacheDirectory: " + System.lineSeparator() + directoryToString(mojo.cacheDirectory) + System.lineSeparator()
-                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory);
+                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()
+                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory);
     }
 
     public static String directoryToString(File path) {
         if (!path.exists()) {
-            return quote(path) + " does not exist" + System.lineSeparator();
+            return path + " does not exist" + System.lineSeparator();
         }
         if (!path.isDirectory()) {
             throw new IllegalArgumentException("The path is not a directory: " + path);
@@ -101,13 +101,17 @@ public class Utils {
                 DirectoryFileFilter.DIRECTORY
         );
 
+        if (files.size() == 0) {
+            return path + " is empty";
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append(path);
         stringBuilder.append(System.lineSeparator());
 
         int padSize = longestPath(files, path);
-        for (Iterator iterator = files.iterator(); iterator.hasNext();) {
+        for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
             File file = (File) iterator.next();
             String relativePath = getRelativePath(file, path);
             if (iterator.hasNext()) {
