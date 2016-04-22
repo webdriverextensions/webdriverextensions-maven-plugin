@@ -69,9 +69,9 @@ public class Utils {
 
     public static String debugInfo(InstallDriversMojo mojo) {
         return  System.lineSeparator()
-                + "installationDirectory: " + directoryToString(mojo.installationDirectory)
-                + "cacheDirectory: " + directoryToString(mojo.cacheDirectory)
-                + "tempDirectory: " + directoryToString(mojo.tempDirectory);
+                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory)
+                + "cacheDirectory: " + System.lineSeparator() + directoryToString(mojo.cacheDirectory)
+                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory);
     }
 
     public static String debugInfo(Driver driver) {
@@ -80,16 +80,16 @@ public class Utils {
     }
 
     public static String debugInfo(InstallDriversMojo mojo, Driver driver) {
-        return  System.lineSeparator()
-                + "driver: " + driver + System.lineSeparator()
-                + "installationDirectory: " + directoryToString(mojo.installationDirectory)
-                + "cacheDirectory: " + directoryToString(mojo.cacheDirectory)
-                + "tempDirectory: " + directoryToString(mojo.tempDirectory);
+        return  System.lineSeparator() + System.lineSeparator()
+                + "driver: " + driver + System.lineSeparator() + System.lineSeparator()
+                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory) + System.lineSeparator()
+                + "cacheDirectory: " + System.lineSeparator() + directoryToString(mojo.cacheDirectory) + System.lineSeparator()
+                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory);
     }
 
     public static String directoryToString(File path) {
         if (!path.exists()) {
-            return "Directory " + quote(path) + " does not exist";
+            return quote(path) + " does not exist" + System.lineSeparator();
         }
         if (!path.isDirectory()) {
             throw new IllegalArgumentException("The path is not a directory: " + path);
