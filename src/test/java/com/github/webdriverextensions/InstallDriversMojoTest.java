@@ -7,7 +7,7 @@ import java.nio.file.attribute.FileTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class InstallDriversMojoTest extends AbstractInstallDriverMojoTest {
+public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_configuration_with_explicit_driver_that_is_not_available_in_the_repository_fails_with_error_message_could_not_find_driver() throws Exception {
         // Given

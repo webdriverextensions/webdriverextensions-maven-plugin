@@ -12,9 +12,7 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Proxy;
-import org.apache.maven.settings.Settings;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,12 +26,12 @@ public class DriverDownloader {
     public static final int FILE_DOWNLOAD_READ_TIMEOUT = 30 * 60 * 1000; // 30 min
     public static final int FILE_DOWNLOAD_CONNECT_TIMEOUT = 30 * 1000; // 30 seconds
     public static final int FILE_DOWNLOAD_RETRY_ATTEMPTS = 3;
-    private final Log log;
+    private final InstallDriversMojo mojo;
     private final Proxy proxySettings;
 
-    public DriverDownloader(Settings settings, String proxyId, Log log) throws MojoExecutionException {
-        this.log = log;
-        this.proxySettings = ProxyUtils.getProxyFromSettings(settings, proxyId);
+    public DriverDownloader(InstallDriversMojo mojo) throws MojoExecutionException {
+        this.mojo = mojo;
+        this.proxySettings = ProxyUtils.getProxyFromSettings(mojo);
     }
 
     public Path downloadFile(Driver driver, File downloadPath) throws MojoExecutionException {
@@ -43,9 +41,9 @@ public class DriverDownloader {
 
         File fileToDownload = downloadLocation.toFile();
         if (fileToDownload.exists()) {
-            log.info("  Using cached driver from " + downloadLocation);
+            mojo.getLog().info("  Using cached driver from " + downloadLocation);
         } else {
-            log.info("  Downloading " + url + " to " + downloadLocation);
+            mojo.getLog().info("  Downloading " + url + " to " + downloadLocation);
             HttpClientBuilder httpClientBuilder = prepareHttpClientBuilderWithTimeoutsAndProxySettings(proxySettings);
             httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(FILE_DOWNLOAD_RETRY_ATTEMPTS, true));
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
@@ -53,9 +51,9 @@ public class DriverDownloader {
                     HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
                     copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
                 }
-            } catch (IOException ex) {
-                log.info("  Problem downloading file from " + url + " cause of " + ex.getCause());
-                throw new MojoExecutionException("Failed to download driver" + ex.getMessage() + System.lineSeparator() + "driver: " + driver, ex);
+            } catch (IOException e) {
+                mojo.getLog().info("  Failed to download driver cause of " + e.getCause() + Utils.debugInfo(mojo, driver), e);
+                throw new InstallDriversMojoExecutionException("Failed to download driver cause of " + e.getCause(), e, mojo, driver);
             }
         }
         return downloadLocation;

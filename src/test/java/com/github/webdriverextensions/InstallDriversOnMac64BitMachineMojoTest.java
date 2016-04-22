@@ -1,6 +1,6 @@
 package com.github.webdriverextensions;
 
-public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriverMojoTest {
+public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriversMojoTest {
 
     @Override
     protected void setUp() throws Exception {

@@ -1,7 +1,6 @@
 package com.github.webdriverextensions;
 
 import org.apache.commons.compress.archivers.ArchiveEntry;
-import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -11,7 +10,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -19,23 +17,21 @@ import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
 public class DriverExtractor {
-    private final File tempDirectory;
-    private final Log log;
+    private final InstallDriversMojo mojo;
 
-    public DriverExtractor(File tempDirectory, Log log) {
-        this.tempDirectory = tempDirectory;
-        this.log = log;
+    public DriverExtractor(InstallDriversMojo mojo) {
+        this.mojo = mojo;
     }
 
     public Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
 
-        log.info("  Extracting " + fileToExtract + " to temp folder");
+        mojo.getLog().info("  Extracting " + fileToExtract + " to temp folder");
         String fileExtension = FilenameUtils.getExtension(fileToExtract.toString());
         try {
             switch (fileExtension) {
                 case "bz2":
                     String extractedFilename = FilenameUtils.getBaseName(fileToExtract.toString());
-                    Path extractedFile = Paths.get(tempDirectory.getPath(), extractedFilename);
+                    Path extractedFile = Paths.get(mojo.tempDirectory.getPath(), extractedFilename);
                     try (FileInputStream fin = new FileInputStream(fileToExtract.toFile())) {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                             try (BZip2CompressorInputStream input = new BZip2CompressorInputStream(bin)) {
@@ -49,9 +45,9 @@ public class DriverExtractor {
                     return extractDriver(driver, extractedFile);
                 case "tar":
                 case "zip":
-                    Path extractToDirectory = Paths.get(tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
+                    Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
                     if (!extractToDirectory.toFile().mkdirs()) {
-                        throw new MojoExecutionException("Failed create directory " + extractToDirectory + " for extracted files");
+                        throw new RuntimeException("Failed create directory " + extractToDirectory + " for extracted files");
                     }
 
                     Pattern pattern = null;
@@ -70,7 +66,7 @@ public class DriverExtractor {
                                     } else if (entry.isDirectory()) {
                                         File directory = new File(extractToDirectory.toFile(), name);
                                         if (!directory.mkdirs()) {
-                                            throw new MojoExecutionException("Failed create extracted directory " + directory);
+                                            throw new RuntimeException("Failed create extracted directory " + directory);
                                         }
                                     } else {
                                         File file = null;
@@ -105,20 +101,15 @@ public class DriverExtractor {
                                     FileUtils.forceDelete(fileToExtract.toFile());
                                 }
                                 return extractToDirectory;
-                            } catch (ArchiveException e) {
-                                throw new MojoExecutionException(e.getMessage(), e);
                             }
                         }
                     }
                 default:
-                    throw new MojoExecutionException("Unsupported file type, file extension: " + fileExtension);
+                    throw new UnsupportedOperationException("Unsupported extraction type, file extension: " + fileExtension);
             }
-        } catch (MojoExecutionException e) {
-            log.info("Failed to extract driver: " + e.getMessage() + System.lineSeparator() + "driver: " + driver, e);
-            throw e;
         } catch (Exception e) {
-            log.info("Failed to extract driver: " + e.getMessage() + System.lineSeparator() + "driver: " + driver, e);
-            throw new MojoExecutionException("Failed to extract driver: " + e.getMessage() + System.lineSeparator() + "driver: " + driver, e);
+            mojo.getLog().info("Failed to extract driver cause of " + e.getMessage() + Utils.debugInfo(mojo, driver), e);
+            throw new InstallDriversMojoExecutionException("Failed to extract driver cause of " + e.getMessage(), e, mojo, driver);
         }
     }
 }

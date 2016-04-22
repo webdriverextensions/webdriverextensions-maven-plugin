@@ -17,7 +17,7 @@ import java.nio.file.attribute.FileTime;
 
 import static com.github.webdriverextensions.Utils.*;
 
-public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase {
+public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
 
     public File tempDirectory;
     public File installationDirectory;

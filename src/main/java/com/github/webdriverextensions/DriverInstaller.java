@@ -1,7 +1,6 @@
 package com.github.webdriverextensions;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
@@ -11,14 +10,12 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class DriverInstaller {
-    private final File installationDirectory;
-    private final Log log;
+    private final InstallDriversMojo mojo;
     private final DriverVersionHandler versionHandler;
 
-    public DriverInstaller(File installationDirectory, Log log) {
-        this.installationDirectory = installationDirectory;
-        this.log = log;
-        this.versionHandler = new DriverVersionHandler(installationDirectory);
+    public DriverInstaller(InstallDriversMojo mojo) {
+        this.mojo = mojo;
+        this.versionHandler = new DriverVersionHandler(mojo.installationDirectory);
     }
 
     public boolean needInstallation(Driver driver) throws MojoExecutionException {
@@ -27,23 +24,28 @@ public class DriverInstaller {
 
     public void install(Driver driver, Path extractLocation) throws MojoExecutionException {
         if (directoryIsEmpty(extractLocation)) {
-            throw new MojoExecutionException("No files found to install, directory: " + extractLocation + System.lineSeparator() + "driver: " + driver);
+            throw new InstallDriversMojoExecutionException("Failed to install driver since no files found to install", mojo, driver);
         }
 
-        if (directoryContainsSingleDirectory(extractLocation)) {
-            moveDirectoryInDirectory(extractLocation, Paths.get(installationDirectory.getPath(), driver.getId()));
-        } else if (directoryContainsSingleFile(extractLocation)) {
-            moveFileInDirectory(extractLocation, Paths.get(installationDirectory.getPath(), driver.getFileName()));
-            makeExecutable(Paths.get(installationDirectory.getPath(), driver.getFileName()));
-        } else {
-            moveAllFilesInDirectory(extractLocation, Paths.get(installationDirectory.getPath(), driver.getId()));
+        try {
+            if (directoryContainsSingleDirectory(extractLocation)) {
+                moveDirectoryInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getId()));
+            } else if (directoryContainsSingleFile(extractLocation)) {
+                moveFileInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
+                makeExecutable(Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
+            } else {
+                moveAllFilesInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getId()));
+            }
+
+            versionHandler.writeVersionFile(driver);
+        } catch (Exception e) {
+            throw new InstallDriversMojoExecutionException("Failed to install driver", e, mojo, driver);
         }
 
-        versionHandler.writeVersionFile(driver);
     }
 
     private boolean isInstalled(Driver driver) {
-        Path path = Paths.get(installationDirectory.getPath(), driver.getFileName());
+        Path path = Paths.get(mojo.installationDirectory.getPath(), driver.getFileName());
         return path.toFile().exists();
     }
 
@@ -70,10 +72,10 @@ public class DriverInstaller {
             }
 
             File singleDirectory = new File(subDirectories.get(1));
-            log.info("  Moving " + singleDirectory + " to " + to);
+            mojo.getLog().info("  Moving " + singleDirectory + " to " + to);
             org.apache.commons.io.FileUtils.moveDirectory(singleDirectory, to.toFile());
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when moving directory in directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to move directory in directory " + Utils.quote(from) + " to " + Utils.quote(to), e);
         }
     }
 
@@ -82,10 +84,10 @@ public class DriverInstaller {
         try {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
             File singleFile = new File(files.get(0));
-            log.info("  Moving " + singleFile + " to " + to);
+            mojo.getLog().info("  Moving " + singleFile + " to " + to);
             FileUtils.rename(singleFile, to.toFile());
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when moving file in directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to move file in directory " + Utils.quote(from) + " to " + Utils.quote(to), e);
         }
     }
 
@@ -93,10 +95,10 @@ public class DriverInstaller {
     private void moveAllFilesInDirectory(Path from, Path to) throws MojoExecutionException {
         try {
             List<String> subDirectories = FileUtils.getDirectoryNames(from.toFile(), null, null, true);
-            log.info("  Moving " + subDirectories.get(0) + " to " + to);
+            mojo.getLog().info("  Moving " + subDirectories.get(0) + " to " + to);
             FileUtils.rename(new File(subDirectories.get(0)), to.toFile());
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Error when moving directory " + Utils.quote(from) + " to " + Utils.quote(to), ex);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to move directory " + Utils.quote(from) + " to " + Utils.quote(to), e);
         }
     }
 

@@ -34,15 +34,15 @@ public class Repository {
         String repositoryAsString;
         try {
             repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
-        } catch (IOException ex) {
-            throw new MojoExecutionException("ERROR: Could not download repository from url " + Utils.quote(repositoryUrl), ex);
+        } catch (IOException e) {
+            throw new MojoExecutionException("ERROR: Could not download repository from url " + Utils.quote(repositoryUrl), e);
         }
 
         Repository repository;
         try {
             repository = new Gson().fromJson(repositoryAsString, Repository.class);
-        } catch (JsonSyntaxException ex) {
-            throw new MojoExecutionException("ERROR: Failed to parse repository json " + repositoryAsString, ex);
+        } catch (JsonSyntaxException e) {
+            throw new MojoExecutionException("ERROR: Failed to parse repository json " + repositoryAsString, e);
         }
 
         repository.drivers = sortDrivers(repository.drivers);
@@ -137,7 +137,7 @@ public class Repository {
 
         try {
             return getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).get(0);
-        } catch (IndexOutOfBoundsException ex) {
+        } catch (IndexOutOfBoundsException e) {
             // Could not find any driver for the current platform/bit/version in repo
             return null;
         }

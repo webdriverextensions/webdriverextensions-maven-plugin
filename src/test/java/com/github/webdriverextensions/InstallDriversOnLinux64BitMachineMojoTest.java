@@ -1,6 +1,6 @@
 package com.github.webdriverextensions;
 
-public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDriverMojoTest {
+public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDriversMojoTest {
 
     @Override
     protected void setUp() throws Exception {

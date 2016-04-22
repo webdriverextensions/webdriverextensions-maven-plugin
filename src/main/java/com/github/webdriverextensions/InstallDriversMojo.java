@@ -146,7 +146,7 @@ public class InstallDriversMojo extends AbstractMojo {
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
-            Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
+            Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
             getLog().info("Installation directory " + Utils.quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
@@ -155,9 +155,9 @@ public class InstallDriversMojo extends AbstractMojo {
                 getLog().info("Installing drivers from configuration");
             }
 
-            DriverDownloader driverDownloader = new DriverDownloader(settings, proxyId, getLog());
-            DriverExtractor driverExtractor = new DriverExtractor(tempDirectory, getLog());
-            DriverInstaller driverInstaller = new DriverInstaller(installationDirectory, getLog());
+            DriverDownloader driverDownloader = new DriverDownloader(this);
+            DriverExtractor driverExtractor = new DriverExtractor(this);
+            DriverInstaller driverInstaller = new DriverInstaller(this);
 
             cleanupTempDirectory();
             for (Driver _driver : drivers) {
@@ -182,8 +182,9 @@ public class InstallDriversMojo extends AbstractMojo {
     private void cleanupTempDirectory() throws MojoExecutionException {
         try {
             FileUtils.deleteDirectory(tempDirectory);
-        } catch (IOException ex) {
-            throw new MojoExecutionException("Failed to delete temp directory:" + tempDirectory, ex);
+        } catch (IOException e) {
+            throw new MojoExecutionException("Failed to delete temp directory:" + System.lineSeparator()
+                    + Utils.directoryToString(tempDirectory), e);
         }
     }
 
