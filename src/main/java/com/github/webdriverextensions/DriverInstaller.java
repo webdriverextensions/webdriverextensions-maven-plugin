@@ -27,7 +27,7 @@ public class DriverInstaller {
 
     public void install(Driver driver, Path extractLocation) throws MojoExecutionException {
         if (directoryIsEmpty(extractLocation)) {
-            throw new MojoExecutionException("No files found to install, directory: " + extractLocation + "\ndriver: " + driver);
+            throw new MojoExecutionException("No files found to install, directory: " + extractLocation + System.lineSeparator() + "driver: " + driver);
         }
 
         if (directoryContainsSingleDirectory(extractLocation)) {

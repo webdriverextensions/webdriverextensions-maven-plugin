@@ -97,13 +97,13 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
                     attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
                 } catch (IOException e) {
                     fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                            + "\n" + filesInInstallationDirectoryAsString());
+                            + System.lineSeparator() + filesInInstallationDirectoryAsString());
                 }
                 return attr.creationTime();
             }
         }
         fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                + "\n" + filesInInstallationDirectoryAsString());
+                + System.lineSeparator() + filesInInstallationDirectoryAsString());
         return null;
     }
 
@@ -120,11 +120,11 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         }
         if (!foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was not found in the installation directory"
-                    + "\n" + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
         }
         if (!foundDriverVersionFile) {
             fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
-                    + "\n" + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
         }
     }
 
@@ -141,11 +141,11 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         }
         if (foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
-                    + "\n" + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
         }
         if (foundDriverVersionFile) {
             fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
-                    + "\n" + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
         }
     }
 
@@ -154,7 +154,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         System.out.println(filesInInstallationDirectoryAsString());
         if (installationDirectory.listFiles().length != numberOfDrivers * 2) {
             fail("Number of drivers installed is not " + numberOfDrivers +
-                    "\n" + filesInInstallationDirectoryAsString());
+                    System.lineSeparator() + filesInInstallationDirectoryAsString());
         }
     }
 
@@ -162,7 +162,7 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
     public String filesInInstallationDirectoryAsString() {
         String installedFiles = "";
         for (File file : installationDirectory.listFiles()) {
-            installedFiles += "  " + file.getName() + "\n";
+            installedFiles += "  " + file.getName() + System.lineSeparator();
         }
         return "Files in installation folder:\n" + installedFiles;
     }

@@ -55,7 +55,7 @@ public class DriverDownloader {
                 }
             } catch (IOException ex) {
                 log.info("  Problem downloading file from " + url + " cause of " + ex.getCause());
-                throw new MojoExecutionException("Failed to download driver" + ex.getMessage() + "\ndriver: " + driver, ex);
+                throw new MojoExecutionException("Failed to download driver" + ex.getMessage() + System.lineSeparator() + "driver: " + driver, ex);
             }
         }
         return downloadLocation;
