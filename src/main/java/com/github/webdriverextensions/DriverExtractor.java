@@ -108,7 +108,6 @@ public class DriverExtractor {
                     throw new UnsupportedOperationException("Unsupported extraction type, file extension: " + fileExtension);
             }
         } catch (Exception e) {
-            mojo.getLog().info("Failed to extract driver cause of " + e.getMessage() + Utils.debugInfo(mojo, driver), e);
             throw new InstallDriversMojoExecutionException("Failed to extract driver cause of " + e.getMessage(), e, mojo, driver);
         }
     }

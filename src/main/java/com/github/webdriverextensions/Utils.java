@@ -89,7 +89,7 @@ public class Utils {
 
     public static String directoryToString(File path) {
         if (!path.exists()) {
-            throw new IllegalArgumentException("Directory does not exist: " + path);
+            return "Directory " + quote(path) + " does not exist";
         }
         if (!path.isDirectory()) {
             throw new IllegalArgumentException("The path is not a directory: " + path);
