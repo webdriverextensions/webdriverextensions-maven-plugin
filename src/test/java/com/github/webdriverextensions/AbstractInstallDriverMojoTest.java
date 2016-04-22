@@ -164,7 +164,16 @@ public abstract class AbstractInstallDriverMojoTest extends AbstractMojoTestCase
         for (File file : installationDirectory.listFiles()) {
             installedFiles += "  " + file.getName() + System.lineSeparator();
         }
-        return "Files in installation folder:\n" + installedFiles;
+        return "Files in installation folder:" + System.lineSeparator() + installedFiles;
+    }
+
+
+    public String filesInTempDirectoryAsString() {
+        String installedFiles = "";
+        for (File file : tempDirectory.listFiles()) {
+            installedFiles += "  " + file.getName() + System.lineSeparator();
+        }
+        return "Files in installation folder:" + System.lineSeparator() + installedFiles;
     }
 
     public void fakePlatformToBeLinux() {
