@@ -69,8 +69,8 @@ public class Utils {
 
     public static String debugInfo(InstallDriversMojo mojo) {
         return System.lineSeparator()
-                + "cacheDirectory: " + System.lineSeparator() + directoryToString(mojo.cacheDirectory)
-                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory)
+                + "cacheDirectory: " + System.lineSeparator() + directoryToString(mojo.cacheDirectory) + System.lineSeparator()
+                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()
                 + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory);
     }
 
