@@ -20,7 +20,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
             fail("should raise an exception");
         } catch (MojoExecutionException e) {
             // Then
-            assertEquals("Could not find driver: {\"name\":\"phantooomjs\",\"platform\":\"linux\",\"bit\":\"32\",\"version\":\"1.9.7\"}", e.getMessage());
+            assertEquals("Could not find driver: " + mojo.drivers.get(0), e.getMessage());
         }
     }
 
