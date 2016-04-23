@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.github.webdriverextensions.Utils.quote;
+
 public class DriverInstaller {
     private final InstallDriversMojo mojo;
     private final DriverVersionHandler versionHandler;
@@ -72,10 +74,10 @@ public class DriverInstaller {
             }
 
             File singleDirectory = new File(subDirectories.get(1));
-            mojo.getLog().info("  Moving " + singleDirectory + " to " + to);
+            mojo.getLog().info("  Moving " + quote(singleDirectory) + " to " + quote(to));
             org.apache.commons.io.FileUtils.moveDirectory(singleDirectory, to.toFile());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to move directory in directory " + Utils.quote(from) + " to " + Utils.quote(to), e);
+            throw new RuntimeException("Failed to move directory in directory " + quote(from) + " to " + quote(to), e);
         }
     }
 
@@ -84,10 +86,10 @@ public class DriverInstaller {
         try {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
             File singleFile = new File(files.get(0));
-            mojo.getLog().info("  Moving " + singleFile + " to " + to);
+            mojo.getLog().info("  Moving " + quote(singleFile) + " to " +   quote(to));
             FileUtils.rename(singleFile, to.toFile());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to move file in directory " + Utils.quote(from) + " to " + Utils.quote(to), e);
+            throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to), e);
         }
     }
 
@@ -98,7 +100,7 @@ public class DriverInstaller {
             mojo.getLog().info("  Moving " + subDirectories.get(0) + " to " + to);
             FileUtils.rename(new File(subDirectories.get(0)), to.toFile());
         } catch (IOException e) {
-            throw new RuntimeException("Failed to move directory " + Utils.quote(from) + " to " + Utils.quote(to), e);
+            throw new RuntimeException("Failed to move directory " + quote(from) + " to " + quote(to), e);
         }
     }
 

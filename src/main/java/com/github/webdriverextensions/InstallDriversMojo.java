@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
+import static com.github.webdriverextensions.Utils.quote;
 
 // TODO: refactor exception messages
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
@@ -147,7 +148,7 @@ public class InstallDriversMojo extends AbstractMojo {
             getLog().info("Skipping install-drivers goal execution");
         } else {
             Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
-            getLog().info("Installation directory " + Utils.quote(installationDirectory));
+            getLog().info("Installation directory " + quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
                 drivers = repository.getLatestDrivers();

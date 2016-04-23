@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.regex.Pattern;
 
+import static com.github.webdriverextensions.Utils.quote;
+
 public class DriverExtractor {
     private final InstallDriversMojo mojo;
 
@@ -25,7 +27,7 @@ public class DriverExtractor {
 
     public Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
 
-        mojo.getLog().info("  Extracting " + fileToExtract + " to temp folder");
+        mojo.getLog().info("  Extracting " + quote(fileToExtract) + " to temp folder");
         String fileExtension = FilenameUtils.getExtension(fileToExtract.toString());
         try {
             switch (fileExtension) {
@@ -47,7 +49,7 @@ public class DriverExtractor {
                 case "zip":
                     Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
                     if (!extractToDirectory.toFile().mkdirs()) {
-                        throw new RuntimeException("Failed create directory " + extractToDirectory + " for extracted files");
+                        throw new RuntimeException("Failed create directory " + quote(extractToDirectory) + " for extracted files");
                     }
 
                     Pattern pattern = null;
@@ -66,7 +68,7 @@ public class DriverExtractor {
                                     } else if (entry.isDirectory()) {
                                         File directory = new File(extractToDirectory.toFile(), name);
                                         if (!directory.mkdirs()) {
-                                            throw new RuntimeException("Failed create extracted directory " + directory);
+                                            throw new RuntimeException("Failed create extracted directory " + quote(directory));
                                         }
                                     } else {
                                         File file = null;
@@ -108,7 +110,7 @@ public class DriverExtractor {
                     throw new UnsupportedOperationException("Unsupported extraction type, file extension: " + fileExtension);
             }
         } catch (Exception e) {
-            throw new InstallDriversMojoExecutionException("Failed to extract driver from " + Utils.quote(fileToExtract) + " cause of " + e.getMessage(), e, mojo, driver);
+            throw new InstallDriversMojoExecutionException("Failed to extract driver from " + quote(fileToExtract) + " cause of " + e.getMessage(), e, mojo, driver);
         }
     }
 }

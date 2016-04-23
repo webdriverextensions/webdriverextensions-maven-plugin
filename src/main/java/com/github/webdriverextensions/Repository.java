@@ -35,7 +35,7 @@ public class Repository {
         try {
             repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to download repository from url " + Utils.quote(repositoryUrl), e);
+            throw new MojoExecutionException("Failed to download repository from url " + quote(repositoryUrl), e);
         }
 
         Repository repository;
@@ -99,7 +99,7 @@ public class Repository {
 
     public Driver enrichDriver(Driver driver) throws MojoExecutionException {
         if (isBlank(driver.getName())) {
-            throw new MojoExecutionException("Driver name must be set, driver = " + driver.toString());
+            throw new MojoExecutionException("Driver name must be set, driver = " + driver);
         }
         if (isNotBlank(driver.getUrl())) {
             return driver;

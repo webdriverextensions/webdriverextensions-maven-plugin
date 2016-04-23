@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.github.webdriverextensions.Utils.quote;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 public class DriverDownloader {
@@ -41,9 +42,9 @@ public class DriverDownloader {
 
         File fileToDownload = downloadLocation.toFile();
         if (fileToDownload.exists()) {
-            mojo.getLog().info("  Using cached driver from " + downloadLocation);
+            mojo.getLog().info("  Using cached driver from " + quote(downloadLocation));
         } else {
-            mojo.getLog().info("  Downloading " + url + " to " + downloadLocation);
+            mojo.getLog().info("  Downloading " + quote(url) + " to " + quote(downloadLocation));
             HttpClientBuilder httpClientBuilder = prepareHttpClientBuilderWithTimeoutsAndProxySettings(proxySettings);
             httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(FILE_DOWNLOAD_RETRY_ATTEMPTS, true));
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
@@ -52,7 +53,7 @@ public class DriverDownloader {
                     copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
                 }
             } catch (IOException e) {
-                throw new InstallDriversMojoExecutionException("Failed to download driver from " + Utils.quote(url) + " cause of " + e.getCause(), e, mojo, driver);
+                throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " cause of " + e.getCause(), e, mojo, driver);
             }
         }
         return downloadLocation;
