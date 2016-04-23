@@ -52,7 +52,7 @@ public class DriverDownloader {
                     copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
                 }
             } catch (IOException e) {
-                throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " cause of " + e.getCause(), e, mojo, driver);
+                throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " to " + quote(downloadFilePath) + " cause of " + e.getCause(), e, mojo, driver);
             }
         }
         return downloadFilePath;
