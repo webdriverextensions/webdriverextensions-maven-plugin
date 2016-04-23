@@ -59,7 +59,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertThat(installationDirectory.listFiles()).isNullOrEmpty();;;
+        assertThat(mojo.installationDirectory.listFiles()).isNullOrEmpty();;;
     }
 
     public void test_that_installation_directory_configuration_installs_driver_into_custom_directory() throws Exception {
@@ -71,7 +71,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertTrue(installationDirectory.toString().endsWith("target_phantomjs-extract-test"));
+        assertTrue(mojo.installationDirectory.toString().endsWith("target_phantomjs-extract-test"));
         assertDriverIsInstalled("phantomjs-linux-32bit");
         assertNumberOfInstalledDriverIs(1);
     }
@@ -87,7 +87,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         // Then
         assertDriverIsInstalled("customdriver-windows-32bit");
         assertNumberOfInstalledDriverIs(1);
-        File[] installedFiles = installationDirectory.listFiles();
+        File[] installedFiles = mojo.installationDirectory.listFiles();
         assertThat(installedFiles[0]).isDirectory();
         assertThat(installedFiles[0].listFiles()).hasSize(6);
         assertThat(installedFiles[1]).isFile();

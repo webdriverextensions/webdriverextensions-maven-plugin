@@ -19,8 +19,7 @@ import static com.github.webdriverextensions.Utils.*;
 
 public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
 
-    public File tempDirectory;
-    public File installationDirectory;
+    private InstallDriversMojo mojo;
 
     @Override
     protected void tearDown() throws Exception {
@@ -42,8 +41,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, goal);
 
         // some global test preparations
-        tempDirectory = mojo.tempDirectory;
-        installationDirectory = mojo.installationDirectory;
+        this.mojo = mojo;
 
         // delete download directories before running test
         deleteTempDirectory();
@@ -55,14 +53,14 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     private void deleteTempDirectory() throws IOException {
-        if (tempDirectory != null) {
-            FileUtils.deleteDirectory(tempDirectory);
+        if (mojo.tempDirectory != null) {
+            FileUtils.deleteDirectory(mojo.tempDirectory);
         }
     }
 
     private void deleteInstallationDirectory() throws IOException {
-        if (installationDirectory != null) {
-            FileUtils.deleteDirectory(installationDirectory);
+        if (mojo.installationDirectory != null) {
+            FileUtils.deleteDirectory(mojo.installationDirectory);
         }
     }
 
@@ -90,27 +88,27 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     public FileTime getDriverCreationTime(String driver) {
-        for (File file : installationDirectory.listFiles()) {
+        for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driver)) {
                 BasicFileAttributes attr = null;
                 try {
                     attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
                 } catch (IOException e) {
                     fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                            + System.lineSeparator() + filesInInstallationDirectoryAsString());
+                            + System.lineSeparator() + Utils.debugInfo(mojo));
                 }
                 return attr.creationTime();
             }
         }
         fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                + System.lineSeparator() + filesInInstallationDirectoryAsString());
+                + System.lineSeparator() + Utils.debugInfo(mojo));
         return null;
     }
 
     public void assertDriverIsInstalled(String driverFileName) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
-        for (File file : installationDirectory.listFiles()) {
+        for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driverFileName)) {
                 foundDriverFile = true;
             }
@@ -120,18 +118,18 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
         if (!foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was not found in the installation directory"
-                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + Utils.debugInfo(mojo));
         }
         if (!foundDriverVersionFile) {
             fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
-                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }
 
     public void assertDriverIsNotInstalled(String driverFileName) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
-        for (File file : installationDirectory.listFiles()) {
+        for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driverFileName)) {
                 foundDriverFile = true;
             }
@@ -141,39 +139,19 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
         if (foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
-                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + Utils.debugInfo(mojo));
         }
         if (foundDriverVersionFile) {
             fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
-                    + System.lineSeparator() + filesInInstallationDirectoryAsString());
+                    + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }
 
     public void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
-        System.out.println(filesInTempDirectoryAsString());
-        System.out.println(filesInInstallationDirectoryAsString());
-        if (installationDirectory.listFiles().length != numberOfDrivers * 2) {
-            fail("Number of drivers installed is not " + numberOfDrivers +
-                    System.lineSeparator() + filesInInstallationDirectoryAsString());
+        if (mojo.installationDirectory.listFiles().length != numberOfDrivers * 2) {
+            fail("Number of drivers installed is not " + numberOfDrivers
+                    + System.lineSeparator() + Utils.debugInfo(mojo));
         }
-    }
-
-
-    public String filesInInstallationDirectoryAsString() {
-        String installedFiles = "";
-        for (File file : installationDirectory.listFiles()) {
-            installedFiles += "  " + file.getName() + System.lineSeparator();
-        }
-        return "Files in installation folder:" + System.lineSeparator() + installedFiles;
-    }
-
-
-    public String filesInTempDirectoryAsString() {
-        String installedFiles = "";
-        for (File file : tempDirectory.listFiles()) {
-            installedFiles += "  " + file.getName() + System.lineSeparator();
-        }
-        return "Files in installation folder:" + System.lineSeparator() + installedFiles;
     }
 
     public void fakePlatformToBeLinux() {
