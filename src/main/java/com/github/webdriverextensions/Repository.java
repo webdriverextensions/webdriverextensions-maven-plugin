@@ -35,14 +35,14 @@ public class Repository {
         try {
             repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
         } catch (IOException e) {
-            throw new MojoExecutionException("ERROR: Could not download repository from url " + Utils.quote(repositoryUrl), e);
+            throw new MojoExecutionException("Failed to download repository from url " + Utils.quote(repositoryUrl), e);
         }
 
         Repository repository;
         try {
             repository = new Gson().fromJson(repositoryAsString, Repository.class);
         } catch (JsonSyntaxException e) {
-            throw new MojoExecutionException("ERROR: Failed to parse repository json " + repositoryAsString, e);
+            throw new MojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
         }
 
         repository.drivers = sortDrivers(repository.drivers);

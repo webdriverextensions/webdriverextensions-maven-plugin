@@ -39,7 +39,7 @@ public class DriverInstaller {
 
             versionHandler.writeVersionFile(driver);
         } catch (Exception e) {
-            throw new InstallDriversMojoExecutionException("Failed to install driver", e, mojo, driver);
+            throw new InstallDriversMojoExecutionException("Failed to install driver cause of " + e.getMessage(), e, mojo, driver);
         }
 
     }

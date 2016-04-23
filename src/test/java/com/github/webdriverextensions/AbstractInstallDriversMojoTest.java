@@ -80,7 +80,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         } else if (isLinux()) {
             return "LINUX";
         }
-        throw new IllegalStateException("Fatal error");
+        throw new IllegalStateException("Unsupported OS, OS is neither MAC, WINDOWS nor LINUX");
     }
 
     private static String currentBit() {
