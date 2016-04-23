@@ -35,28 +35,27 @@ public class DriverDownloader {
         this.proxySettings = ProxyUtils.getProxyFromSettings(mojo);
     }
 
-    public Path downloadFile(Driver driver, File downloadPath) throws MojoExecutionException {
+    public Path downloadFile(Driver driver, File downloadDirectory) throws MojoExecutionException {
 
         String url = driver.getUrl();
-        Path downloadLocation = Paths.get(downloadPath.getPath(), driver.getFilenameFromUrl());
+        Path downloadFilePath = Paths.get(downloadDirectory.getPath(), driver.getFilenameFromUrl());
 
-        File fileToDownload = downloadLocation.toFile();
-        if (fileToDownload.exists()) {
-            mojo.getLog().info("  Using cached driver from " + quote(downloadLocation));
+        if (downloadFilePath.toFile().exists()) {
+            mojo.getLog().info("  Using cached driver from " + quote(downloadFilePath));
         } else {
-            mojo.getLog().info("  Downloading " + quote(url) + " to " + quote(downloadLocation));
+            mojo.getLog().info("  Downloading " + quote(url) + " to " + quote(downloadFilePath));
             HttpClientBuilder httpClientBuilder = prepareHttpClientBuilderWithTimeoutsAndProxySettings(proxySettings);
             httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(FILE_DOWNLOAD_RETRY_ATTEMPTS, true));
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
                 try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
                     HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
-                    copyInputStreamToFile(remoteFileStream.getContent(), fileToDownload);
+                    copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
                 }
             } catch (IOException e) {
                 throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " cause of " + e.getCause(), e, mojo, driver);
             }
         }
-        return downloadLocation;
+        return downloadFilePath;
     }
 
     private HttpClientBuilder prepareHttpClientBuilderWithTimeoutsAndProxySettings(Proxy proxySettings) throws MojoExecutionException {
