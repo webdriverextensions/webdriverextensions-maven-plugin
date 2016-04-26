@@ -21,7 +21,6 @@ import java.util.List;
 import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.quote;
 
-// TODO: refactor exception messages
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class InstallDriversMojo extends AbstractMojo {
 
