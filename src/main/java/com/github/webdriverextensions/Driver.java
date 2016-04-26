@@ -20,7 +20,7 @@ public class Driver {
                 + (bit != null ? "-" + bit + "bit" : "");
     }
 
-    public String getIdWithVersion() {
+    public String getDriverCacheDirectoryName() {
         return name
                 + (platform != null ? "-" + platform : "")
                 + (bit != null ? "-" + bit + "bit" : "")

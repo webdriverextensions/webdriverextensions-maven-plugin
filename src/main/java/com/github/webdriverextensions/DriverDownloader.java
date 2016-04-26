@@ -1,5 +1,6 @@
 package com.github.webdriverextensions;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CredentialsProvider;
@@ -16,6 +17,7 @@ import org.apache.maven.settings.Proxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -40,6 +42,11 @@ public class DriverDownloader {
         String url = driver.getUrl();
         Path downloadFilePath = Paths.get(downloadDirectory.getPath(), driver.getFilenameFromUrl());
 
+        if (downloadFilePath.toFile().exists() && !downloadCompletedFileExists(downloadDirectory)) {
+            mojo.getLog().info("  Removing cached driver " + quote(downloadFilePath) + " since it may be corrupt");
+            cleanupDriverCacheDirectory(downloadDirectory, driver);
+        }
+
         if (downloadFilePath.toFile().exists()) {
             mojo.getLog().info("  Using cached driver from " + quote(downloadFilePath));
         } else {
@@ -51,9 +58,10 @@ public class DriverDownloader {
                     HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
                     copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " to " + quote(downloadFilePath) + " cause of " + e.getCause(), e, mojo, driver);
             }
+            createDownloadCompletedFile(downloadDirectory);
         }
         return downloadFilePath;
     }
@@ -77,4 +85,28 @@ public class DriverDownloader {
         return httpClientBuilder;
     }
 
+
+    public void cleanupDriverCacheDirectory(File downloadDirectory, Driver driver) throws MojoExecutionException {
+        try {
+            FileUtils.deleteDirectory(downloadDirectory);
+        } catch (IOException e) {
+            throw new InstallDriversMojoExecutionException("Failed to delete driver cache directory:" + System.lineSeparator()
+                    + Utils.directoryToString(downloadDirectory), e);
+        }
+    }
+
+    private boolean downloadCompletedFileExists(File downloadDirectory) {
+        Path downloadCompletedFile = Paths.get(downloadDirectory.getPath(), "download.completed");
+        return downloadCompletedFile.toFile().exists();
+    }
+
+    private void createDownloadCompletedFile(File downloadDirectory) throws InstallDriversMojoExecutionException {
+        Path downloadCompletedFile = Paths.get(downloadDirectory.getPath(), "download.completed");
+        try {
+            Files.createFile(downloadCompletedFile);
+        } catch (IOException e) {
+            throw new InstallDriversMojoExecutionException("Failed to create download.completed file at " + downloadCompletedFile, e);
+
+        }
+    }
 }
