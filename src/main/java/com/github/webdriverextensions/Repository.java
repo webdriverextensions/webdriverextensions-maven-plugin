@@ -2,6 +2,7 @@ package com.github.webdriverextensions;
 
 import ch.lambdaj.function.compare.ArgumentComparator;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.io.IOUtils;
@@ -35,14 +36,14 @@ public class Repository {
         try {
             repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to download repository from url " + quote(repositoryUrl), e);
+            throw new InstallDriversMojoExecutionException("Failed to download repository from url " + quote(repositoryUrl), e);
         }
 
         Repository repository;
         try {
             repository = new Gson().fromJson(repositoryAsString, Repository.class);
         } catch (JsonSyntaxException e) {
-            throw new MojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
+            throw new InstallDriversMojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
         }
 
         repository.drivers = sortDrivers(repository.drivers);
@@ -99,7 +100,7 @@ public class Repository {
 
     public Driver enrichDriver(Driver driver) throws MojoExecutionException {
         if (isBlank(driver.getName())) {
-            throw new MojoExecutionException("Driver name must be set, driver = " + driver);
+            throw new InstallDriversMojoExecutionException("Driver name must be set in configuration, driver: " + driver);
         }
         if (isNotBlank(driver.getUrl())) {
             return driver;
@@ -107,7 +108,9 @@ public class Repository {
         if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {
             // Explicit driver config make sure it exists in repo
             if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).size() == 0) {
-                throw new MojoExecutionException("Could not find driver: " + driver);
+                throw new MojoExecutionException("Could not find driver: " + driver + System.lineSeparator()
+                        + System.lineSeparator()
+                        + "in repository: " + this);
             }
         }
 
@@ -185,4 +188,8 @@ public class Repository {
         return latestDriver.getVersion();
     }
 
+    @Override
+    public String toString() {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+    }
 }

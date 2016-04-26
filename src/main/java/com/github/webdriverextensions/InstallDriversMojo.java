@@ -184,7 +184,7 @@ public class InstallDriversMojo extends AbstractMojo {
         try {
             FileUtils.deleteDirectory(tempDirectory);
         } catch (IOException e) {
-            throw new MojoExecutionException("Failed to delete temp directory:" + System.lineSeparator()
+            throw new InstallDriversMojoExecutionException("Failed to delete temp directory:" + System.lineSeparator()
                     + Utils.directoryToString(tempDirectory), e);
         }
     }

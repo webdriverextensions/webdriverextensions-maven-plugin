@@ -52,7 +52,7 @@ public class ProxyUtils {
                     return proxy;
                 }
             }
-            throw new MojoExecutionException("Configured proxy with id=" + mojo.proxyId + " not found in settings.xml");
+            throw new InstallDriversMojoExecutionException("Configured proxy with id=" + mojo.proxyId + " not found in settings.xml");
         }
 
         // Get active http/https proxy
