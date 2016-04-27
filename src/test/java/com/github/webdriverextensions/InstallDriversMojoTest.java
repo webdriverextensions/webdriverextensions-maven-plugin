@@ -20,7 +20,9 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
             fail("should raise an exception");
         } catch (MojoExecutionException e) {
             // Then
-            assertEquals("Could not find driver: " + mojo.drivers.get(0), e.getMessage());
+            assertEquals("Could not find driver: " + mojo.drivers.get(0) + System.lineSeparator()
+                    + System.lineSeparator()
+                    + "in repository: " + mojo.repository, e.getMessage());
         }
     }
 

@@ -140,13 +140,14 @@ public class InstallDriversMojo extends AbstractMojo {
 
     File cacheDirectory = createCachePath();
     File tempDirectory = createTempPath();
+    Repository repository;
 
     public void execute() throws MojoExecutionException {
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
-            Repository repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
+            repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
             getLog().info("Installation directory " + quote(installationDirectory));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
