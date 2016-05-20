@@ -17,9 +17,11 @@ import org.apache.maven.settings.Proxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import static com.github.webdriverextensions.Utils.quote;
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
@@ -44,7 +46,7 @@ public class DriverDownloader {
 
         if (downloadFilePath.toFile().exists() && !downloadCompletedFileExists(downloadDirectory)) {
             mojo.getLog().info("  Removing cached driver " + quote(downloadFilePath) + " since it may be corrupt");
-            cleanupDriverCacheDirectory(downloadDirectory, driver);
+            cleanupDriverCacheDirectory(downloadDirectory);
         }
 
         if (downloadFilePath.toFile().exists()) {
@@ -57,13 +59,34 @@ public class DriverDownloader {
                 try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
                     HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
                     copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
+                    if (driverFileIsCorrupt(downloadFilePath)) {
+                        printXmlFileContetIfPresentInDonwloadedFile(downloadFilePath);
+                        cleanupDriverCacheDirectory(downloadDirectory);
+                        throw new InstallDriversMojoExecutionException("Failed to download a non corrupt driver", mojo, driver);
+                    }
                 }
+            } catch (InstallDriversMojoExecutionException e) {
+                throw e;
             } catch (Exception e) {
                 throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " to " + quote(downloadFilePath) + " cause of " + e.getCause(), e, mojo, driver);
             }
             createDownloadCompletedFile(downloadDirectory);
         }
         return downloadFilePath;
+    }
+
+    private void printXmlFileContetIfPresentInDonwloadedFile(Path downloadFilePath) {
+        try {
+            List<String> fileContent = Files.readAllLines(Paths.get("/Users/anders/Temp/cache/old/phantomjs-linux-64bit-1.9.8/phantomjs-1.9.8-linux-x86_64.tar.bz2"), StandardCharsets.UTF_8);
+            if (fileContent.get(0).startsWith("<?xml")) {
+                mojo.getLog().info("Downloaded driver file contains the following error message");
+                for (String line : fileContent) {
+                    mojo.getLog().info(line);
+                }
+            }
+        } catch (Exception e) {
+            // no file  or file content to read
+        }
     }
 
     private HttpClientBuilder prepareHttpClientBuilderWithTimeoutsAndProxySettings(Proxy proxySettings) throws MojoExecutionException {
@@ -85,8 +108,22 @@ public class DriverDownloader {
         return httpClientBuilder;
     }
 
+    private boolean driverFileIsCorrupt(Path downloadFilePath) {
+        if (Utils.hasExtension(downloadFilePath, "zip")) {
+            return !Utils.validateZipFile(downloadFilePath);
+        } else if (Utils.hasExtension(downloadFilePath, "bz2")) {
+            if (!Utils.validateBz2File(downloadFilePath)) {
+                return true;
+            } else {
+                return !Utils.validateFileIsLargerThanBytes(downloadFilePath, 1000);
+            }
+        } else {
+            return false;
+        }
+    }
 
-    public void cleanupDriverCacheDirectory(File downloadDirectory, Driver driver) throws MojoExecutionException {
+
+    public void cleanupDriverCacheDirectory(File downloadDirectory) throws MojoExecutionException {
         try {
             FileUtils.deleteDirectory(downloadDirectory);
         } catch (IOException e) {
