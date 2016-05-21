@@ -37,7 +37,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>2.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -63,7 +63,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>2.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -157,7 +157,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>2.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -181,7 +181,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>2.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -206,7 +206,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>2.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -226,7 +226,7 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>1.1.0</version>
+    <version>2.1.0</version>
     <executions>
         <execution>
             <goals>
@@ -251,6 +251,25 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
+#### 2.1.0 (2016 May 20)
+- IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
+- IMPROVEMENT Improved logs to exactly show what the install goal is doing, e.g.
+```
+[info] chromedriver-mac-32bit version 2.20.0
+[info]   Downloading "http://chromedriver.storage.googleapis.com/2.20/chromedriver_mac32.zip" to "/var/folders/mc/fd7bwdvd4c19wwhw0dmt2ngm0000gn/T/webdriverextensions-maven-plugin/temp/chromedriver_mac32.zip"
+[info]   Extracting "/var/folders/mc/fd7bwdvd4c19wwhw0dmt2ngm0000gn/T/webdriverextensions-maven-plugin/temp/chromedriver_mac32.zip" to temp folder
+[info]   Moving "/var/folders/mc/fd7bwdvd4c19wwhw0dmt2ngm0000gn/T/webdriverextensions-maven-plugin/temp/chromedriver_mac32/chromedriver" to "/Users/anders/Workspace/webdriverextensions-maven-plugin/src/test/resources/drivers/chromedriver-mac-32bit"
+```
+- IMPROVEMENT Print error message in downloaded file if present, e.g.
+```
+[info] phantomjs-linux-64bit version 1.9.8
+[info]   Downloading "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.8-linux-x86_64.tar.bz2" to "/var/folders/mc/fd7bwdvd4c19wwhw0dmt2ngm0000gn/T/webdriverextensions-maven-plugin/temp/phantomjs-1.9.8-linux-x86_64.tar.bz2"
+[info]   Downloaded driver file contains the following error message
+[info]   <?xml version="1.0" encoding="UTF-8"?>
+[info]   <Error><Code>AccessDenied</Code><Message>Request has expired</Message><Expires>2016-04-19T21:53:01Z</Expires><ServerTime>2016-04-19T21:57:53Z</ServerTime><RequestId>A7C783167E23A035</RequestId><HostId>QgT8M6Wsn6CdvOPcL1Iu3bpSmPYc9fLIhvSbGTrWRmQYmX6ZejV76VoeNeNnCYt6yGvb/0HBRdY=</HostId></Error>
+```
+- REFACTORING Lots of it to make the code more readable
+
 #### 2.0.0 (2015 September 20)
 - FEATURE Added support for extracting bz2 files (Thanks to [@lkwg82](https://github.com/lkwg82))
 - FEATURE Added support for only extracting specific files with the `fileMatchInside` driver configuration parameter (Thanks to [@lkwg82](https://github.com/lkwg82))
@@ -262,8 +281,8 @@ For more details on how to further configure this plugin please see the
 - FEATURE Added support for using proxy configured in settings.xml
 
 #### 1.0.1 (2014 September 2)
-- BUGFIX - Fixed platform not provided bug
-- BUGFIX - Removed dependency to java 7
+- BUGFIX Fixed platform not provided bug
+- BUGFIX Removed dependency to java 7
 
 #### 1.0.0 (2014 June 6)
 - Initial release!
