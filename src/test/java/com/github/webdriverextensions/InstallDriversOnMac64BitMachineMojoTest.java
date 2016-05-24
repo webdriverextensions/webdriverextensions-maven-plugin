@@ -32,8 +32,8 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsInstalled("phantomjs-mac-64bit");
-        assertNumberOfInstalledDriverIs(2);
+//        assertDriverIsInstalled("phantomjs-mac-64bit");
+        assertNumberOfInstalledDriverIs(1);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
@@ -49,8 +49,8 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertNumberOfInstalledDriverIs(5);
+//        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertNumberOfInstalledDriverIs(4);
     }
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
@@ -68,10 +68,10 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-        assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsInstalled("phantomjs-linux-64bit");
-        assertDriverIsInstalled("phantomjs-mac-64bit");
-        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(10);
+//        assertDriverIsInstalled("phantomjs-linux-32bit");
+//        assertDriverIsInstalled("phantomjs-linux-64bit");
+//        assertDriverIsInstalled("phantomjs-mac-64bit");
+//        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(6);
     }
 }

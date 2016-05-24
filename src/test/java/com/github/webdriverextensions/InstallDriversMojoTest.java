@@ -73,8 +73,8 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertTrue(mojo.installationDirectory.toString().endsWith("target_phantomjs-extract-test"));
-        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertTrue(mojo.installationDirectory.toString().endsWith("custom-installation-directory"));
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(1);
     }
 
@@ -139,10 +139,10 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-        assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsInstalled("phantomjs-linux-64bit");
-        assertDriverIsInstalled("phantomjs-mac-64bit");
-        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(10);
+//        assertDriverIsInstalled("phantomjs-linux-32bit");
+//        assertDriverIsInstalled("phantomjs-linux-64bit");
+//        assertDriverIsInstalled("phantomjs-mac-64bit");
+//        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(6);
     }
 }
