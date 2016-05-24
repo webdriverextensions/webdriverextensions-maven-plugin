@@ -251,7 +251,7 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
-#### 2.1.0 (2016 May 20)
+#### 2.1.0 (2016 May 24)
 - IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
 - IMPROVEMENT Improved logs to exactly show what the install goal is doing, e.g.
 ```
