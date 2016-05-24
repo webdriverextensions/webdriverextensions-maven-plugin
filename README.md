@@ -20,6 +20,10 @@ The following drivers are currently maintained and available for installation:
 - phantomjs, linux, 32bit
 - phantomjs, linux, 64bit
 
+WARNING! There may be some issue with downloading the phantomjs driver from bitbucket. At least the tests seems to randomly fail
+cause of some "Request has expired" or other unknown reason. If you encounter this when using this plugin please report
+this as a bug as a github issue. WARNING!
+
 I try to update the drivers as soon as I notice they are updated. If you want to help to keep the drivers
 updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0).
 To verify that a version is available for installation check that it exists in the
