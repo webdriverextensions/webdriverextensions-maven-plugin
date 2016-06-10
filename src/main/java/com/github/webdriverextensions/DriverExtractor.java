@@ -1,5 +1,12 @@
 package com.github.webdriverextensions;
 
+import static com.github.webdriverextensions.Utils.quote;
+
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.regex.Pattern;
+
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
@@ -11,21 +18,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.regex.Pattern;
-
-import static com.github.webdriverextensions.Utils.quote;
-
-public class DriverExtractor {
+class DriverExtractor {
     private final InstallDriversMojo mojo;
 
-    public DriverExtractor(InstallDriversMojo mojo) {
+    DriverExtractor(InstallDriversMojo mojo) {
         this.mojo = mojo;
     }
 
-    public Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
+    Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
 
         mojo.getLog().info("  Extracting " + quote(fileToExtract) + " to temp folder");
         String fileExtension = FilenameUtils.getExtension(fileToExtract.toString());
@@ -41,13 +41,12 @@ public class DriverExtractor {
                             }
                         }
                     }
-                    if (!fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
-                        FileUtils.forceDelete(fileToExtract.toFile());
-                    }
+                    decideToDeleteFile(fileToExtract);
                     return extractDriver(driver, extractedFile);
                 case "tar":
                 case "zip":
-                    Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
+                    Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(),
+                                                        FilenameUtils.getBaseName(fileToExtract.toString()));
                     if (!extractToDirectory.toFile().mkdirs()) {
                         throw new RuntimeException("Failed create directory " + quote(extractToDirectory) + " for extracted files");
                     }
@@ -59,7 +58,9 @@ public class DriverExtractor {
 
                     try (FileInputStream fin = new FileInputStream(fileToExtract.toFile())) {
                         try (BufferedInputStream bin = new BufferedInputStream(fin)) {
-                            try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(fileExtension, bin)) {
+                            try (ArchiveInputStream aiStream = new ArchiveStreamFactory().createArchiveInputStream(
+                                    fileExtension,
+                                    bin)) {
                                 ArchiveEntry entry;
                                 while ((entry = aiStream.getNextEntry()) != null) {
                                     String name = entry.getName();
@@ -68,7 +69,8 @@ public class DriverExtractor {
                                     } else if (entry.isDirectory()) {
                                         File directory = new File(extractToDirectory.toFile(), name);
                                         if (!directory.mkdirs()) {
-                                            throw new RuntimeException("Failed create extracted directory " + quote(directory));
+                                            throw new RuntimeException("Failed create extracted directory " + quote(
+                                                    directory));
                                         }
                                     } else {
                                         File file = null;
@@ -86,7 +88,8 @@ public class DriverExtractor {
 
                                         if (pattern != null) {
                                             if (pattern.matcher(name).matches()) {
-                                                file = new File(extractToDirectory.toFile(), FilenameUtils.getName(name));
+                                                file = new File(extractToDirectory.toFile(),
+                                                                FilenameUtils.getName(name));
                                             } else {
                                                 file = null;
                                             }
@@ -99,9 +102,7 @@ public class DriverExtractor {
                                         }
                                     }
                                 }
-                                if (!fileToExtract.toString().contains(Paths.get("webdriverextensions-maven-plugin", "cache").toString())) {
-                                    FileUtils.forceDelete(fileToExtract.toFile());
-                                }
+                                decideToDeleteFile(fileToExtract);
                                 return extractToDirectory;
                             }
                         }
@@ -110,7 +111,16 @@ public class DriverExtractor {
                     throw new UnsupportedOperationException("Unsupported extraction type, file extension: " + fileExtension);
             }
         } catch (Exception e) {
-            throw new InstallDriversMojoExecutionException("Failed to extract driver from " + quote(fileToExtract) + " cause of " + e.getMessage(), e, mojo, driver);
+            throw new InstallDriversMojoExecutionException("Failed to extract driver from " + quote(fileToExtract) + " cause of " + e
+                    .getMessage(), e, mojo, driver);
+        }
+    }
+
+    private void decideToDeleteFile(Path fileToExtract) throws IOException {
+        Path cache = Paths.get("webdriverextensions-maven-plugin", "cache");
+        boolean isNotInCache = !fileToExtract.toString().contains(cache.toString());
+        if (isNotInCache && !mojo.keepDownloadedWebdrivers) {
+            FileUtils.forceDelete(fileToExtract.toFile());
         }
     }
 }
