@@ -1,13 +1,6 @@
 package com.github.webdriverextensions;
 
-import org.junit.Assert;
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingRequest;
+import static com.github.webdriverextensions.Utils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
-import static com.github.webdriverextensions.Utils.*;
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
+import org.junit.Assert;
 
 public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
 
@@ -28,7 +28,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         deleteInstallationDirectory();
     }
 
-    public MavenProject getMavenProject(String pomPath) throws Exception {
+    private MavenProject getMavenProject(String pomPath) throws Exception {
         File pom = new File(pomPath);
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setPom(pom);
@@ -36,7 +36,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return lookup(ProjectBuilder.class).build(pom, configuration).getProject();
     }
 
-    public InstallDriversMojo getMojo(String pomPath, String goal) throws Exception {
+    InstallDriversMojo getMojo(String pomPath, String goal) throws Exception {
         MavenProject project = getMavenProject(pomPath);
         InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, goal);
 
@@ -64,7 +64,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
     }
 
-    public void logTestName(InstallDriversMojo mojo) {
+    private void logTestName(InstallDriversMojo mojo) {
         System.out.println("");
         System.out.println("");
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
@@ -87,7 +87,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return is64Bit() ? "64" : "32";
     }
 
-    public FileTime getDriverCreationTime(String driver) {
+    FileTime getDriverCreationTime(String driver) {
         for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driver)) {
                 BasicFileAttributes attr = null;
@@ -105,7 +105,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return null;
     }
 
-    public void assertDriverIsInstalled(String driverFileName) {
+    void assertDriverIsInstalled(String driverFileName) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
         for (File file : mojo.installationDirectory.listFiles()) {
@@ -147,30 +147,30 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
     }
 
-    public void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
+    void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
         if (mojo.installationDirectory.listFiles().length != numberOfDrivers * 2) {
             fail("Number of drivers installed is not " + numberOfDrivers
                     + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }
 
-    public void fakePlatformToBeLinux() {
+    void fakePlatformToBeLinux() {
         System.setProperty(FAKED_OS_NAME_PROPERTY_KEY, "linux");
     }
 
-    public void fakePlatformToBeWindows() {
+    void fakePlatformToBeWindows() {
         System.setProperty(FAKED_OS_NAME_PROPERTY_KEY, "windows");
     }
 
-    public void fakePlatformToBeMac() {
+    void fakePlatformToBeMac() {
         System.setProperty(FAKED_OS_NAME_PROPERTY_KEY, "mac");
     }
 
-    public void fakeBitToBe64() {
+    void fakeBitToBe64() {
         System.setProperty(FAKED_BIT_PROPERTY_KEY, "64");
     }
 
-    public void fakeBitToBe32() {
+    void fakeBitToBe32() {
         System.setProperty(FAKED_BIT_PROPERTY_KEY, "32");
     }
 
