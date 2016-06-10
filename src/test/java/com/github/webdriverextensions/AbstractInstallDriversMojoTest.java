@@ -36,9 +36,9 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return lookup(ProjectBuilder.class).build(pom, configuration).getProject();
     }
 
-    InstallDriversMojo getMojo(String pomPath, String goal) throws Exception {
+    InstallDriversMojo getMojo(String pomPath) throws Exception {
         MavenProject project = getMavenProject(pomPath);
-        InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, goal);
+        InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
 
         // some global test preparations
         this.mojo = mojo;

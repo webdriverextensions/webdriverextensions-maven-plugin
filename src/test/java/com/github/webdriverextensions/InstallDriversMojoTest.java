@@ -11,7 +11,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_configuration_with_explicit_driver_that_is_not_available_in_the_repository_fails_with_error_message_could_not_find_driver() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_in_repositoy_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_in_repositoy_pom.xml");
 
 
         try {
@@ -28,7 +28,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_driver_compressed_with_tar_bz2_is_supported() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/extract_tar_bz2_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/extract_tar_bz2_pom.xml");
 
 
         // When
@@ -41,7 +41,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_driver_compressed_with_zip_is_supported() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/extract_zip_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/extract_zip_pom.xml");
 
 
         // When
@@ -54,19 +54,19 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_skip_configuration_does_not_install_configured_drivers() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml");
 
 
         // When
         mojo.execute();
 
         // Then
-        assertThat(mojo.installationDirectory.listFiles()).isNullOrEmpty();;;
+        assertThat(mojo.installationDirectory.listFiles()).isNullOrEmpty();
     }
 
     public void test_that_installation_directory_configuration_installs_driver_into_custom_directory() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/installation_directory_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/installation_directory_pom.xml");
 
 
         // When
@@ -80,7 +80,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_configuration_with_custom_driver_not_in_repository_works() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_pom.xml");
 
 
         // When
@@ -97,7 +97,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_configuration_with_custom_driver_not_in_repository_with_file_match_inside_works() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_file_match_inside_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_file_match_inside_pom.xml");
 
 
         // When
@@ -110,7 +110,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_driver_already_downloaded_is_not_downloaded_again() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/a_driver_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/a_driver_pom.xml");
 
         mojo.execute();
         FileTime creationTimeFirstInstallation = getDriverCreationTime("phantomjs-windows-64bit.exe");
@@ -127,7 +127,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers_from_remote_repository() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/no_version_pom.xml", "install-drivers");
+        InstallDriversMojo mojo = getMojo("src/test/resources/no_version_pom.xml");
 
         // When
         mojo.execute();
