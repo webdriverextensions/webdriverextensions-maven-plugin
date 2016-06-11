@@ -57,6 +57,10 @@
             <name>andidev</name>
             <url>https://github.com/andidev</url>
         </contributor>
+        <contributor>
+            <name>lkwg82</name>
+            <url>https://github.com/lkwg82</url>
+        </contributor>
     </contributors>
 
     <issueManagement>
@@ -114,6 +118,7 @@
         <maven-release-plugin.version>2.5</maven-release-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.6</nexus-staging-maven-plugin.version>
+        <webdriverextensions-maven-plugin.version>2.1.0</webdriverextensions-maven-plugin.version>
     </properties>
 
     <dependencies>
