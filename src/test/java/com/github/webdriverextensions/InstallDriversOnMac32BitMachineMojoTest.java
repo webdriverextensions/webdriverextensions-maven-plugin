@@ -31,8 +31,8 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-//        assertDriverIsInstalled("phantomjs-mac-64bit");
-        assertNumberOfInstalledDriverIs(1);
+        assertDriverIsInstalled("phantomjs-mac-64bit");
+        assertNumberOfInstalledDriverIs(2);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {

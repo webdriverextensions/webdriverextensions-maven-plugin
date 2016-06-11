@@ -27,7 +27,6 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_platform_pom.xml");
 
-
         // When
         mojo.execute();
 
@@ -35,8 +34,8 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-//        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(3);
+        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(4);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {

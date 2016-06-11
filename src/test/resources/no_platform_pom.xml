@@ -33,16 +33,16 @@
                             <bit>64</bit>
                             <version>2.41.0</version>
                         </driver>
-                        <!--<driver>-->
-                            <!--<name>phantomjs</name>-->
-                            <!--<bit>32</bit>-->
-                            <!--<version>1.9.7</version>-->
-                        <!--</driver>-->
-                        <!--<driver>-->
-                            <!--<name>phantomjs</name>-->
-                            <!--<bit>64</bit>-->
-                            <!--<version>1.9.7</version>-->
-                        <!--</driver>-->
+                        <driver>
+                            <name>phantomjs</name>
+                            <bit>32</bit>
+                            <version>1.9.7</version>
+                        </driver>
+                        <driver>
+                            <name>phantomjs</name>
+                            <bit>64</bit>
+                            <version>1.9.7</version>
+                        </driver>
                     </drivers>
                 </configuration>
             </plugin>
