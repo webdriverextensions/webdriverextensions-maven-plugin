@@ -118,9 +118,16 @@
         <maven-release-plugin.version>2.5</maven-release-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.6</nexus-staging-maven-plugin.version>
+        <webdriverextensions-maven-plugin.version>2.1.0</webdriverextensions-maven-plugin.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.webdriverextensions</groupId>
+            <artifactId>webdriverextensions-maven-plugin</artifactId>
+            <version>${webdriverextensions-maven-plugin.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
@@ -223,6 +230,27 @@
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>com.github.webdriverextensions</groupId>
+                <artifactId>webdriverextensions-maven-plugin</artifactId>
+                <version>${webdriverextensions-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>install-drivers</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <drivers>
+                                <driver>
+                                    <name>phantomjs</name>
+                                    <version>1.9.8</version>
+                                </driver>
+                            </drivers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

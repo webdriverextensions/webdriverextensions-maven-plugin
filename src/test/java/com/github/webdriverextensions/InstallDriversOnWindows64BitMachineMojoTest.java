@@ -43,7 +43,6 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_bit_pom.xml");
 
-
         // When
         mojo.execute();
 
@@ -60,7 +59,6 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_version_pom.xml");
 
-
         // When
         mojo.execute();
 
@@ -71,10 +69,10 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
-//        assertDriverIsInstalled("phantomjs-linux-32bit");
-//        assertDriverIsInstalled("phantomjs-linux-64bit");
-//        assertDriverIsInstalled("phantomjs-mac-64bit");
-//        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(6);
+        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertDriverIsInstalled("phantomjs-mac-64bit");
+        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(10);
     }
 }
