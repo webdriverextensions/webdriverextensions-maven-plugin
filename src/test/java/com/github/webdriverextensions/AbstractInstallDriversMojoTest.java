@@ -56,8 +56,9 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     private void deleteTempDirectory() throws IOException {
-        if (mojo.tempDirectory != null) {
-            FileUtils.deleteDirectory(mojo.tempDirectory);
+        File tempDirectory = mojo.tempDirectory;
+        if (tempDirectory != null && tempDirectory.isDirectory()) {
+            FileUtils.deleteDirectory(tempDirectory);
         }
     }
 
@@ -71,8 +72,10 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         System.out.println("");
         System.out.println("");
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        mojo.getLog().info("## TEST: " + stackTrace[2].getFileName().replace(".java", "") + "." + stackTrace[2].getMethodName() + " on platform "
-                + currentPlatform() + " " + currentBit() + "BIT");
+        mojo.getLog().info("## TEST: " + stackTrace[2]
+                .getFileName()
+                .replace(".java", "") + "." + stackTrace[2].getMethodName() + " on platform "
+                           + currentPlatform() + " " + currentBit() + "BIT");
     }
 
     private static String currentPlatform() {
@@ -98,13 +101,13 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
                     attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
                 } catch (IOException e) {
                     fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                            + System.lineSeparator() + Utils.debugInfo(mojo));
+                         + System.lineSeparator() + Utils.debugInfo(mojo));
                 }
                 return attr.creationTime();
             }
         }
         fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                + System.lineSeparator() + Utils.debugInfo(mojo));
+             + System.lineSeparator() + Utils.debugInfo(mojo));
         return null;
     }
 
@@ -121,11 +124,11 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
         if (!foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was not found in the installation directory"
-                    + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + Utils.debugInfo(mojo));
         }
         if (!foundDriverVersionFile) {
             fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
-                    + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }
 
@@ -142,18 +145,19 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
         if (foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
-                    + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + Utils.debugInfo(mojo));
         }
         if (foundDriverVersionFile) {
             fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
-                    + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }
 
     void assertNumberOfInstalledDriverIs(int numberOfDrivers) {
-        if (mojo.installationDirectory.listFiles().length != numberOfDrivers * 2) {
-            fail("Number of drivers installed is not " + numberOfDrivers
-                    + System.lineSeparator() + Utils.debugInfo(mojo));
+        int length = mojo.installationDirectory.listFiles().length;
+        if (length != numberOfDrivers * 2) {
+            fail("Number of drivers installed is not " + numberOfDrivers + ", it is " + (length / 2)
+                 + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }
 

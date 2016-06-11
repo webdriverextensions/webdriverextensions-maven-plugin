@@ -128,12 +128,27 @@ class Repository {
             driver.setVersion(getLatestDriverVersion(driver.getId()));
         }
 
-        try {
-            return getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).get(0);
-        } catch (IndexOutOfBoundsException e) {
-            // Could not find any driver for the current platform/bit/version in repo
+        List<Driver> drivers = getDrivers(driver.getName(),
+                                          driver.getPlatform(),
+                                          driver.getBit(),
+                                          driver.getVersion());
+        if (drivers.isEmpty()) {
+            if ("64".equals(driver.getBit())) {
+                // toogle bits and try the other bit to get a driver configuration
+                drivers = getDrivers(driver.getName(),
+                                     driver.getPlatform(),
+                                     "32",
+                                     driver.getVersion());
+
+                if (drivers.isEmpty()) {
+                    // Could not find any driver for the current platform/bit/version in repo
+                    return null;
+                }
+                return drivers.get(0);
+            }
             return null;
         }
+        return drivers.get(0);
     }
 
     List<Driver> getLatestDrivers() {
@@ -141,28 +156,38 @@ class Repository {
         Collection<String> driverNames = selectDistinct(collect(drivers, on(Driver.class).getName()));
 
         String platform = detectPlatform();
-        String bit;
-        bit = detectBits();
+        String bit = detectBits();
+        boolean is64Bit = bit.equals("64");
 
         for (String driverName : driverNames) {
             List<Driver> driversWithDriverName = select(drivers, having(on(Driver.class).getName(), is(driverName)));
             List<Driver> driversWithDriverNameAndPlatform = select(driversWithDriverName,
                                                                    having(on(Driver.class).getPlatform(),
                                                                           is(platform)));
-            List<Driver> driversWithDriverNameAndPlatformAndBit = select(driversWithDriverNameAndPlatform,
-                                                                         having(on(Driver.class).getBit(), is(bit)));
-            Driver latestDriver = selectMax(driversWithDriverNameAndPlatformAndBit,
-                                            on(Driver.class).getComparableVersion());
+            Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);
             if (latestDriver != null) {
                 latestDrivers.add(latestDriver);
+            } else if (is64Bit) {
+                Driver latestDriverComplement = getDriverByBit("32", driversWithDriverNameAndPlatform);
+                if (latestDriverComplement != null) {
+                    latestDrivers.add(latestDriverComplement);
+                }
             }
         }
 
         return sortDrivers(latestDrivers);
     }
 
+    private Driver getDriverByBit(String bit, List<Driver> driversWithDriverNameAndPlatform) {
+        List<Driver> driversWithDriverNameAndPlatformAndBit = select(driversWithDriverNameAndPlatform,
+                                                                     having(on(Driver.class).getBit(), is(bit)));
+
+        return selectMax(driversWithDriverNameAndPlatformAndBit,
+                         on(Driver.class).getComparableVersion());
+    }
+
     private static String detectBits() {
-        if (isLinux() && is64Bit()) {
+        if (is64Bit()) {
             return "64";
         }
         return "32";

@@ -13,7 +13,6 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_configuration_pom.xml");
 
-
         // When
         mojo.execute();
 
@@ -26,7 +25,6 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_platform_pom.xml");
-
 
         // When
         mojo.execute();
@@ -43,7 +41,6 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_bit_pom.xml");
 
-
         // When
         mojo.execute();
 
@@ -52,8 +49,8 @@ public class InstallDriversOnWindows32BitMachineMojoTest extends AbstractInstall
         assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
-//        assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertNumberOfInstalledDriverIs(4);
+        assertDriverIsInstalled("phantomjs-linux-32bit");
+        assertNumberOfInstalledDriverIs(5);
     }
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
