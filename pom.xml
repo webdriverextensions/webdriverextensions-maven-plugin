@@ -123,12 +123,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.webdriverextensions</groupId>
-            <artifactId>webdriverextensions-maven-plugin</artifactId>
-            <version>${webdriverextensions-maven-plugin.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>${maven-plugin-api.version}</version>
@@ -230,27 +224,6 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.webdriverextensions</groupId>
-                <artifactId>webdriverextensions-maven-plugin</artifactId>
-                <version>${webdriverextensions-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>install-drivers</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <drivers>
-                                <driver>
-                                    <name>phantomjs</name>
-                                    <version>1.9.8</version>
-                                </driver>
-                            </drivers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
