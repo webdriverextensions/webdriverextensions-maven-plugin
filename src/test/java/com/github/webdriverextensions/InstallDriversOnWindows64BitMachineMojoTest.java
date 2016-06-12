@@ -19,7 +19,7 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         // Then
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(3);
     }
 
@@ -47,9 +47,9 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsInstalled("chromedriver-linux-64bit");
+        assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
-        assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertNumberOfInstalledDriverIs(5);
     }
