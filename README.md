@@ -20,11 +20,7 @@ The following drivers are currently maintained and available for installation:
 - phantomjs, linux, 32bit
 - phantomjs, linux, 64bit
 
-WARNING! There may be some issue with downloading the phantomjs driver from bitbucket. At least the tests seems to randomly fail
-cause of some "Request has expired" or other unknown reason. If you encounter this when using this plugin please report
-this as a bug as a github issue. WARNING!
-
-I try to update the drivers as soon as I notice they are updated. If you want to help to keep the drivers
+We try to update the drivers as soon as we notice they are updated. If you want to help to keep the drivers
 updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0).
 To verify that a version is available for installation check that it exists in the
 [default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0/blob/master/repository.json).
@@ -32,6 +28,8 @@ To verify that a version is available for installation check that it exists in t
 However if the driver is not yet available in the repo it can also be installed by providing an URL to the download
 location, see the [section below](#installing-a-driver-from-an-url) for
 more details on how.
+
+There are some issues with the tests failing to download the phantomjs driver from bitbucket. This should however only occur in the tests.
 
 ## Usage
 ### Installing the Latest Drivers
@@ -254,6 +252,11 @@ For more details on how to further configure this plugin please see the
 
 
 ## Changelog
+
+
+#### 2.1.0 (2016 May 24)
+- IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
+
 
 #### 2.1.0 (2016 May 24)
 - IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
