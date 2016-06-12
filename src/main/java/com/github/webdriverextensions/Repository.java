@@ -2,7 +2,7 @@ package com.github.webdriverextensions;
 
 import static ch.lambdaj.Lambda.*;
 import static com.github.webdriverextensions.Utils.*;
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.CharEncoding.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
@@ -122,7 +122,7 @@ class Repository {
             driver.setPlatform(detectPlatform());
         }
         if (isBlank(driver.getBit())) {
-            driver.setBit(detectBits());
+            driver.setBit(detectBits(driver.getName()));
         }
         if (isBlank(driver.getVersion())) {
             driver.setVersion(getLatestDriverVersion(driver.getId()));
@@ -156,14 +156,14 @@ class Repository {
         Collection<String> driverNames = selectDistinct(collect(drivers, on(Driver.class).getName()));
 
         String platform = detectPlatform();
-        String bit = detectBits();
-        boolean is64Bit = bit.equals("64");
 
         for (String driverName : driverNames) {
             List<Driver> driversWithDriverName = select(drivers, having(on(Driver.class).getName(), is(driverName)));
             List<Driver> driversWithDriverNameAndPlatform = select(driversWithDriverName,
                                                                    having(on(Driver.class).getPlatform(),
                                                                           is(platform)));
+            String bit = detectBits(driverName);
+            boolean is64Bit = bit.equals("64");
             Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);
             if (latestDriver != null) {
                 latestDrivers.add(latestDriver);
@@ -186,7 +186,17 @@ class Repository {
                          on(Driver.class).getComparableVersion());
     }
 
-    private static String detectBits() {
+    private static String detectBits(String driverName) {
+        // Chrome driver does only exist in 64 bit version for linux
+        if (driverName.equals("chromedriver") && !isLinux()) {
+            return "32";
+        }
+        // Default installed internetexplorer bit version on < Windows 10 versions is 32 bit
+        if (driverName.equals("internetexplorerdriver") && !isWindows10()) {
+            return "32";
+        }
+
+        // Detect bit version from os
         if (is64Bit()) {
             return "64";
         }

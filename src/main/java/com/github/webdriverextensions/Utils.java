@@ -47,6 +47,13 @@ public class Utils {
         return Platform.getCurrent().is(Platform.WINDOWS);
     }
 
+    public static boolean isWindows10() {
+        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {
+            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals("windows10");
+        }
+        return Platform.getCurrent().is(Platform.WIN10);
+    }
+
     public static boolean isMac() {
         if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {
             return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals("mac");

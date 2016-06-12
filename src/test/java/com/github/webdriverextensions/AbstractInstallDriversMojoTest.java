@@ -75,12 +75,14 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         mojo.getLog().info("## TEST: " + stackTrace[2]
                 .getFileName()
                 .replace(".java", "") + "." + stackTrace[2].getMethodName() + " on platform "
-                           + currentPlatform() + " " + currentBit() + "BIT");
+                           + currentPlatform()  + " " + currentBit() + "BIT");
     }
 
     private static String currentPlatform() {
         if (isMac()) {
             return "MAC";
+        } else if (isWindows10()) {
+            return "WINDOWS";
         } else if (isWindows()) {
             return "WINDOWS";
         } else if (isLinux()) {
@@ -167,6 +169,10 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
 
     void fakePlatformToBeWindows() {
         System.setProperty(FAKED_OS_NAME_PROPERTY_KEY, "windows");
+    }
+
+    void fakePlatformToBeWindows10() {
+        System.setProperty(FAKED_OS_NAME_PROPERTY_KEY, "windows10");
     }
 
     void fakePlatformToBeMac() {

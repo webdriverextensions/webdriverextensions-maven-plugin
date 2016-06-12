@@ -1,12 +1,12 @@
 package com.github.webdriverextensions;
 
-public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDriversMojoTest {
+public class InstallDriversOnWindows1032BitMachineMojoTest extends AbstractInstallDriversMojoTest {
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        fakePlatformToBeLinux();
-        fakeBitToBe64();
+        fakePlatformToBeWindows10();
+        fakeBitToBe32();
     }
 
     public void test_that_no_configuration_downloads_the_latest_driver_for_the_current_platform() throws Exception {
@@ -17,8 +17,8 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-linux-64bit");
-        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(2);
     }
 
@@ -30,10 +30,10 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-linux-32bit");
-        assertDriverIsInstalled("chromedriver-linux-64bit");
-        assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
+        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
         assertNumberOfInstalledDriverIs(4);
     }
 
@@ -46,15 +46,17 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsInstalled("chromedriver-linux-64bit");
+        assertDriverIsInstalled("chromedriver-linux-32bit");
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
-        assertDriverIsInstalled("phantomjs-linux-64bit");
+        assertDriverIsInstalled("phantomjs-linux-32bit");
         assertNumberOfInstalledDriverIs(5);
     }
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_version_pom.xml");
+
 
         // When
         mojo.execute();
