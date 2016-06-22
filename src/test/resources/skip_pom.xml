@@ -39,6 +39,11 @@
                             <bit>32</bit>
                             <version>1.9.7</version>
                         </driver>
+                        <driver>
+                            <name>marionette</name>
+                            <bit>32</bit>
+                            <version>0.8.0</version>
+                        </driver>
                     </drivers>
                 </configuration>
             </plugin>

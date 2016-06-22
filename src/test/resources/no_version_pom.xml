@@ -62,6 +62,26 @@
                             <platform>windows</platform>
                             <bit>64</bit>
                         </driver>
+                        <driver>
+                            <name>marionette</name>
+                            <platform>windows</platform>
+                            <bit>32</bit>
+                        </driver>
+                        <driver>
+                            <name>marionette</name>
+                            <platform>linux</platform>
+                            <bit>64</bit>
+                        </driver>
+                        <driver>
+                            <name>marionette</name>
+                            <platform>mac</platform>
+                            <bit>32</bit>
+                        </driver>
+                        <driver>
+                            <name>marionette</name>
+                            <platform>mac</platform>
+                            <bit>64</bit>
+                        </driver>
                     </drivers>
                 </configuration>
             </plugin>

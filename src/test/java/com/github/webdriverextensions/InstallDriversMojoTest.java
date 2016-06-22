@@ -52,6 +52,19 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertNumberOfInstalledDriverIs(1);
     }
 
+    public void test_that_driver_compressed_with_gz_is_supported() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/extract_gz_pom.xml");
+
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("marionette-linux-64bit");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
     public void test_that_skip_configuration_does_not_install_configured_drivers() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml");
@@ -143,6 +156,10 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(10);
+        assertDriverIsInstalled("marionette-windows-32bit.exe");
+        assertDriverIsInstalled("marionette-mac-32bit");
+        assertDriverIsInstalled("marionette-mac-64bit");
+        assertDriverIsInstalled("marionette-linux-64bit");
+        assertNumberOfInstalledDriverIs(14);
     }
 }

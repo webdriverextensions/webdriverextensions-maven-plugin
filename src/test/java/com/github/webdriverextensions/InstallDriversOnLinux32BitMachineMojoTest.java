@@ -34,7 +34,8 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("phantomjs-linux-32bit");
         assertDriverIsInstalled("phantomjs-linux-64bit");
-        assertNumberOfInstalledDriverIs(4);
+        assertDriverIsInstalled("marionette-linux-64bit");
+        assertNumberOfInstalledDriverIs(5);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
@@ -50,7 +51,9 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertNumberOfInstalledDriverIs(5);
+        assertDriverIsInstalled("marionette-windows-32bit.exe");
+        assertDriverIsInstalled("marionette-mac-32bit");
+        assertNumberOfInstalledDriverIs(7);
     }
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
@@ -71,6 +74,10 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(10);
+        assertDriverIsInstalled("marionette-windows-32bit.exe");
+        assertDriverIsInstalled("marionette-mac-32bit");
+        assertDriverIsInstalled("marionette-mac-64bit");
+        assertDriverIsInstalled("marionette-linux-64bit");
+        assertNumberOfInstalledDriverIs(14);
     }
 }
