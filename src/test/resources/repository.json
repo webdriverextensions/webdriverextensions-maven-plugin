@@ -552,13 +552,6 @@
         {
             "name": "geckodriver",
             "platform": "mac",
-            "bit": "32",
-            "version": "0.8.0",
-            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-0.8.0-OSX.gz"
-        },
-        {
-            "name": "geckodriver",
-            "platform": "mac",
             "bit": "64",
             "version": "0.8.0",
             "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-0.8.0-OSX.gz"

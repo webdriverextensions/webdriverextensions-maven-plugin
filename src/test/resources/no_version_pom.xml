@@ -75,11 +75,6 @@
                         <driver>
                             <name>geckodriver</name>
                             <platform>mac</platform>
-                            <bit>32</bit>
-                        </driver>
-                        <driver>
-                            <name>geckodriver</name>
-                            <platform>mac</platform>
                             <bit>64</bit>
                         </driver>
                     </drivers>

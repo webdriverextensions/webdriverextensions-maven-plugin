@@ -35,9 +35,8 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
-        assertDriverIsInstalled("geckodriver-mac-32bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
-        assertNumberOfInstalledDriverIs(4);
+        assertNumberOfInstalledDriverIs(3);
     }
 
     public void test_that_driver_configuration_with_no_bit_downloads_the_driver_only_for_the_current_bit() throws Exception {
@@ -79,9 +78,8 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
         assertDriverIsInstalled("geckodriver-windows-32bit.exe");
-        assertDriverIsInstalled("geckodriver-mac-32bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
-        assertNumberOfInstalledDriverIs(14);
+        assertNumberOfInstalledDriverIs(13);
     }
 }

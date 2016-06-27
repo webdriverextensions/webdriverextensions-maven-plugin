@@ -52,8 +52,7 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-32bit");
         assertDriverIsInstalled("geckodriver-windows-32bit.exe");
-        assertDriverIsInstalled("geckodriver-mac-32bit");
-        assertNumberOfInstalledDriverIs(7);
+        assertNumberOfInstalledDriverIs(6);
     }
 
     public void test_that_driver_configuration_with_no_version_downloads_latest_drivers() throws Exception {
@@ -75,9 +74,8 @@ public class InstallDriversOnLinux32BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
         assertDriverIsInstalled("geckodriver-windows-32bit.exe");
-        assertDriverIsInstalled("geckodriver-mac-32bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
-        assertNumberOfInstalledDriverIs(14);
+        assertNumberOfInstalledDriverIs(13);
     }
 }
