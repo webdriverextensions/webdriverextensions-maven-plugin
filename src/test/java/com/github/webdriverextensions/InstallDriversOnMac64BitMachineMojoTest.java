@@ -50,7 +50,7 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         // Then
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsInstalled("chromedriver-linux-32bit");
+        assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("geckodriver-windows-32bit.exe");
