@@ -13,7 +13,7 @@
                 <configuration>
                     <drivers>
                         <driver>
-                            <name>marionette</name>
+                            <name>geckodriver</name>
                             <platform>linux</platform>
                             <bit>64</bit>
                             <version>0.8.0</version>

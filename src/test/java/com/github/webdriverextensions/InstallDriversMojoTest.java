@@ -61,7 +61,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("marionette-linux-64bit");
+        assertDriverIsInstalled("geckodriver-linux-64bit");
         assertNumberOfInstalledDriverIs(1);
     }
 
@@ -156,10 +156,10 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertDriverIsInstalled("marionette-windows-32bit.exe");
-        assertDriverIsInstalled("marionette-mac-32bit");
-        assertDriverIsInstalled("marionette-mac-64bit");
-        assertDriverIsInstalled("marionette-linux-64bit");
+        assertDriverIsInstalled("geckodriver-windows-32bit.exe");
+        assertDriverIsInstalled("geckodriver-mac-32bit");
+        assertDriverIsInstalled("geckodriver-mac-64bit");
+        assertDriverIsInstalled("geckodriver-linux-64bit");
         assertNumberOfInstalledDriverIs(14);
     }
 }

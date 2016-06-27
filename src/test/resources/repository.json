@@ -536,28 +536,28 @@
             "fileMatchInside": ".*/phantomjs.exe$"
         },
         {
-            "name": "marionette",
+            "name": "geckodriver",
             "platform": "windows",
             "bit": "32",
             "version": "0.8.0",
             "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-v0.8.0-win32.zip"
         },
         {
-            "name": "marionette",
+            "name": "geckodriver",
             "platform": "linux",
             "bit": "64",
             "version": "0.8.0",
             "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-0.8.0-linux64.gz"
         },
         {
-            "name": "marionette",
+            "name": "geckodriver",
             "platform": "mac",
             "bit": "32",
             "version": "0.8.0",
             "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-0.8.0-OSX.gz"
         },
         {
-            "name": "marionette",
+            "name": "geckodriver",
             "platform": "mac",
             "bit": "64",
             "version": "0.8.0",

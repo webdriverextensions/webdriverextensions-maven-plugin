@@ -18,7 +18,7 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
 
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
-        assertDriverIsInstalled("marionette-mac-32bit");
+        assertDriverIsInstalled("geckodriver-mac-32bit");
         assertNumberOfInstalledDriverIs(2);
     }
 
@@ -33,8 +33,8 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         // Then
         assertDriverIsInstalled("chromedriver-mac-32bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
-        assertDriverIsInstalled("marionette-mac-32bit");
-        assertDriverIsInstalled("marionette-mac-64bit");
+        assertDriverIsInstalled("geckodriver-mac-32bit");
+        assertDriverIsInstalled("geckodriver-mac-64bit");
         assertNumberOfInstalledDriverIs(4);
     }
 
@@ -52,8 +52,8 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-32bit");
-        assertDriverIsInstalled("marionette-windows-32bit.exe");
-        assertDriverIsInstalled("marionette-mac-32bit");
+        assertDriverIsInstalled("geckodriver-windows-32bit.exe");
+        assertDriverIsInstalled("geckodriver-mac-32bit");
         assertNumberOfInstalledDriverIs(7);
     }
 
@@ -76,10 +76,10 @@ public class InstallDriversOnMac32BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertDriverIsInstalled("marionette-windows-32bit.exe");
-        assertDriverIsInstalled("marionette-mac-32bit");
-        assertDriverIsInstalled("marionette-mac-64bit");
-        assertDriverIsInstalled("marionette-linux-64bit");
+        assertDriverIsInstalled("geckodriver-windows-32bit.exe");
+        assertDriverIsInstalled("geckodriver-mac-32bit");
+        assertDriverIsInstalled("geckodriver-mac-64bit");
+        assertDriverIsInstalled("geckodriver-linux-64bit");
         assertNumberOfInstalledDriverIs(14);
     }
 }

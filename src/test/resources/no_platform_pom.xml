@@ -44,12 +44,12 @@
                             <version>1.9.7</version>
                         </driver>
                         <driver>
-                            <name>marionette</name>
+                            <name>geckodriver</name>
                             <bit>32</bit>
                             <version>0.8.0</version>
                         </driver>
                         <driver>
-                            <name>marionette</name>
+                            <name>geckodriver</name>
                             <bit>64</bit>
                             <version>0.8.0</version>
                         </driver>
