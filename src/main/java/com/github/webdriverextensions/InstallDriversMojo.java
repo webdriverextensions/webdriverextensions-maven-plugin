@@ -35,7 +35,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * json file containing information of available drivers and their
      * locations, checksums, etc.
      */
-    @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository-3.0/master/repository.json")
+    @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository-3.0.json")
     URL repositoryUrl;
 
     /**
@@ -72,7 +72,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * provided for the driver together with a checksum (to retrieve the
      * checksum run the plugin without providing a checksum once, the plugin
      * will then calculate and print the checksum for you). The default
-     * repository with all available drivers can be found <a href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository.json">here</a>.<br/>
+     * repository with all available drivers can be found <a href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json">here</a>.<br/>
      * <br/>
      * <strong>Some Examples</strong><br/>
      * Installing all latest drivers<br/>

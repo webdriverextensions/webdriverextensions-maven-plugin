@@ -23,9 +23,9 @@ The following drivers are currently maintained and available for installation:
 - geckodriver, linux, 64bit
 
 We try to update the drivers as soon as we notice they are updated. If you want to help to keep the drivers
-updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-3.0).
+updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository).
 To verify that a version is available for installation check that it exists in the
-[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-3.0/blob/master/repository.json).
+[default drivers repository-3.0.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json).
 
 However if the driver is not yet available in the repo it can also be installed by providing an URL to the download
 location, see the [section below](#installing-a-driver-from-an-url) for
@@ -124,7 +124,7 @@ see the [plugin goal documentation](http://webdriverextensions.github.io/webdriv
 
 ### Installing a Driver from an URL
 If the driver is not available in the
-[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-3.0/blob/master/repository.json) you can install the driver by also
+[default drivers repository-3.0.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json) you can install the driver by also
 providing an URL to the download location.
 
 E.g. to install an old Chrome Driver for windows
