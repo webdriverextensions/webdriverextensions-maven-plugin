@@ -255,10 +255,9 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
-
-#### 2.1.0 (2016 May 24)
-- IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
-
+#### 2.2.0 (2016 June 13)
+- Fixed bitDetection for internetexplorerdriver on Windows 10 enviroments 
+- Fixed bitDetection for phantomjs (Thanks to [@lkwg82](https://github.com/lkwg82))
 
 #### 2.1.0 (2016 May 24)
 - IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
