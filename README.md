@@ -41,7 +41,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -67,7 +67,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -81,37 +81,37 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.45</version>
+                <version>2.53</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>2.45</version>
+                <version>2.53</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>32</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
         </drivers>
     </configuration>
@@ -133,7 +133,7 @@ E.g. to install an old Chrome Driver for windows
     <name>chromedriver</name>
     <platform>windows</platform>
     <bit>32</bit>
-    <version>2.10</version>
+    <version>2.22</version>
     <url>http://chromedriver.storage.googleapis.com/2.10/chromedriver_win32.zip</url>
 </driver>
 ```
@@ -147,7 +147,7 @@ the downloaded zip/bz2 file. This is done by providing a regex pattern in a tag 
     <name>phantomjs</name>
     <platform>linux</platform>
     <bit>32</bit>
-    <version>1.9.6</version>
+    <version>2.1.1</version>
     <url>https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.6-linux-i686.tar.bz2</url>
     <fileMatchInside>.*/bin/phantomjs$</fileMatchInside>
 </driver>
@@ -161,7 +161,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -185,7 +185,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -210,7 +210,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -230,7 +230,7 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
