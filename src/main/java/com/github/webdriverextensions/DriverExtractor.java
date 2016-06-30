@@ -13,6 +13,7 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -43,10 +44,30 @@ class DriverExtractor {
                     }
                     decideToDeleteFile(fileToExtract);
                     return extractDriver(driver, extractedFile);
+                case "gz":
+                    String extractedFromGzFilename = FilenameUtils.getBaseName(fileToExtract.toString());
+                    Path extractedFromGzFile = Paths.get(mojo.tempDirectory.getPath(), extractedFromGzFilename);
+
+                    try (FileInputStream fin = new FileInputStream(fileToExtract.toFile())) {
+                        try (BufferedInputStream bin = new BufferedInputStream(fin)) {
+                            try (GzipCompressorInputStream input = new GzipCompressorInputStream(bin)) {
+
+                                File file = new File(extractedFromGzFile.toFile(), extractedFromGzFilename);
+                                if (!extractedFromGzFile.toFile().mkdirs()) {
+                                    throw new RuntimeException("Failed create directory " + quote(extractedFromGzFile) + " for extracted files");
+                                }
+
+                                try (FileOutputStream out = new FileOutputStream(file)) {
+                                    IOUtils.copy(input, out);
+                                }
+                            }
+                        }
+                    }
+                    decideToDeleteFile(fileToExtract);
+                    return extractedFromGzFile;
                 case "tar":
                 case "zip":
-                    Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(),
-                                                        FilenameUtils.getBaseName(fileToExtract.toString()));
+                    Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
                     if (!extractToDirectory.toFile().mkdirs()) {
                         throw new RuntimeException("Failed create directory " + quote(extractToDirectory) + " for extracted files");
                     }
@@ -89,7 +110,7 @@ class DriverExtractor {
                                         if (pattern != null) {
                                             if (pattern.matcher(name).matches()) {
                                                 file = new File(extractToDirectory.toFile(),
-                                                                FilenameUtils.getName(name));
+                                                        FilenameUtils.getName(name));
                                             } else {
                                                 file = null;
                                             }

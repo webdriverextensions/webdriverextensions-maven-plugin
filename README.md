@@ -18,6 +18,9 @@ The following drivers are currently maintained and available for installation:
 - phantomjs, mac, 64bit
 - phantomjs, linux, 32bit
 - phantomjs, linux, 64bit
+- geckodriver, windows, 32bit
+- geckodriver, mac, 64bit
+- geckodriver, linux, 64bit
 
 We try to update the drivers as soon as we notice they are updated. If you want to help to keep the drivers
 updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0).

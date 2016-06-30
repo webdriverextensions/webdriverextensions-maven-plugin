@@ -52,6 +52,19 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertNumberOfInstalledDriverIs(1);
     }
 
+    public void test_that_driver_compressed_with_gz_is_supported() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/extract_gz_pom.xml");
+
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("geckodriver-linux-64bit");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
     public void test_that_skip_configuration_does_not_install_configured_drivers() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml");
@@ -143,6 +156,9 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertNumberOfInstalledDriverIs(10);
+        assertDriverIsInstalled("geckodriver-windows-32bit.exe");
+        assertDriverIsInstalled("geckodriver-mac-64bit");
+        assertDriverIsInstalled("geckodriver-linux-64bit");
+        assertNumberOfInstalledDriverIs(13);
     }
 }

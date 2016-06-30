@@ -37,6 +37,21 @@
                             <platform>linux</platform>
                             <version>1.9.7</version>
                         </driver>
+                        <driver>
+                            <name>geckodriver</name>
+                            <platform>windows</platform>
+                            <version>0.8.0</version>
+                        </driver>
+                        <driver>
+                            <name>geckodriver</name>
+                            <platform>mac</platform>
+                            <version>0.8.0</version>
+                        </driver>
+                        <driver>
+                            <name>geckodriver</name>
+                            <platform>linux</platform>
+                            <version>0.8.0</version>
+                        </driver>
                     </drivers>
                 </configuration>
             </plugin>
