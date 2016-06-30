@@ -706,6 +706,41 @@
             "bit": "64",
             "version": "3.14366",
             "url": "https://download.microsoft.com/download/1/4/1/14156DA0-D40F-460A-B14D-1B264CA081A5/MicrosoftWebDriver.exe"
+        },
+        {
+            "name": "operadriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win32.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win64.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "mac",
+            "bit": "64",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_mac64.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "linux",
+            "bit": "32",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_linux32.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_linux64.zip"
         }
     ]
 }
