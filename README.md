@@ -122,13 +122,13 @@ E.g. to install specific versions of all available drivers
             <driver>
                 <name>phantomjs</name>
                 <platform>windows</platform>
-                <bit>32</bit>
+                <bit>64</bit>
                 <version>2.1.1</version>
             </driver>
             <driver>
                 <name>phantomjs</name>
                 <platform>mac</platform>
-                <bit>32</bit>
+                <bit>64</bit>
                 <version>2.1.1</version>
             </driver>
             <driver>
