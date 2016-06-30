@@ -18,7 +18,7 @@ The following drivers are currently maintained and available for installation:
 - phantomjs, mac, 64bit
 - phantomjs, linux, 32bit
 - phantomjs, linux, 64bit
-- geckodriver, windows, 32bit
+- geckodriver, windows, 64bit
 - geckodriver, mac, 64bit
 - geckodriver, linux, 64bit
 
