@@ -40,17 +40,37 @@
                         <driver>
                             <name>geckodriver</name>
                             <platform>windows</platform>
-                            <version>0.8.0</version>
+                            <version>0.9.0</version>
                         </driver>
                         <driver>
                             <name>geckodriver</name>
                             <platform>mac</platform>
-                            <version>0.8.0</version>
+                            <version>0.9.0</version>
                         </driver>
                         <driver>
                             <name>geckodriver</name>
                             <platform>linux</platform>
-                            <version>0.8.0</version>
+                            <version>0.9.0</version>
+                        </driver>
+                        <driver>
+                            <name>edgedriver</name>
+                            <platform>windows</platform>
+                            <version>3.14366</version>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>windows</platform>
+                            <version>0.2.2</version>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>linux</platform>
+                            <version>0.2.2</version>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>mac</platform>
+                            <version>0.2.2</version>
                         </driver>
                     </drivers>
                 </configuration>

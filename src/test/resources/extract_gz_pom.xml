@@ -16,7 +16,7 @@
                             <name>geckodriver</name>
                             <platform>linux</platform>
                             <bit>64</bit>
-                            <version>0.8.0</version>
+                            <version>0.9.0</version>
                         </driver>
                     </drivers>
                 </configuration>

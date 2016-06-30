@@ -21,6 +21,12 @@ The following drivers are currently maintained and available for installation:
 - geckodriver, windows, 64bit
 - geckodriver, mac, 64bit
 - geckodriver, linux, 64bit
+- edgedriver, windows, 64bit
+- operadriver, windows, 32bit
+- operadriver, windows, 64bit
+- operadriver, mac, 32bit
+- operadriver, linux, 32bit
+- operadriver, linux, 64bit
 
 We try to update the drivers as soon as we notice they are updated. If you want to help to keep the drivers
 updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository).
@@ -112,6 +118,60 @@ E.g. to install specific versions of all available drivers
                 <platform>linux</platform>
                 <bit>64</bit>
                 <version>2.22</version>
+            </driver>
+            <driver>
+                <name>geckodriver</name>
+                <platform>windows</platform>
+                <bit>64</bit>
+                <version>0.9.0</version>
+            </driver>
+            <driver>
+                <name>geckodriver</name>
+                <platform>mac</platform>
+                <bit>64</bit>
+                <version>0.9.0</version>
+            </driver>
+            <driver>
+                <name>geckodriver</name>
+                <platform>linux</platform>
+                <bit>64</bit>
+                <version>0.9.0</version>
+            </driver>
+            <driver>
+                <name>edgedriver</name>
+                <platform>windows</platform>
+                <bit>64</bit>
+                <version>3.14366</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>windows</platform>
+                <bit>32</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>windows</platform>
+                <bit>64</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>mac</platform>
+                <bit>64</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>linux</platform>
+                <bit>32</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>linux</platform>
+                <bit>64</bit>
+                <version>0.2.2</version>
             </driver>
         </drivers>
     </configuration>
@@ -254,6 +314,11 @@ For more details on how to further configure this plugin please see the
 
 
 ## Changelog
+
+#### 3.0.0 (2016 June 13)
+- Added support for geckodriver (Marionette) (Thanks to [@pumano](https://github.com/pumano))
+- Added support for edgedriver (Microsoft WebDriver)
+- Added support for operadriver
 
 #### 2.2.0 (2016 June 13)
 - Fixed bitDetection for internetexplorerdriver on Windows 10 enviroments 

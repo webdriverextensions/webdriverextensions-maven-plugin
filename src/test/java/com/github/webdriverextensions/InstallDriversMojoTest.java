@@ -156,9 +156,15 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("phantomjs-windows-64bit.exe");
-        assertDriverIsInstalled("geckodriver-windows-32bit.exe");
+        assertDriverIsInstalled("geckodriver-windows-64bit.exe");
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
-        assertNumberOfInstalledDriverIs(13);
+        assertDriverIsInstalled("edgedriver-windows-64bit.exe");
+        assertDriverIsInstalled("operadriver-windows-32bit.exe");
+        assertDriverIsInstalled("operadriver-windows-64bit.exe");
+        assertDriverIsInstalled("operadriver-mac-64bit");
+        assertDriverIsInstalled("operadriver-linux-32bit");
+        assertDriverIsInstalled("operadriver-linux-64bit");
+        assertNumberOfInstalledDriverIs(19);
     }
 }
