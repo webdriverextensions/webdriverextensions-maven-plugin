@@ -65,7 +65,7 @@
                         <driver>
                             <name>geckodriver</name>
                             <platform>windows</platform>
-                            <bit>32</bit>
+                            <bit>64</bit>
                         </driver>
                         <driver>
                             <name>geckodriver</name>
@@ -74,6 +74,36 @@
                         </driver>
                         <driver>
                             <name>geckodriver</name>
+                            <platform>mac</platform>
+                            <bit>64</bit>
+                        </driver>
+                        <driver>
+                            <name>edgedriver</name>
+                            <platform>windows</platform>
+                            <bit>64</bit>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>windows</platform>
+                            <bit>32</bit>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>windows</platform>
+                            <bit>64</bit>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>linux</platform>
+                            <bit>32</bit>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
+                            <platform>linux</platform>
+                            <bit>64</bit>
+                        </driver>
+                        <driver>
+                            <name>operadriver</name>
                             <platform>mac</platform>
                             <bit>64</bit>
                         </driver>

@@ -4,6 +4,62 @@
             "name": "chromedriver",
             "platform": "linux",
             "bit": "32",
+            "version": "2.22.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.22/chromedriver_linux32.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "2.22.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.22.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.22/chromedriver_mac32.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.22.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.22/chromedriver_win32.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "32",
+            "version": "2.21.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.21/chromedriver_linux32.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "2.21.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.21/chromedriver_linux64.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "mac",
+            "bit": "32",
+            "version": "2.21.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.21/chromedriver_mac32.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.21.0",
+            "url": "http://chromedriver.storage.googleapis.com/2.21/chromedriver_win32.zip"
+        },
+        {
+            "name": "chromedriver",
+            "platform": "linux",
+            "bit": "32",
             "version": "2.20.0",
             "url": "http://chromedriver.storage.googleapis.com/2.20/chromedriver_linux32.zip"
         },
@@ -333,6 +389,62 @@
             "name": "internetexplorerdriver",
             "platform": "windows",
             "bit": "32",
+            "version": "2.53.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_Win32_2.53.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.53.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.53/IEDriverServer_x64_2.53.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.52.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.52/IEDriverServer_Win32_2.52.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.52.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.52/IEDriverServer_x64_2.52.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.51.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.51/IEDriverServer_Win32_2.51.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.51.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.51/IEDriverServer_x64_2.51.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "2.50.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.50/IEDriverServer_Win32_2.50.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.50.0",
+            "url": "http://selenium-release.storage.googleapis.com/2.50/IEDriverServer_x64_2.50.0.zip"
+        },
+        {
+            "name": "internetexplorerdriver",
+            "platform": "windows",
+            "bit": "32",
             "version": "2.49.0",
             "url": "http://selenium-release.storage.googleapis.com/2.49/IEDriverServer_Win32_2.49.0.zip"
         },
@@ -459,6 +571,38 @@
             "name": "phantomjs",
             "platform": "mac",
             "bit": "64",
+            "version": "2.1.1",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-macosx.zip",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "windows",
+            "bit": "64",
+            "version": "2.1.1",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-windows.zip",
+            "fileMatchInside": ".*phantomjs.exe$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "linux",
+            "bit": "64",
+            "version": "2.1.1",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "linux",
+            "bit": "32",
+            "version": "2.1.1",
+            "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-i686.tar.bz2",
+            "fileMatchInside": ".*/bin/phantomjs$"
+        },
+        {
+            "name": "phantomjs",
+            "platform": "mac",
+            "bit": "64",
             "version": "2.0.0",
             "url": "https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.0.0-macosx.zip",
             "fileMatchInside": ".*/bin/phantomjs$"
@@ -538,6 +682,27 @@
         {
             "name": "geckodriver",
             "platform": "windows",
+            "bit": "64",
+            "version": "0.9.0",
+            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.9.0/geckodriver-v0.9.0-win64.zip"
+        },
+        {
+            "name": "geckodriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "0.9.0",
+            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.9.0/geckodriver-v0.9.0-linux64.tar.gz"
+        },
+        {
+            "name": "geckodriver",
+            "platform": "mac",
+            "bit": "64",
+            "version": "0.9.0",
+            "url": "https://github.com/mozilla/geckodriver/releases/download/v0.9.0/geckodriver-v0.9.0-mac.tar.gz"
+        },
+        {
+            "name": "geckodriver",
+            "platform": "windows",
             "bit": "32",
             "version": "0.8.0",
             "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-v0.8.0-win32.zip"
@@ -555,6 +720,48 @@
             "bit": "64",
             "version": "0.8.0",
             "url": "https://github.com/mozilla/geckodriver/releases/download/v0.8.0/geckodriver-0.8.0-OSX.gz"
+        },
+        {
+            "name": "edgedriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "3.14366",
+            "url": "https://download.microsoft.com/download/1/4/1/14156DA0-D40F-460A-B14D-1B264CA081A5/MicrosoftWebDriver.exe"
+        },
+        {
+            "name": "operadriver",
+            "platform": "windows",
+            "bit": "32",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win32.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "windows",
+            "bit": "64",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_win64.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "mac",
+            "bit": "64",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_mac64.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "linux",
+            "bit": "32",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_linux32.zip"
+        },
+        {
+            "name": "operadriver",
+            "platform": "linux",
+            "bit": "64",
+            "version": "0.2.2",
+            "url": "https://github.com/operasoftware/operachromiumdriver/releases/download/v0.2.2/operadriver_linux64.zip"
         }
     ]
 }

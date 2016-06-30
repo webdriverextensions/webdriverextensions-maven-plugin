@@ -18,14 +18,20 @@ The following drivers are currently maintained and available for installation:
 - phantomjs, mac, 64bit
 - phantomjs, linux, 32bit
 - phantomjs, linux, 64bit
-- geckodriver, windows, 32bit
+- geckodriver, windows, 64bit
 - geckodriver, mac, 64bit
 - geckodriver, linux, 64bit
+- edgedriver, windows, 64bit
+- operadriver, windows, 32bit
+- operadriver, windows, 64bit
+- operadriver, mac, 32bit
+- operadriver, linux, 32bit
+- operadriver, linux, 64bit
 
 We try to update the drivers as soon as we notice they are updated. If you want to help to keep the drivers
-updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0).
+updated see the [projects GitHub repository](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository).
 To verify that a version is available for installation check that it exists in the
-[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0/blob/master/repository.json).
+[default drivers repository-3.0.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json).
 
 However if the driver is not yet available in the repo it can also be installed by providing an URL to the download
 location, see the [section below](#installing-a-driver-from-an-url) for
@@ -41,7 +47,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -67,7 +73,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -81,37 +87,91 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.45</version>
+                <version>2.53</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>2.45</version>
+                <version>2.53</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>32</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>2.14</version>
+                <version>2.22</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>2.14</version>
+                <version>2.22</version>
+            </driver>
+            <driver>
+                <name>geckodriver</name>
+                <platform>windows</platform>
+                <bit>64</bit>
+                <version>0.9.0</version>
+            </driver>
+            <driver>
+                <name>geckodriver</name>
+                <platform>mac</platform>
+                <bit>64</bit>
+                <version>0.9.0</version>
+            </driver>
+            <driver>
+                <name>geckodriver</name>
+                <platform>linux</platform>
+                <bit>64</bit>
+                <version>0.9.0</version>
+            </driver>
+            <driver>
+                <name>edgedriver</name>
+                <platform>windows</platform>
+                <bit>64</bit>
+                <version>3.14366</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>windows</platform>
+                <bit>32</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>windows</platform>
+                <bit>64</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>mac</platform>
+                <bit>64</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>linux</platform>
+                <bit>32</bit>
+                <version>0.2.2</version>
+            </driver>
+            <driver>
+                <name>operadriver</name>
+                <platform>linux</platform>
+                <bit>64</bit>
+                <version>0.2.2</version>
             </driver>
         </drivers>
     </configuration>
@@ -124,7 +184,7 @@ see the [plugin goal documentation](http://webdriverextensions.github.io/webdriv
 
 ### Installing a Driver from an URL
 If the driver is not available in the
-[default drivers repository.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository-2.0/blob/master/repository.json) you can install the driver by also
+[default drivers repository-3.0.json file](https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json) you can install the driver by also
 providing an URL to the download location.
 
 E.g. to install an old Chrome Driver for windows
@@ -133,7 +193,7 @@ E.g. to install an old Chrome Driver for windows
     <name>chromedriver</name>
     <platform>windows</platform>
     <bit>32</bit>
-    <version>2.10</version>
+    <version>2.22</version>
     <url>http://chromedriver.storage.googleapis.com/2.10/chromedriver_win32.zip</url>
 </driver>
 ```
@@ -147,7 +207,7 @@ the downloaded zip/bz2 file. This is done by providing a regex pattern in a tag 
     <name>phantomjs</name>
     <platform>linux</platform>
     <bit>32</bit>
-    <version>1.9.6</version>
+    <version>2.1.1</version>
     <url>https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.6-linux-i686.tar.bz2</url>
     <fileMatchInside>.*/bin/phantomjs$</fileMatchInside>
 </driver>
@@ -161,7 +221,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -185,7 +245,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -210,7 +270,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -230,7 +290,7 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>2.1.0</version>
+    <version>2.3.0</version>
     <executions>
         <execution>
             <goals>
@@ -255,10 +315,14 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
+#### 3.0.0 (2016 June 13)
+- Added support for geckodriver (Marionette) (Thanks to [@pumano](https://github.com/pumano))
+- Added support for edgedriver (Microsoft WebDriver)
+- Added support for operadriver
 
-#### 2.1.0 (2016 May 24)
-- IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)
-
+#### 2.2.0 (2016 June 13)
+- Fixed bitDetection for internetexplorerdriver on Windows 10 enviroments 
+- Fixed bitDetection for phantomjs (Thanks to [@lkwg82](https://github.com/lkwg82))
 
 #### 2.1.0 (2016 May 24)
 - IMPROVEMENT No need to manually delete drivers when download fails [issue 11](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/11)

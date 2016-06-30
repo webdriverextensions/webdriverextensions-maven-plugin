@@ -187,10 +187,6 @@ class Repository {
     }
 
     private static String detectBits(String driverName) {
-        // Chrome driver does only exist in 64 bit version for linux
-        if (driverName.equals("chromedriver") && !isLinux()) {
-            return "32";
-        }
         // Default installed internetexplorer bit version on < Windows 10 versions is 32 bit
         if (driverName.equals("internetexplorerdriver") && !isWindows10()) {
             return "32";

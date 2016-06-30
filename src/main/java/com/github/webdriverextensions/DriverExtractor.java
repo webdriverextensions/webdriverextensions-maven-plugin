@@ -27,12 +27,11 @@ class DriverExtractor {
     }
 
     Path extractDriver(Driver driver, Path fileToExtract) throws MojoExecutionException {
-
-        mojo.getLog().info("  Extracting " + quote(fileToExtract) + " to temp folder");
         String fileExtension = FilenameUtils.getExtension(fileToExtract.toString());
         try {
             switch (fileExtension) {
                 case "bz2":
+                    mojo.getLog().info("  Extracting " + quote(fileToExtract) + " to temp folder");
                     String extractedFilename = FilenameUtils.getBaseName(fileToExtract.toString());
                     Path extractedFile = Paths.get(mojo.tempDirectory.getPath(), extractedFilename);
                     try (FileInputStream fin = new FileInputStream(fileToExtract.toFile())) {
@@ -45,6 +44,7 @@ class DriverExtractor {
                     decideToDeleteFile(fileToExtract);
                     return extractDriver(driver, extractedFile);
                 case "gz":
+                    mojo.getLog().info("  Extracting " + quote(fileToExtract) + " to temp folder");
                     String extractedFromGzFilename = FilenameUtils.getBaseName(fileToExtract.toString());
                     Path extractedFromGzFile = Paths.get(mojo.tempDirectory.getPath(), extractedFromGzFilename);
 
@@ -67,6 +67,7 @@ class DriverExtractor {
                     return extractedFromGzFile;
                 case "tar":
                 case "zip":
+                    mojo.getLog().info("  Extracting " + quote(fileToExtract) + " to temp folder");
                     Path extractToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getBaseName(fileToExtract.toString()));
                     if (!extractToDirectory.toFile().mkdirs()) {
                         throw new RuntimeException("Failed create directory " + quote(extractToDirectory) + " for extracted files");
@@ -128,6 +129,13 @@ class DriverExtractor {
                             }
                         }
                     }
+                case "exe":
+                case "":
+                    mojo.getLog().info("  Copying " + quote(fileToExtract) + " to temp folder");
+                    Path copyToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getName(fileToExtract.toString()));
+                    FileUtils.copyFile(fileToExtract.toFile(), copyToDirectory.toFile());
+                    decideToDeleteFile(fileToExtract);
+                    return mojo.tempDirectory.toPath();
                 default:
                     throw new UnsupportedOperationException("Unsupported extraction type, file extension: " + fileExtension);
             }

@@ -49,7 +49,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
 
         logTestName(mojo);
 
-        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository.json");
+        mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository-3.0.json");
         mojo.keepDownloadedWebdrivers = true;
 
         return mojo;
