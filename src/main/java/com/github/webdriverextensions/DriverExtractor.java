@@ -131,11 +131,15 @@ class DriverExtractor {
                     }
                 case "exe":
                 case "":
-                    mojo.getLog().info("  Copying " + quote(fileToExtract) + " to temp folder");
-                    Path copyToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getName(fileToExtract.toString()));
-                    FileUtils.copyFile(fileToExtract.toFile(), copyToDirectory.toFile());
-                    decideToDeleteFile(fileToExtract);
-                    return mojo.tempDirectory.toPath();
+                    if (mojo.keepDownloadedWebdrivers) {
+                        mojo.getLog().info("  Copying " + quote(fileToExtract) + " to temp folder");
+                        Path copyToDirectory = Paths.get(mojo.tempDirectory.getPath(), FilenameUtils.getName(fileToExtract.toString()));
+                        FileUtils.copyFile(fileToExtract.toFile(), copyToDirectory.toFile());
+                        decideToDeleteFile(fileToExtract);
+                        return mojo.tempDirectory.toPath();
+                    } else {
+                        return fileToExtract;
+                    }
                 default:
                     throw new UnsupportedOperationException("Unsupported extraction type, file extension: " + fileExtension);
             }

@@ -25,12 +25,14 @@ public class DriverInstaller {
     }
 
     public void install(Driver driver, Path extractLocation) throws MojoExecutionException {
-        if (directoryIsEmpty(extractLocation)) {
+        if (extractLocation.toFile().isDirectory() && directoryIsEmpty(extractLocation)) {
             throw new InstallDriversMojoExecutionException("Failed to install driver since no files found to install", mojo, driver);
         }
 
         try {
-            if (directoryContainsSingleDirectory(extractLocation)) {
+            if (isFile(extractLocation)) {
+                moveFile(driver, extractLocation);
+            } else if (directoryContainsSingleDirectory(extractLocation)) {
                 moveDirectoryInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getId()));
             } else if (directoryContainsSingleFile(extractLocation)) {
                 moveFileInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
@@ -51,6 +53,10 @@ public class DriverInstaller {
         return path.toFile().exists();
     }
 
+    private boolean isFile(Path extractLocation) {
+        return extractLocation.toFile().isFile();
+    }
+
     private boolean directoryIsEmpty(Path directory) {
         return directory.toFile().listFiles().length == 0;
     }
@@ -63,6 +69,12 @@ public class DriverInstaller {
     private boolean directoryContainsSingleFile(Path directory) throws MojoExecutionException {
         File[] files = directory.toFile().listFiles();
         return files != null && files.length == 1 && files[0].isFile();
+    }
+
+    private void moveFile(Driver driver, Path extractLocation) throws IOException {
+        File to = Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()).toFile();
+        mojo.getLog().info("  Moving " + quote(extractLocation) + " to " + quote(to));
+        org.apache.commons.io.FileUtils.moveFile(extractLocation.toFile(), to);
     }
 
     private void moveDirectoryInDirectory(Path from, Path to) throws MojoExecutionException {
