@@ -115,7 +115,7 @@ public class Utils {
         );
 
         if (files.size() == 0) {
-            return path + " is empty";
+            return path + " is empty" + System.lineSeparator();
         }
 
         StringBuilder stringBuilder = new StringBuilder();
@@ -152,7 +152,7 @@ public class Utils {
     }
 
     private static String getRelativePath(File file, File relativeToPath) {
-        return file.getAbsolutePath().replaceFirst(relativeToPath.getAbsolutePath() + File.separator, "");
+        return StringUtils.replaceOnce(file.getAbsolutePath(), relativeToPath.getAbsolutePath() + File.separator, "");
     }
 
     private static String readableFileSize(File file) {
