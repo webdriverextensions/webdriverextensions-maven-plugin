@@ -124,11 +124,11 @@ class DriverExtractor {
                                         }
                                     }
                                 }
-                                decideToDeleteFile(fileToExtract);
-                                return extractToDirectory;
                             }
                         }
                     }
+                    decideToDeleteFile(fileToExtract);
+                    return extractToDirectory;
                 case "exe":
                 case "":
                     if (mojo.keepDownloadedWebdrivers) {
