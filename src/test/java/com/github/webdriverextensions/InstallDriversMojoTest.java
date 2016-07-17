@@ -6,7 +6,9 @@ import java.io.File;
 import java.nio.file.attribute.FileTime;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.junit.Ignore;
 
+@Ignore
 public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_configuration_with_explicit_driver_that_is_not_available_in_the_repository_fails_with_error_message_could_not_find_driver() throws Exception {
