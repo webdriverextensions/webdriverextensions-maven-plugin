@@ -13,7 +13,7 @@ public class InstallChromedriverMojoTest extends AbstractInstallDriversMojoTest 
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-windows-32bit");
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(1);
     }
 
