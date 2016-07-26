@@ -339,7 +339,13 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
-#### 3.0.0 (2016 June 13)
+#### 3.0.2 (2016 July 13)
+- BUGFIX Fixed [issue 21](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/21) with failing on extracting chromedriver on windows machines
+
+#### 3.0.1 (2016 July 5)
+- BUGFIX Fixed debug message on error not shown on windows machines
+
+#### 3.0.0 (2016 July 1)
 - Added support for geckodriver (Marionette) (Thanks to [@pumano](https://github.com/pumano))
 - Added support for edgedriver (Microsoft WebDriver)
 - Added support for operadriver
