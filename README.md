@@ -218,7 +218,7 @@ E.g. to install an old Chrome Driver for windows
     <platform>windows</platform>
     <bit>32</bit>
     <version>2.22</version>
-    <url>http://chromedriver.storage.googleapis.com/2.10/chromedriver_win32.zip</url>
+    <url>http://chromedriver.storage.googleapis.com/2.22/chromedriver_win32.zip</url>
 </driver>
 ```
 
