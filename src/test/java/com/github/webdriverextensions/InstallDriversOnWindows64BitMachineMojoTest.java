@@ -1,5 +1,8 @@
 package com.github.webdriverextensions;
 
+import org.junit.Ignore;
+
+@Ignore
 public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstallDriversMojoTest {
 
     @Override
