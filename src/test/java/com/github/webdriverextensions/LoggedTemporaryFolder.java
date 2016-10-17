@@ -17,7 +17,7 @@ public class LoggedTemporaryFolder extends TemporaryFolder {
                 try {
                     base.evaluate();
                 } catch (Throwable e) {
-                    System.out.println(Utils.directoryToString(getRoot()));
+                    System.out.println(Utils.directoryToString(getRoot().toPath()));
                     throw e;
                 } finally {
                     after();

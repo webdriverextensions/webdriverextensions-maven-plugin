@@ -56,14 +56,13 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     private void deleteTempDirectory() throws IOException {
-        File tempDirectory = mojo.tempDirectory;
-        if (tempDirectory != null && tempDirectory.isDirectory()) {
-            FileUtils.deleteDirectory(tempDirectory);
+        if (mojo.tempDirectory != null && mojo.tempDirectory.toFile().exists()) {
+            FileUtils.deleteDirectory(mojo.tempDirectory.toFile());
         }
     }
 
     private void deleteInstallationDirectory() throws IOException {
-        if (mojo.installationDirectory != null) {
+        if (mojo.installationDirectory.toPath() != null && mojo.installationDirectory.exists()) {
             FileUtils.deleteDirectory(mojo.installationDirectory);
         }
     }

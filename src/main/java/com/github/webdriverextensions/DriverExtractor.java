@@ -22,16 +22,16 @@ class DriverExtractor {
         try {
             if (fileExtractor.isExtractable(downloadedFile)) {
                 mojo.getLog().info("  Extracting " + quote(downloadedFile) + " to temp folder");
-                fileExtractor.extractFile(downloadedFile, mojo.tempDirectory.toPath());
+                fileExtractor.extractFile(downloadedFile, mojo.tempDirectory);
             } else {
                 mojo.getLog().info("  Copying " + quote(downloadedFile) + " to temp folder");
-                Files.createDirectories(mojo.tempDirectory.toPath());
-                Files.copy(downloadedFile, mojo.tempDirectory.toPath().resolve(downloadedFile.getFileName()));
+                Files.createDirectories(mojo.tempDirectory);
+                Files.copy(downloadedFile, mojo.tempDirectory.resolve(downloadedFile.getFileName()));
             }
             if (!mojo.keepDownloadedWebdrivers) {
                 Files.delete(downloadedFile);
             }
-            return mojo.tempDirectory.toPath();
+            return mojo.tempDirectory;
         } catch (Exception e) {
             throw new InstallDriversMojoExecutionException("Failed to extract driver from " + quote(downloadedFile) + " cause of " + e.getMessage(), e, mojo, driver);
         }

@@ -2,23 +2,22 @@ package com.github.webdriverextensions;
 
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 class DriverVersionHandler {
-    private final File installationDirectory;
+    private final Path installationDirectory;
 
-    public DriverVersionHandler(File installationDirectory) {
+    public DriverVersionHandler(Path installationDirectory) {
         this.installationDirectory = installationDirectory;
     }
 
     void writeVersionFile(Driver driver) throws MojoExecutionException {
-        File file = getVersionFile(driver);
+        Path file = getVersionFile(driver);
         String versionString = createVersionString(driver);
 
         try {
-            org.apache.commons.io.FileUtils.writeStringToFile(file, versionString);
+            org.apache.commons.io.FileUtils.writeStringToFile(file.toFile(), versionString);
         } catch (IOException e) {
             throw new RuntimeException("Failed to create version file containing metadata about the installed driver" + Utils.debugInfo(driver), e);
         }
@@ -28,17 +27,17 @@ class DriverVersionHandler {
         return driver.toString();
     }
 
-    private File getVersionFile(Driver driver) {
-        return Paths.get(installationDirectory.getPath(), driver.getId() + ".version").toFile();
+    private Path getVersionFile(Driver driver) {
+        return installationDirectory.resolve(driver.getId() + ".version");
     }
 
     public boolean isSameVersion(Driver driver) throws MojoExecutionException {
         try {
-            File versionFile = getVersionFile(driver);
-            if (!versionFile.exists()) {
+            Path versionFile = getVersionFile(driver);
+            if (!versionFile.toFile().exists()) {
                 return false;
             }
-            String savedVersion = org.apache.commons.io.FileUtils.readFileToString(versionFile);
+            String savedVersion = org.apache.commons.io.FileUtils.readFileToString(versionFile.toFile());
             String currentVersion = createVersionString(driver);
             return savedVersion.equals(currentVersion);
         } catch (IOException e) {

@@ -32,10 +32,6 @@ public class Utils {
         return quote(path.toString());
     }
 
-    public static String quote(File file) {
-        return quote(file.getAbsolutePath());
-    }
-
     public static String quote(URL url) {
         return quote(url.toString());
     }
@@ -84,7 +80,7 @@ public class Utils {
         return System.lineSeparator()
                 + "downloadDirectory: " + System.lineSeparator() + directoryToString(mojo.downloadDirectory) + System.lineSeparator()
                 + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()
-                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory);
+                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath());
     }
 
     public static String debugInfo(Driver driver) {
@@ -97,19 +93,19 @@ public class Utils {
                 + "driver: " + driver + System.lineSeparator() + System.lineSeparator()
                 + "downloadDirectory: " + System.lineSeparator() + directoryToString(mojo.downloadDirectory) + System.lineSeparator()
                 + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()
-                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory);
+                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath());
     }
 
-    public static String directoryToString(File path) {
-        if (!path.exists()) {
+    public static String directoryToString(Path path) {
+        if (!path.toFile().exists()) {
             return path + " does not exist" + System.lineSeparator();
         }
-        if (!path.isDirectory()) {
+        if (!path.toFile().isDirectory()) {
             throw new IllegalArgumentException("The path is not a directory: " + path);
         }
 
         Collection<File> files = FileUtils.listFiles(
-                path,
+                path.toFile(),
                 new RegexFileFilter("^(.*?)"),
                 DirectoryFileFilter.DIRECTORY
         );
@@ -123,10 +119,10 @@ public class Utils {
         stringBuilder.append(path);
         stringBuilder.append(System.lineSeparator());
 
-        int padSize = longestPath(files, path);
+        int padSize = longestPath(files, path.toFile());
         for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
             File file = (File) iterator.next();
-            String relativePath = getRelativePath(file, path);
+            String relativePath = getRelativePath(file, path.toFile());
             if (iterator.hasNext()) {
                 stringBuilder.append("├── ");
             } else {

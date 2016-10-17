@@ -5,6 +5,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -17,7 +18,7 @@ public class DriverInstaller {
 
     public DriverInstaller(InstallDriversMojo mojo) {
         this.mojo = mojo;
-        this.versionHandler = new DriverVersionHandler(mojo.installationDirectory);
+        this.versionHandler = new DriverVersionHandler(mojo.installationDirectory.toPath());
     }
 
     public boolean needInstallation(Driver driver) throws MojoExecutionException {
@@ -31,10 +32,10 @@ public class DriverInstaller {
 
         try {
             if (directoryContainsSingleFile(extractLocation)) {
-                moveFileInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
-                makeExecutable(Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
+                moveFileInDirectory(extractLocation, mojo.installationDirectory.toPath().resolve(driver.getFileName()));
+                makeExecutable(mojo.installationDirectory.toPath().resolve(driver.getFileName()));
             } else {
-                moveAllFilesInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getId()));
+                moveAllFilesInDirectory(extractLocation, mojo.installationDirectory.toPath().resolve(driver.getId()));
             }
 
             versionHandler.writeVersionFile(driver);
@@ -45,7 +46,7 @@ public class DriverInstaller {
     }
 
     private boolean isInstalled(Driver driver) {
-        Path path = Paths.get(mojo.installationDirectory.getPath(), driver.getFileName());
+        Path path = mojo.installationDirectory.toPath().resolve(driver.getFileName());
         return path.toFile().exists();
     }
 
@@ -62,21 +63,23 @@ public class DriverInstaller {
         assert directoryContainsSingleFile(from);
         try {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
-            File singleFile = new File(files.get(0));
-            mojo.getLog().info("  Moving " + quote(singleFile) + " to " +   quote(to));
-            FileUtils.rename(singleFile, to.toFile());
+            Path singleFile = Paths.get(files.get(0));
+            mojo.getLog().info("  Moving " + quote(singleFile) + " to " + quote(to));
+            Files.createDirectories(to);
+            Files.move(singleFile, to.resolve(singleFile.getFileName()));
         } catch (IOException e) {
             throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to), e);
         }
     }
 
-    // TODO: Investigate if this method does what it should do, should the method name be changed or the method implementation
     private void moveAllFilesInDirectory(Path from, Path to) throws MojoExecutionException {
         try {
-            List<String> subDirectories = FileUtils.getDirectoryNames(from.toFile(), null, null, true);
-            mojo.getLog().info("  Moving " + subDirectories.get(0) + " to " + to);
-            FileUtils.rename(new File(subDirectories.get(0)), to.toFile());
-        } catch (IOException e) {
+            Files.createDirectories(to);
+            for (File file : from.toFile().listFiles()) {
+                mojo.getLog().info("  Moving " + file + " to " + to.resolve(file.toPath().getFileName()));
+                Files.move(file.toPath(), to.resolve(file.toPath().getFileName()));
+            }
+        } catch (Exception e) {
             throw new RuntimeException("Failed to move directory " + quote(from) + " to " + quote(to), e);
         }
     }

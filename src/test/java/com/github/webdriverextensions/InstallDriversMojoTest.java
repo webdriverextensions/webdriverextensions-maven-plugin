@@ -86,7 +86,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertTrue(mojo.installationDirectory.toString().endsWith("custom-installation-directory"));
+        assertTrue(mojo.installationDirectory.toPath().toString().endsWith("custom-installation-directory"));
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(1);
     }

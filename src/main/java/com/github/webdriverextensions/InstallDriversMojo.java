@@ -138,8 +138,9 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
-    File downloadDirectory = createDownloadPath();
-    File tempDirectory = createTempPath();
+    Path pluginWorkingDirectory = Paths.get(System.getProperty("java.io.tmpdir")).resolve("webdriverextensions-maven-plugin");
+    Path downloadDirectory = pluginWorkingDirectory.resolve("downloads");
+    Path tempDirectory = pluginWorkingDirectory.resolve("temp");
     Repository repository;
 
     public void execute() throws MojoExecutionException {
@@ -148,7 +149,7 @@ public class InstallDriversMojo extends AbstractMojo {
             getLog().info("Skipping install-drivers goal execution");
         } else {
             repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
-            getLog().info("Installation directory " + quote(installationDirectory));
+            getLog().info("Installation directory " + quote(installationDirectory.toPath()));
             if (drivers.isEmpty()) {
                 getLog().info("Installing latest drivers for current platform");
                 drivers = repository.getLatestDrivers();
@@ -168,10 +169,13 @@ public class InstallDriversMojo extends AbstractMojo {
                 }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverInstaller.needInstallation(driver)) {
-                    File downloadPath = keepDownloadedWebdrivers ? Paths.get(downloadDirectory.getPath(), driver.getDriverDownloadDirectoryName()).toFile() : tempDirectory;
+                    Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
                     Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
                     Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
                     driverInstaller.install(driver, extractLocation);
+                    if (!keepDownloadedWebdrivers) {
+                        cleanupDownloadsDirectory();
+                    }
                     cleanupTempDirectory();
                 } else {
                     getLog().info("  Already installed");
@@ -180,26 +184,22 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
+    private void cleanupDownloadsDirectory() throws MojoExecutionException {
+        try {
+            FileUtils.deleteDirectory(downloadDirectory.toFile());
+        } catch (IOException e) {
+            throw new InstallDriversMojoExecutionException("Failed to delete downloads directory:" + System.lineSeparator()
+                    + Utils.directoryToString(downloadDirectory), e);
+        }
+    }
+
     private void cleanupTempDirectory() throws MojoExecutionException {
         try {
-            FileUtils.deleteDirectory(tempDirectory);
+            FileUtils.deleteDirectory(tempDirectory.toFile());
         } catch (IOException e) {
             throw new InstallDriversMojoExecutionException("Failed to delete temp directory:" + System.lineSeparator()
                     + Utils.directoryToString(tempDirectory), e);
         }
-    }
-
-    private File createDownloadPath() {
-        return Paths.get(getPluginWorkingDirectory(), "downloads").toFile();
-    }
-
-    private File createTempPath() {
-        return new File(getPluginWorkingDirectory(), "temp");
-    }
-
-    private String getPluginWorkingDirectory() {
-        String systemTempDirectory = System.getProperty("java.io.tmpdir");
-        return Paths.get(systemTempDirectory, "webdriverextensions-maven-plugin").toString();
     }
 
 }
