@@ -1,6 +1,6 @@
 package com.github.webdriverextensions.newversion;
 
-import com.github.webdriverextensions.Utils;
+import com.github.webdriverextensions.LoggedTemporaryFolder;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.is;
 public class FileExtractorImplTest {
 
     @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public TemporaryFolder temporaryFolder = new LoggedTemporaryFolder();
 
     private Path toDirectory;
 
@@ -34,7 +34,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("single-file").toFile().exists(), is(true));
     }
@@ -50,7 +49,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("single-file").toFile().exists(), is(true));
     }
@@ -66,7 +64,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
     }
@@ -81,7 +78,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(2));
         assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
         assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
@@ -105,7 +101,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
     }
@@ -121,7 +116,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
     }
@@ -136,7 +130,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(2));
         assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
         assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
@@ -160,7 +153,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
     }
@@ -176,7 +168,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
     }
@@ -191,7 +182,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(2));
         assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
         assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
@@ -215,7 +205,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
     }
@@ -231,7 +220,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
     }
@@ -246,7 +234,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(2));
         assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
         assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
@@ -270,7 +257,6 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        System.out.println(Utils.directoryToString(toDirectory.toFile()));
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
     }
