@@ -30,6 +30,20 @@ public class FileExtractorImpl implements FileExtractor {
     }
 
     @Override
+    public boolean isExtractable(Path file) {
+        if (TAR_BZ2.matches(file) ||
+                TAR_GZ.matches(file) ||
+                BZ2.matches(file) ||
+                GZ.matches(file) ||
+                TAR.matches(file) ||
+                ZIP.matches(file)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public void extractFile(Path file, Path toDirectory) {
         try {
             if (TAR_BZ2.matches(file)) {
