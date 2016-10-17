@@ -47,8 +47,8 @@ public class DriverDownloader {
         Path downloadFilePath = Paths.get(downloadDirectory.getPath(), driver.getFilenameFromUrl());
 
         if (downloadFilePath.toFile().exists() && !downloadCompletedFileExists(downloadDirectory)) {
-            mojo.getLog().info("  Removing cached driver " + quote(downloadFilePath) + " since it may be corrupt");
-            cleanupDriverCacheDirectory(downloadDirectory);
+            mojo.getLog().info("  Removing downloaded driver " + quote(downloadFilePath) + " since it may be corrupt");
+            cleanupDriverDownloadDirectory(downloadDirectory);
         }
 
         if (downloadFilePath.toFile().exists()) {
@@ -63,7 +63,7 @@ public class DriverDownloader {
                     copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
                     if (driverFileIsCorrupt(downloadFilePath)) {
                         printXmlFileContetIfPresentInDonwloadedFile(downloadFilePath);
-                        cleanupDriverCacheDirectory(downloadDirectory);
+                        cleanupDriverDownloadDirectory(downloadDirectory);
                         throw new InstallDriversMojoExecutionException("Failed to download a non corrupt driver", mojo, driver);
                     }
                 }
@@ -79,7 +79,7 @@ public class DriverDownloader {
 
     private void printXmlFileContetIfPresentInDonwloadedFile(Path downloadFilePath) {
         try {
-            List<String> fileContent = Files.readAllLines(Paths.get("/Users/anders/Temp/cache/old/phantomjs-linux-64bit-1.9.8/phantomjs-1.9.8-linux-x86_64.tar.bz2"), StandardCharsets.UTF_8);
+            List<String> fileContent = Files.readAllLines(Paths.get("/Users/anders/Temp/downloads/old/phantomjs-linux-64bit-1.9.8/phantomjs-1.9.8-linux-x86_64.tar.bz2"), StandardCharsets.UTF_8);
             if (fileContent.get(0).startsWith("<?xml")) {
                 mojo.getLog().info("  Downloaded driver file contains the following error message");
                 for (String line : fileContent) {
@@ -126,7 +126,7 @@ public class DriverDownloader {
     }
 
 
-    public void cleanupDriverCacheDirectory(File downloadDirectory) throws MojoExecutionException {
+    public void cleanupDriverDownloadDirectory(File downloadDirectory) throws MojoExecutionException {
         try {
             FileUtils.deleteDirectory(downloadDirectory);
         } catch (IOException e) {

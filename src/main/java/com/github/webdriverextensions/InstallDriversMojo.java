@@ -138,7 +138,7 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
-    File cacheDirectory = createCachePath();
+    File downloadDirectory = createDownloadPath();
     File tempDirectory = createTempPath();
     Repository repository;
 
@@ -168,7 +168,7 @@ public class InstallDriversMojo extends AbstractMojo {
                 }
                 getLog().info(driver.getId() + " version " + driver.getVersion());
                 if (driverInstaller.needInstallation(driver)) {
-                    File downloadPath = keepDownloadedWebdrivers ? Paths.get(cacheDirectory.getPath(), driver.getDriverCacheDirectoryName()).toFile() : tempDirectory;
+                    File downloadPath = keepDownloadedWebdrivers ? Paths.get(downloadDirectory.getPath(), driver.getDriverDownloadDirectoryName()).toFile() : tempDirectory;
                     Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
                     Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
                     driverInstaller.install(driver, extractLocation);
@@ -189,8 +189,8 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
-    private File createCachePath() {
-        return Paths.get(getPluginWorkingDirectory(), "cache").toFile();
+    private File createDownloadPath() {
+        return Paths.get(getPluginWorkingDirectory(), "downloads").toFile();
     }
 
     private File createTempPath() {
