@@ -30,11 +30,7 @@ public class DriverInstaller {
         }
 
         try {
-            if (isFile(extractLocation)) {
-                moveFile(driver, extractLocation);
-            } else if (directoryContainsSingleDirectory(extractLocation)) {
-                moveDirectoryInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getId()));
-            } else if (directoryContainsSingleFile(extractLocation)) {
+            if (directoryContainsSingleFile(extractLocation)) {
                 moveFileInDirectory(extractLocation, Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
                 makeExecutable(Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()));
             } else {
@@ -53,44 +49,13 @@ public class DriverInstaller {
         return path.toFile().exists();
     }
 
-    private boolean isFile(Path extractLocation) {
-        return extractLocation.toFile().isFile();
-    }
-
     private boolean directoryIsEmpty(Path directory) {
         return directory.toFile().listFiles().length == 0;
-    }
-
-    private boolean directoryContainsSingleDirectory(Path directory) {
-        File[] files = directory.toFile().listFiles();
-        return files != null && files.length == 1 && files[0].isDirectory();
     }
 
     private boolean directoryContainsSingleFile(Path directory) throws MojoExecutionException {
         File[] files = directory.toFile().listFiles();
         return files != null && files.length == 1 && files[0].isFile();
-    }
-
-    private void moveFile(Driver driver, Path extractLocation) throws IOException {
-        File to = Paths.get(mojo.installationDirectory.getPath(), driver.getFileName()).toFile();
-        mojo.getLog().info("  Moving " + quote(extractLocation) + " to " + quote(to));
-        org.apache.commons.io.FileUtils.moveFile(extractLocation.toFile(), to);
-    }
-
-    private void moveDirectoryInDirectory(Path from, Path to) throws MojoExecutionException {
-        assert directoryContainsSingleDirectory(from);
-        try {
-            List<String> subDirectories = FileUtils.getDirectoryNames(from.toFile(), null, null, true);
-            if (to.toFile().exists()) {
-                org.apache.commons.io.FileUtils.deleteDirectory(to.toFile());
-            }
-
-            File singleDirectory = new File(subDirectories.get(1));
-            mojo.getLog().info("  Moving " + quote(singleDirectory) + " to " + quote(to));
-            org.apache.commons.io.FileUtils.moveDirectory(singleDirectory, to.toFile());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to move directory in directory " + quote(from) + " to " + quote(to), e);
-        }
     }
 
     private void moveFileInDirectory(Path from, Path to) throws MojoExecutionException {
