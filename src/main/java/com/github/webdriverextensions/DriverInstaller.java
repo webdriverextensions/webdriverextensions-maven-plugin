@@ -75,6 +75,7 @@ public class DriverInstaller {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
             Path singleFile = Paths.get(files.get(0));
             mojo.getLog().info("  Moving " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
+            FileUtils.forceDelete(to.resolve(newFileName).toFile());
             Files.move(singleFile, to.resolve(newFileName));
         } catch (IOException e) {
             throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to.resolve(newFileName)), e);
@@ -86,6 +87,7 @@ public class DriverInstaller {
             Files.createDirectories(to);
             for (File file : from.toFile().listFiles()) {
                 mojo.getLog().info("  Moving " + file + " to " + to.resolve(file.toPath().getFileName()));
+                FileUtils.forceDelete(to.resolve(file.toPath().getFileName()).toFile());
                 Files.move(file.toPath(), to.resolve(file.toPath().getFileName()));
             }
         } catch (Exception e) {

@@ -113,14 +113,29 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     void assertDriverIsInstalled(String driverFileName) {
+        assertDriverIsInstalled(driverFileName, null);
+    }
+
+    void assertDriverIsInstalled(String driverFileName, String version) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
+        String versionFilename = driverFileName.replace(".exe", "") + ".version";
         for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driverFileName)) {
                 foundDriverFile = true;
             }
-            if (file.getName().equals(driverFileName.replace(".exe", "") + ".version")) {
+            if (file.getName().equals(versionFilename)) {
                 foundDriverVersionFile = true;
+                if (version != null) {
+                    try {
+                        String versionFileString = FileUtils.readFileToString(file);
+                        if (!versionFileString.contains("\"version\": \"" + version + "\"")) {
+                            fail("Version " + version + " was not found in version file, version file content: " + versionFileString);
+                        }
+                    } catch (IOException e) {
+                        fail("Failed to read version file " + versionFilename);
+                    }
+                }
             }
         }
         if (!foundDriverFile) {
@@ -128,7 +143,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
                  + System.lineSeparator() + Utils.debugInfo(mojo));
         }
         if (!foundDriverVersionFile) {
-            fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory"
+            fail("Driver version file with file name " + versionFilename + " was not found in the installation directory"
                  + System.lineSeparator() + Utils.debugInfo(mojo));
         }
     }

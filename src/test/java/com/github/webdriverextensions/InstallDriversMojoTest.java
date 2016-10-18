@@ -39,6 +39,21 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertNumberOfInstalledDriverIs(1);
     }
 
+    public void test_that_installing_new_driver_should_overwrite_old_driver() throws Exception {
+        // Given
+        InstallDriversMojo oldDriverMojo = getMojo("src/test/resources/old_driver_pom.xml");
+        InstallDriversMojo newDriverMojo = getMojo("src/test/resources/new_driver_pom.xml");
+
+
+        // When
+        oldDriverMojo.execute();
+        newDriverMojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe", "2.15.0");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
     public void test_that_driver_compressed_with_zip_is_supported() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/extract_zip_pom.xml");
