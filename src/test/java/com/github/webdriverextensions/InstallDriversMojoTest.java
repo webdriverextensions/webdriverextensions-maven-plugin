@@ -1,11 +1,11 @@
 package com.github.webdriverextensions;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
 import java.nio.file.attribute.FileTime;
 
-import org.apache.maven.plugin.MojoExecutionException;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
@@ -102,10 +102,10 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         // Then
         assertDriverIsInstalled("customdriver-windows-32bit");
         assertNumberOfInstalledDriverIs(1);
-        File[] installedFiles = mojo.installationDirectory.listFiles();
+        File[] installedFiles = mojo.installationDirectory.toPath().resolve("customdriver-windows-32bit").toFile().listFiles();
         assertThat(installedFiles[0]).isDirectory();
+        assertThat(installedFiles[0]).hasName("phantomjs-1.9.7-windows");
         assertThat(installedFiles[0].listFiles()).hasSize(6);
-        assertThat(installedFiles[1]).isFile();
     }
 
     public void test_that_configuration_with_custom_driver_not_in_repository_with_file_match_inside_works() throws Exception {
