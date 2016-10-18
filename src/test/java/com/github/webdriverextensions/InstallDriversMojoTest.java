@@ -91,10 +91,21 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertNumberOfInstalledDriverIs(1);
     }
 
-    public void test_that_configuration_with_custom_driver_not_in_repository_works() throws Exception {
+    public void test_that_configuration_with_custom_driver_containing_single_file_not_in_repository_works() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_pom.xml");
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_single_file_pom.xml");
 
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("customdriver-windows-32bit.exe");
+        assertNumberOfInstalledDriverIs(1);
+    }
+
+    public void test_that_configuration_with_custom_driver_containing_directory_not_in_repository_works() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_directory_pom.xml");
 
         // When
         mojo.execute();
@@ -103,9 +114,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("customdriver-windows-32bit");
         assertNumberOfInstalledDriverIs(1);
         File[] installedFiles = mojo.installationDirectory.toPath().resolve("customdriver-windows-32bit").toFile().listFiles();
-        assertThat(installedFiles[0]).isDirectory();
-        assertThat(installedFiles[0]).hasName("phantomjs-1.9.7-windows");
-        assertThat(installedFiles[0].listFiles()).hasSize(6);
+        assertThat(installedFiles).hasSize(6);
     }
 
     public void test_that_configuration_with_custom_driver_not_in_repository_with_file_match_inside_works() throws Exception {

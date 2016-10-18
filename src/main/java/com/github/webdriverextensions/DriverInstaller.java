@@ -31,9 +31,14 @@ public class DriverInstaller {
         }
 
         try {
-            if (directoryContainsSingleFile(extractLocation)) {
-                moveFileInDirectory(extractLocation, mojo.installationDirectory.toPath().resolve(driver.getFileName()));
-                makeExecutable(mojo.installationDirectory.toPath().resolve(driver.getFileName()));
+            Files.createDirectories(mojo.installationDirectory.toPath());
+            if (directoryContainsSingleDirectory(extractLocation)) {
+                Path singleDirectory = extractLocation.toFile().listFiles()[0].toPath();
+                moveAllFilesInDirectory(singleDirectory, mojo.installationDirectory.toPath().resolve(driver.getId()));
+            } else if (directoryContainsSingleFile(extractLocation)) {
+                String newFileName = driver.getFileName();
+                moveFileInDirectory(extractLocation, mojo.installationDirectory.toPath(), newFileName);
+                makeExecutable(mojo.installationDirectory.toPath().resolve(newFileName));
             } else {
                 moveAllFilesInDirectory(extractLocation, mojo.installationDirectory.toPath().resolve(driver.getId()));
             }
@@ -59,16 +64,20 @@ public class DriverInstaller {
         return files != null && files.length == 1 && files[0].isFile();
     }
 
-    private void moveFileInDirectory(Path from, Path to) throws MojoExecutionException {
+    private boolean directoryContainsSingleDirectory(Path directory) {
+        File[] files = directory.toFile().listFiles();
+        return files != null && files.length == 1 && files[0].isDirectory();
+    }
+
+    private void moveFileInDirectory(Path from, Path to, String newFileName) throws MojoExecutionException {
         assert directoryContainsSingleFile(from);
         try {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
             Path singleFile = Paths.get(files.get(0));
-            mojo.getLog().info("  Moving " + quote(singleFile) + " to " + quote(to));
-            Files.createDirectories(to);
-            Files.move(singleFile, to.resolve(singleFile.getFileName()));
+            mojo.getLog().info("  Moving " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
+            Files.move(singleFile, to.resolve(newFileName));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to), e);
+            throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to.resolve(newFileName)), e);
         }
     }
 
