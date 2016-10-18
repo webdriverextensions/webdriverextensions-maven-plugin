@@ -339,7 +339,10 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
-#### 3.1.0 (2016 October 18)
+#### 3.1.1 (2016 October 18)
+- MAJOR BUGFIX Fixed issue where updating driver was not possible
+
+#### 3.1.0 [DO NOT USE THIS RELEASE, USE 3.1.1 INSTEAD] (2016 October 18)
 - BUGFIX Fixed [issue 24](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/24) Geckodriver on macOS shows as posix tar
 - REFACTORING Cache folder name changed from cache to downloads
 
