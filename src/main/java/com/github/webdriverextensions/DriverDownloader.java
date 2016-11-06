@@ -79,7 +79,7 @@ public class DriverDownloader {
 
     private void printXmlFileContetIfPresentInDonwloadedFile(Path downloadFilePath) {
         try {
-            List<String> fileContent = Files.readAllLines(Paths.get("/Users/anders/Temp/downloads/old/phantomjs-linux-64bit-1.9.8/phantomjs-1.9.8-linux-x86_64.tar.bz2"), StandardCharsets.UTF_8);
+            List<String> fileContent = Files.readAllLines(downloadFilePath, StandardCharsets.UTF_8);
             if (fileContent.get(0).startsWith("<?xml")) {
                 mojo.getLog().info("  Downloaded driver file contains the following error message");
                 for (String line : fileContent) {
