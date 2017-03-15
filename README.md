@@ -147,31 +147,31 @@ E.g. to install specific versions of all available drivers
                 <name>geckodriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>0.14.0</version>
+                <version>0.15.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>0.14.0</version>
+                <version>0.15.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>0.14.0</version>
+                <version>0.15.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>0.14.0</version>
+                <version>0.15.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>0.14.0</version>
+                <version>0.15.0</version>
             </driver>
             <driver>
                 <name>edgedriver</name>
