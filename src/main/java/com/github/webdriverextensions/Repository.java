@@ -2,30 +2,22 @@ package com.github.webdriverextensions;
 
 import static ch.lambdaj.Lambda.*;
 import static com.github.webdriverextensions.Utils.*;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.CharEncoding.UTF_8;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.is;
+import static org.apache.commons.lang3.StringUtils.*;
+import static org.hamcrest.Matchers.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.io.*;
+import java.net.*;
+import java.util.*;
 
-import ch.lambdaj.function.compare.ArgumentComparator;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import org.apache.commons.collections.ComparatorUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
+
+import com.google.gson.*;
+
+import ch.lambdaj.function.compare.ArgumentComparator;
 
 class Repository {
 
@@ -144,7 +136,7 @@ class Repository {
                     // Could not find any driver for the current platform/bit/version in repo
                     return null;
                 }
-                return drivers.get(0);
+                return filterLatestDriver(drivers);
             }
             return null;
         }
@@ -210,11 +202,15 @@ class Repository {
 
     private String getLatestDriverVersion(String driverId) {
         List<Driver> allDriverVersions = select(drivers, having(on(Driver.class).getId(), is(driverId)));
-        Driver latestDriver = selectMax(allDriverVersions, on(Driver.class).getComparableVersion());
+        Driver latestDriver = filterLatestDriver(allDriverVersions);
         if (latestDriver == null) {
             return null;
         }
         return latestDriver.getVersion();
+    }
+
+    private Driver filterLatestDriver(List<Driver> drivers) {
+        return selectMax(drivers, on(Driver.class).getComparableVersion());
     }
 
     @Override
