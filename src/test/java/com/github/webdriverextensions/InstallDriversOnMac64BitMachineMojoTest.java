@@ -18,7 +18,7 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-mac-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("operadriver-mac-64bit");
