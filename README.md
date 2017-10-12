@@ -47,7 +47,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <executions>
         <execution>
             <goals>
@@ -73,7 +73,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <executions>
         <execution>
             <goals>
@@ -281,7 +281,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <executions>
         <execution>
             <goals>
@@ -306,7 +306,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <executions>
         <execution>
             <goals>
@@ -326,7 +326,7 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
     <executions>
         <execution>
             <goals>
