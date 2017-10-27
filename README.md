@@ -47,7 +47,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
     <executions>
         <execution>
             <goals>
@@ -73,7 +73,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
     <executions>
         <execution>
             <goals>
@@ -87,37 +87,37 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>3.4.0</version>
+                <version>3.6.0</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>3.4.0</version>
+                <version>3.6.0</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.29</version>
+                <version>2.33</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>2.29</version>
+                <version>2.33</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>2.29</version>
+                <version>2.33</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>2.29</version>
+                <version>2.33</version>
             </driver>
             <driver>
                 <name>phantomjs</name>
@@ -147,67 +147,61 @@ E.g. to install specific versions of all available drivers
                 <name>geckodriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>0.16.0</version>
+                <version>0.19.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>0.16.0</version>
+                <version>0.19.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>0.16.0</version>
+                <version>0.19.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>0.16.0</version>
+                <version>0.19.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>0.16.0</version>
+                <version>0.19.0</version>
             </driver>
             <driver>
                 <name>edgedriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>4.15063</version>
+                <version>5.16299</version>
             </driver>
             <driver>
                 <name>operadriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>0.2.2</version>
+                <version>2.30</version>
             </driver>
             <driver>
                 <name>operadriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>0.2.2</version>
+                <version>2.30</version>
             </driver>
             <driver>
                 <name>operadriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>0.2.2</version>
-            </driver>
-            <driver>
-                <name>operadriver</name>
-                <platform>linux</platform>
-                <bit>32</bit>
-                <version>0.2.2</version>
+                <version>2.30</version>
             </driver>
             <driver>
                 <name>operadriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>0.2.2</version>
+                <version>2.30</version>
             </driver>
         </drivers>
     </configuration>
@@ -257,7 +251,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.1</version>
+    <version>3.1.3</version>
     <executions>
         <execution>
             <goals>
@@ -281,7 +275,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
     <executions>
         <execution>
             <goals>
@@ -306,7 +300,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
     <executions>
         <execution>
             <goals>
@@ -326,7 +320,7 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
     <executions>
         <execution>
             <goals>
@@ -350,6 +344,9 @@ For more details on how to further configure this plugin please see the
 
 
 ## Changelog
+
+#### 3.1.3 (2017 October 27)
+- BUGFIX Made Opera driver executable (Thanks to [@svenruppert](https://github.com/svenruppert))
 
 #### 3.1.2 (2017 June 7)
 - BUGFIX Fixed issue where latest driver where not downloaded when only name was provided for driver
