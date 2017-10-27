@@ -351,6 +351,9 @@ For more details on how to further configure this plugin please see the
 
 ## Changelog
 
+#### 3.1.2 (2017 June 7)
+- BUGFIX Fixed issue where latest driver where not downloaded when only name was provided for driver
+
 #### 3.1.1 (2016 October 18)
 - MAJOR BUGFIX Fixed issue where updating driver was not possible
 
