@@ -31,16 +31,12 @@ public class FileExtractorImpl implements FileExtractor {
 
     @Override
     public boolean isExtractable(Path file) {
-        if (TAR_BZ2.matches(file) ||
-                TAR_GZ.matches(file) ||
-                BZ2.matches(file) ||
-                GZ.matches(file) ||
-                TAR.matches(file) ||
-                ZIP.matches(file)) {
-            return true;
-        } else {
-            return false;
-        }
+        return TAR_BZ2.matches(file) ||
+               TAR_GZ.matches(file) ||
+               BZ2.matches(file) ||
+               GZ.matches(file) ||
+               TAR.matches(file) ||
+               ZIP.matches(file);
     }
 
     @Override
@@ -93,29 +89,7 @@ public class FileExtractorImpl implements FileExtractor {
         try (FileInputStream fis = new FileInputStream(file.toFile())) {
             try (BufferedInputStream bis = new BufferedInputStream(fis)) {
                 try (TarArchiveInputStream tarArchive = new TarArchiveInputStream(bis)) {
-                    for (TarArchiveEntry tarEntry = tarArchive.getNextTarEntry(); tarEntry != null; tarEntry = tarArchive.getNextTarEntry()) {
-                        if (tarEntry.isDirectory()) {
-                            if (extractPattern != null) {
-                                continue;
-                            }
-                            Files.createDirectories(toDirectory.resolve(tarEntry.getName()));
-                        } else {
-                            if (tarEntry.isSymbolicLink()) {
-                                continue;
-                            }
-                            if (extractPattern != null) {
-                                if (!extractPattern.matcher(tarEntry.getName()).matches()) {
-                                    continue;
-                                }
-                                Path filename = Paths.get(tarEntry.getName()).getFileName();
-                                Path fileToExtract = toDirectory.resolve(filename);
-                                Files.copy(tarArchive, fileToExtract);
-                            } else {
-                                Path fileToExtract = toDirectory.resolve(tarEntry.getName());
-                                Files.copy(tarArchive, fileToExtract);
-                            }
-                        }
-                    }
+                    extractTar(toDirectory, tarArchive);
                 }
             }
         }
@@ -127,32 +101,40 @@ public class FileExtractorImpl implements FileExtractor {
             try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                 try (BZip2CompressorInputStream bzip2Archive = new BZip2CompressorInputStream(bin)) {
                     try (TarArchiveInputStream tarArchive = new TarArchiveInputStream(bzip2Archive)) {
-                        for (TarArchiveEntry tarEntry = tarArchive.getNextTarEntry(); tarEntry != null; tarEntry = tarArchive.getNextTarEntry()) {
-                            if (tarEntry.isDirectory()) {
-                                if (extractPattern != null) {
-                                    continue;
-                                }
-                                Files.createDirectories(toDirectory.resolve(tarEntry.getName()));
-                            } else {
-                                if (tarEntry.isSymbolicLink()) {
-                                    continue;
-                                }
-                                if (extractPattern != null) {
-                                    if (!extractPattern.matcher(tarEntry.getName()).matches()) {
-                                        continue;
-                                    }
-                                    Path filename = Paths.get(tarEntry.getName()).getFileName();
-                                    Path fileToExtract = toDirectory.resolve(filename);
-                                    Files.copy(tarArchive, fileToExtract);
-                                } else {
-                                    Path fileToExtract = toDirectory.resolve(tarEntry.getName());
-                                    Files.copy(tarArchive, fileToExtract);
-                                }
-                            }
-                        }
+                        extractTar(toDirectory, tarArchive);
                     }
                 }
             }
+        }
+    }
+
+    private void extractTar(Path toDirectory, TarArchiveInputStream tarArchive) throws IOException {
+        for (TarArchiveEntry tarEntry = tarArchive.getNextTarEntry(); tarEntry != null; tarEntry = tarArchive.getNextTarEntry()) {
+            if (tarEntry.isDirectory()) {
+                if (extractPattern != null) {
+                    continue;
+                }
+                Files.createDirectories(toDirectory.resolve(tarEntry.getName()));
+            } else {
+                if (tarEntry.isSymbolicLink()) {
+                    continue;
+                }
+                extractPattern(toDirectory, tarArchive, tarEntry);
+            }
+        }
+    }
+
+    private void extractPattern(Path toDirectory, TarArchiveInputStream tarArchive, TarArchiveEntry tarEntry) throws IOException {
+        if (extractPattern != null) {
+            if (!extractPattern.matcher(tarEntry.getName()).matches()) {
+                return;
+            }
+            Path filename = Paths.get(tarEntry.getName()).getFileName();
+            Path fileToExtract = toDirectory.resolve(filename);
+            Files.copy(tarArchive, fileToExtract);
+        } else {
+            Path fileToExtract = toDirectory.resolve(tarEntry.getName());
+            Files.copy(tarArchive, fileToExtract);
         }
     }
 
@@ -162,29 +144,7 @@ public class FileExtractorImpl implements FileExtractor {
             try (BufferedInputStream bin = new BufferedInputStream(fin)) {
                 try (GzipCompressorInputStream gzipArchive = new GzipCompressorInputStream(bin)) {
                     try (TarArchiveInputStream tarArchive = new TarArchiveInputStream(gzipArchive)) {
-                        for (TarArchiveEntry tarEntry = tarArchive.getNextTarEntry(); tarEntry != null; tarEntry = tarArchive.getNextTarEntry()) {
-                            if (tarEntry.isDirectory()) {
-                                if (extractPattern != null) {
-                                    continue;
-                                }
-                                Files.createDirectories(toDirectory.resolve(tarEntry.getName()));
-                            } else {
-                                if (tarEntry.isSymbolicLink()) {
-                                    continue;
-                                }
-                                if (extractPattern != null) {
-                                    if (!extractPattern.matcher(tarEntry.getName()).matches()) {
-                                        continue;
-                                    }
-                                    Path filename = Paths.get(tarEntry.getName()).getFileName();
-                                    Path fileToExtract = toDirectory.resolve(filename);
-                                    Files.copy(tarArchive, fileToExtract);
-                                } else {
-                                    Path fileToExtract = toDirectory.resolve(tarEntry.getName());
-                                    Files.copy(tarArchive, fileToExtract);
-                                }
-                            }
-                        }
+                        extractTar(toDirectory, tarArchive);
                     }
                 }
             }

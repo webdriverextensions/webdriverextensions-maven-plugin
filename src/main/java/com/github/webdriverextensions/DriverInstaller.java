@@ -26,6 +26,7 @@ public class DriverInstaller {
     }
 
     public void install(Driver driver, Path extractLocation) throws MojoExecutionException {
+        mojo.getLog().info("start installing : " + driver.getName() + " from " + extractLocation);
         if (extractLocation.toFile().isDirectory() && directoryIsEmpty(extractLocation)) {
             throw new InstallDriversMojoExecutionException("Failed to install driver since no files found to install", mojo, driver);
         }
@@ -74,7 +75,7 @@ public class DriverInstaller {
         try {
             List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
             Path singleFile = Paths.get(files.get(0));
-            mojo.getLog().info("  Moving " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
+            mojo.getLog().info("  Moving (one File) " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
             FileUtils.forceDelete(to.resolve(newFileName).toFile());
             Files.move(singleFile, to.resolve(newFileName));
         } catch (IOException e) {
@@ -86,9 +87,10 @@ public class DriverInstaller {
         try {
             Files.createDirectories(to);
             for (File file : from.toFile().listFiles()) {
-                mojo.getLog().info("  Moving " + file + " to " + to.resolve(file.toPath().getFileName()));
+                mojo.getLog().info("  Moving (All Files) " + file + " to " + to.resolve(file.toPath().getFileName()));
                 FileUtils.forceDelete(to.resolve(file.toPath().getFileName()).toFile());
                 Files.move(file.toPath(), to.resolve(file.toPath().getFileName()));
+                makeExecutable(to.resolve(file.toPath().getFileName()));
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to move directory " + quote(from) + " to " + quote(to), e);
