@@ -145,6 +145,11 @@ public class InstallDriversMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
 
+        if (settings.isOffline()) {
+            getLog().info("Skipping install-drivers goal execution (maven in offline mode)");
+            return;
+        }
+
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
         } else {
