@@ -147,39 +147,47 @@ public class InstallDriversMojo extends AbstractMojo {
 
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
-        } else {
-            repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
-            getLog().info("Installation directory " + quote(installationDirectory.toPath()));
-            if (drivers.isEmpty()) {
-                getLog().info("Installing latest drivers for current platform");
-                drivers = repository.getLatestDrivers();
-            } else {
-                getLog().info("Installing drivers from configuration");
+            return;
+        }
+
+        for (String property : new String[] { "skipTests", "skipITs", "maven.test.skip" }) {
+            if (Boolean.getBoolean(property)) {
+                getLog().info("Skipping install-drivers goal execution (" + property + ")");
+                return;
             }
+        }
 
-            DriverDownloader driverDownloader = new DriverDownloader(this);
-            DriverExtractor driverExtractor = new DriverExtractor(this);
-            DriverInstaller driverInstaller = new DriverInstaller(this);
+        repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
+        getLog().info("Installation directory " + quote(installationDirectory.toPath()));
+        if (drivers.isEmpty()) {
+            getLog().info("Installing latest drivers for current platform");
+            drivers = repository.getLatestDrivers();
+        } else {
+            getLog().info("Installing drivers from configuration");
+        }
 
-            cleanupTempDirectory();
-            for (Driver _driver : drivers) {
-                Driver driver = repository.enrichDriver(_driver);
-                if (driver == null) {
-                    continue;
+        DriverDownloader driverDownloader = new DriverDownloader(this);
+        DriverExtractor driverExtractor = new DriverExtractor(this);
+        DriverInstaller driverInstaller = new DriverInstaller(this);
+
+        cleanupTempDirectory();
+        for (Driver _driver : drivers) {
+            Driver driver = repository.enrichDriver(_driver);
+            if (driver == null) {
+                continue;
+            }
+            getLog().info(driver.getId() + " version " + driver.getVersion());
+            if (driverInstaller.needInstallation(driver)) {
+                Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
+                Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
+                Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
+                driverInstaller.install(driver, extractLocation);
+                if (!keepDownloadedWebdrivers) {
+                    cleanupDownloadsDirectory();
                 }
-                getLog().info(driver.getId() + " version " + driver.getVersion());
-                if (driverInstaller.needInstallation(driver)) {
-                    Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
-                    Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
-                    Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
-                    driverInstaller.install(driver, extractLocation);
-                    if (!keepDownloadedWebdrivers) {
-                        cleanupDownloadsDirectory();
-                    }
-                    cleanupTempDirectory();
-                } else {
-                    getLog().info("  Already installed");
-                }
+                cleanupTempDirectory();
+            } else {
+                getLog().info("  Already installed");
             }
         }
     }
