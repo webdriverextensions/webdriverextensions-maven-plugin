@@ -191,4 +191,49 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("operadriver-linux-64bit");
         assertNumberOfInstalledDriverIs(19);
     }
+
+    public void test_that_driver_file_is_named_to_custom_filename() throws Exception
+    {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_filename_pom.xml");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chrome-linux-custom");
+        assertDriverIsInstalled("chrome-mac-custom");
+        assertDriverIsInstalled("chrome-windows-custom.exe");
+        assertNumberOfInstalledDriverIs(3);
+    }
+
+    public void test_that_driver_file_is_named_to_custom_filename_with_version() throws Exception
+    {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_filename_pom_add_version_pom.xml");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chrome-linux-custom");
+        assertDriverIsInstalled("chrome-mac-custom");
+        assertDriverIsInstalled("chrome-windows-custom.exe");
+        assertNumberOfInstalledDriverIs(3);
+    }
+
+    public void test_that_driver_file_is_named_to_custom_filename_with_version_and_bit() throws Exception
+    {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_filename_pom_add_version_and_bit_pom.xml");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chrome-linux-custom");
+        assertDriverIsInstalled("chrome-mac-custom");
+        assertDriverIsInstalled("chrome-windows-custom.exe");
+        assertNumberOfInstalledDriverIs(3);
+    }
 }

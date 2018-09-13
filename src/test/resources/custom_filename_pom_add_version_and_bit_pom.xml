@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>test-install-drivers-mojo</artifactId>
+    <packaging>war</packaging>
+    <version>2.0.0-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.webdriverextensions</groupId>
+                <artifactId>webdriverextensions-maven-plugin</artifactId>
+                <configuration>
+                    <drivers>
+                        <driver>
+                            <name>chromedriver</name>
+                            <platform>linux</platform>
+                            <bit>32</bit>
+                            <version>2.9.0</version>
+                            <customFileName>chrome-linux-custom</customFileName>
+                        </driver>
+                        <driver>
+                            <name>chromedriver</name>
+                            <platform>mac</platform>
+                            <bit>32</bit>
+                            <version>2.9.0</version>
+                            <customFileName>chrome-mac-custom</customFileName>
+                        </driver>
+                        <driver>
+                            <name>chromedriver</name>
+                            <platform>windows</platform>
+                            <bit>32</bit>
+                            <version>2.9.0</version>
+                            <customFileName>chrome-windows-custom</customFileName>
+                        </driver>
+                    </drivers>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
