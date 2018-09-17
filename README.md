@@ -435,7 +435,7 @@ For more details on how to further configure this plugin please see the
 #### 1.0.0 (2014 June 6)
 - Initial release!
 
-## License
+## License 
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.
