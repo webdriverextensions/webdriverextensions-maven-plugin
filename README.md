@@ -87,37 +87,31 @@ E.g. to install specific versions of all available drivers
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>3.8.0</version>
+                <version>4.0.0</version>
             </driver>
             <driver>
                 <name>internetexplorerdriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>3.8.0</version>
+                <version>4.0.0</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>2.34</version>
+                <version>75.0.3770.8</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>2.34</version>
-            </driver>
-            <driver>
-                <name>chromedriver</name>
-                <platform>linux</platform>
-                <bit>32</bit>
-                <version>2.34</version>
+                <version>75.0.3770.8</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>2.34</version>
+                <version>75.0.3770.8</version>
             </driver>
             <driver>
                 <name>phantomjs</name>
@@ -147,37 +141,37 @@ E.g. to install specific versions of all available drivers
                 <name>geckodriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>0.19.1</version>
+                <version>0.24.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>0.19.1</version>
+                <version>0.24.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>0.19.1</version>
+                <version>0.24.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>0.19.1</version>
+                <version>0.24.0</version>
             </driver>
             <driver>
                 <name>geckodriver</name>
                 <platform>linux</platform>
                 <bit>32</bit>
-                <version>0.19.1</version>
+                <version>0.24.0</version>
             </driver>
             <driver>
                 <name>edgedriver</name>
                 <platform>windows</platform>
                 <bit>64</bit>
-                <version>5.16299</version>
+                <version>6.17134</version>
             </driver>
             <driver>
                 <name>operadriver</name>
