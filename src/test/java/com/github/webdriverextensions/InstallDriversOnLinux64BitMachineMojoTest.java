@@ -18,10 +18,11 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
 
         // Then
         assertDriverIsInstalled("chromedriver-linux-64bit");
+        assertDriverIsInstalled("chromedriver-beta-linux-64bit");
         assertDriverIsInstalled("phantomjs-linux-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
         assertDriverIsInstalled("operadriver-linux-64bit");
-        assertNumberOfInstalledDriverIs(4);
+        assertNumberOfInstalledDriverIs(5);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
@@ -87,8 +88,8 @@ public class InstallDriversOnLinux64BitMachineMojoTest extends AbstractInstallDr
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
         assertDriverIsInstalled("edgedriver-windows-64bit.exe");
-        assertDriverIsInstalled("operadriver-windows-32bit.exe");
-        assertDriverIsInstalled("operadriver-windows-64bit.exe");
+//        assertDriverIsInstalled("operadriver-windows-32bit.exe");
+//        assertDriverIsInstalled("operadriver-windows-64bit.exe");
         assertDriverIsInstalled("operadriver-mac-64bit");
         assertDriverIsInstalled("operadriver-linux-32bit");
         assertDriverIsInstalled("operadriver-linux-64bit");

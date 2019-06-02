@@ -184,8 +184,8 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
         assertDriverIsInstalled("edgedriver-windows-64bit.exe");
-        assertDriverIsInstalled("operadriver-windows-32bit.exe");
-        assertDriverIsInstalled("operadriver-windows-64bit.exe");
+//        assertDriverIsInstalled("operadriver-windows-32bit.exe");
+//        assertDriverIsInstalled("operadriver-windows-64bit.exe");
         assertDriverIsInstalled("operadriver-mac-64bit");
         assertDriverIsInstalled("operadriver-linux-32bit");
         assertDriverIsInstalled("operadriver-linux-64bit");

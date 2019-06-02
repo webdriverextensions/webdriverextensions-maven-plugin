@@ -2,7 +2,7 @@ package com.github.webdriverextensions;
 
 public class InstallDriversOnlyBrowserMojoTest
         extends AbstractInstallDriversMojoTest {
-    private static final String CHROME_DRIVER_LATEST = "2.22.0";
+    private static final String CHROME_DRIVER_LATEST = "74.0.3729.6";
     private InstallDriversMojo mojoUnderTest;
 
     @Override
@@ -75,8 +75,7 @@ public class InstallDriversOnlyBrowserMojoTest
         mojoUnderTest.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-linux-32bit",
-                CHROME_DRIVER_LATEST);
+        assertDriverIsInstalled("chromedriver-linux-32bit", "2.33.0");
         assertNumberOfInstalledDriverIs(1);
     }
 }

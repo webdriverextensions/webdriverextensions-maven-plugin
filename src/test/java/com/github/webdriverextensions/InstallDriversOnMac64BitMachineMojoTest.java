@@ -18,11 +18,12 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-mac-64bit");
+        assertDriverIsInstalled("chromedriver-beta-mac-64bit");
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("operadriver-mac-64bit");
-        assertNumberOfInstalledDriverIs(4);
+        assertNumberOfInstalledDriverIs(5);
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {
@@ -87,8 +88,8 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("geckodriver-linux-64bit");
         assertDriverIsInstalled("edgedriver-windows-64bit.exe");
-        assertDriverIsInstalled("operadriver-windows-32bit.exe");
-        assertDriverIsInstalled("operadriver-windows-64bit.exe");
+//        assertDriverIsInstalled("operadriver-windows-32bit.exe");
+//        assertDriverIsInstalled("operadriver-windows-64bit.exe");
         assertDriverIsInstalled("operadriver-mac-64bit");
         assertDriverIsInstalled("operadriver-linux-32bit");
         assertDriverIsInstalled("operadriver-linux-64bit");
