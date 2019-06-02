@@ -47,7 +47,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -73,7 +73,7 @@ E.g. to install specific versions of all available drivers
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -245,7 +245,7 @@ path through the configuration parameter named `installationDirectory`.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -269,7 +269,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -294,7 +294,7 @@ in the configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -314,7 +314,7 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -337,7 +337,7 @@ To set a custom file name for the specified driver configuration.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.1.3</version>
+    <version>3.2.0</version>
     <executions>
         <execution>
             <goals>
@@ -364,6 +364,12 @@ For more details on how to further configure this plugin please see the
 
 
 ## Changelog
+
+#### 3.2.0 (2019 June 2)
+- IMPROVEMENT Capability for custom file name with binaries [PR 42](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/42)
+- IMPROVEMENT Maven offline mode should be honored [PR 39](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/39)
+- IMPROVEMENT Use separate temp-folders [PR 37](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/37)
+- IMPROVEMENT Add support for skipping if skipTests is defined [PR 35](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/35)
 
 #### 3.1.3 (2017 October 27)
 - BUGFIX Made Opera driver executable (Thanks to [@svenruppert](https://github.com/svenruppert))
