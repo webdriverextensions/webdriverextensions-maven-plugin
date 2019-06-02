@@ -136,11 +136,22 @@ class Repository {
                     // Could not find any driver for the current platform/bit/version in repo
                     return null;
                 }
-                return filterLatestDriver(drivers);
+                return transferCustomFileName(driver,filterLatestDriver(drivers));
             }
             return null;
         }
-        return drivers.get(0);
+
+        return transferCustomFileName(driver, drivers.get(0));
+    }
+
+    private Driver transferCustomFileName(Driver driver, Driver foundDriver) {
+
+        if (isNotBlank(driver.getCustomFileName()))
+        {
+            foundDriver.setCustomFileName(driver.getCustomFileName());
+        }
+
+        return foundDriver;
     }
 
     List<Driver> getLatestDrivers() {

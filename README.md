@@ -331,6 +331,32 @@ To skip the installation you can add `<skip>true</skip>` in the configuration ta
 </plugin>
 ```
 
+### Setting the driver filename
+To set a custom file name for the specified driver configuration.
+```xml
+<plugin>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>webdriverextensions-maven-plugin</artifactId>
+    <version>3.1.3</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>install-drivers</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <drivers>
+            <driver>
+                <name>chromedriver</name>
+                <platform>linux</platform>
+                <customFileName>chrome-linux-custom</customFileName>
+            </driver>
+        </drivers>
+    </configuration>
+</plugin>
+```
+
 ### Further Configurations
 For more details on how to further configure this plugin please see the
 [plugin goal documentation](http://webdriverextensions.github.io/webdriverextensions-maven-plugin/install-drivers-mojo.html).
@@ -403,7 +429,7 @@ For more details on how to further configure this plugin please see the
 #### 1.0.0 (2014 June 6)
 - Initial release!
 
-## License
+## License 
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this work except in compliance with the License.

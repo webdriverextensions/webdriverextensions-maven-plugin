@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static com.github.webdriverextensions.Utils.quote;
@@ -62,7 +61,7 @@ public class DriverDownloader {
                     HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
                     copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
                     if (driverFileIsCorrupt(downloadFilePath)) {
-                        printXmlFileContetIfPresentInDonwloadedFile(downloadFilePath);
+                        printXmlFileContentIfPresentInDownloadedFile(downloadFilePath);
                         cleanupDriverDownloadDirectory(downloadDirectory);
                         throw new InstallDriversMojoExecutionException("Failed to download a non corrupt driver", mojo, driver);
                     }
@@ -77,7 +76,7 @@ public class DriverDownloader {
         return downloadFilePath;
     }
 
-    private void printXmlFileContetIfPresentInDonwloadedFile(Path downloadFilePath) {
+    private void printXmlFileContentIfPresentInDownloadedFile(Path downloadFilePath) {
         try {
             List<String> fileContent = Files.readAllLines(downloadFilePath, StandardCharsets.UTF_8);
             if (fileContent.get(0).startsWith("<?xml")) {

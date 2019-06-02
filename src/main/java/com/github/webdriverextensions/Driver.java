@@ -13,11 +13,18 @@ public class Driver {
     private String version;
     private String url;
     private String fileMatchInside;
+    private String customFileName;
 
     public String getId() {
-        return name
-                + (platform != null ? "-" + platform : "")
-                + (bit != null ? "-" + bit + "bit" : "");
+
+        if (customFileName!= null)
+        {
+            if (!customFileName.isEmpty()) {
+                return customFileName;
+            }
+        }
+
+        return name + (platform != null ? "-" + platform : "") + (bit != null ? "-" + bit + "bit" : "");
     }
 
     public String getDriverDownloadDirectoryName() {
@@ -37,6 +44,14 @@ public class Driver {
 
     public String getPlatform() {
         return platform;
+    }
+
+    public String getCustomFileName() {
+        return customFileName;
+    }
+
+    public void setCustomFileName(String customFileName) {
+        this.customFileName = customFileName;
     }
 
     public void setPlatform(String platform) {
