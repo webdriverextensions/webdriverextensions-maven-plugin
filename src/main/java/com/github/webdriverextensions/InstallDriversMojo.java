@@ -13,6 +13,7 @@ import org.apache.maven.settings.Settings;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -138,10 +139,20 @@ public class InstallDriversMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
-    Path pluginWorkingDirectory = Paths.get(System.getProperty("java.io.tmpdir")).resolve("webdriverextensions-maven-plugin");
-    Path downloadDirectory = pluginWorkingDirectory.resolve("downloads");
-    Path tempDirectory = pluginWorkingDirectory.resolve("temp");
+    Path pluginWorkingDirectory;
+    Path downloadDirectory;
+    Path tempDirectory;
     Repository repository;
+
+    public InstallDriversMojo() {
+        try {
+            pluginWorkingDirectory = Files.createTempDirectory("webdriverextensions-maven-plugin");
+            downloadDirectory = pluginWorkingDirectory.resolve("downloads");
+            tempDirectory = pluginWorkingDirectory.resolve("temp");
+        } catch (IOException e) {
+            throw new RuntimeException("error while creating folders", e);
+        }
+    }
 
     public void execute() throws MojoExecutionException {
 
