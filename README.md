@@ -99,19 +99,19 @@ E.g. to install specific versions of all available drivers
                 <name>chromedriver</name>
                 <platform>windows</platform>
                 <bit>32</bit>
-                <version>75.0.3770.8</version>
+                <version>74.0.3729.6</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>mac</platform>
                 <bit>64</bit>
-                <version>75.0.3770.8</version>
+                <version>74.0.3729.6</version>
             </driver>
             <driver>
                 <name>chromedriver</name>
                 <platform>linux</platform>
                 <bit>64</bit>
-                <version>75.0.3770.8</version>
+                <version>74.0.3729.6</version>
             </driver>
             <driver>
                 <name>phantomjs</name>
