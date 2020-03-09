@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.regex.Pattern;
 
+import static jdk.nashorn.internal.objects.Global.println;
+
 public class FileExtractorImpl implements FileExtractor {
 
     private final Pattern extractPattern;
@@ -176,6 +178,8 @@ public class FileExtractorImpl implements FileExtractor {
                                 Files.copy(zipArchive, fileToExtract);
                             } else {
                                 Path fileToExtract = toDirectory.resolve(zipEntry.getName());
+                                if(!Files.exists(fileToExtract.getParent()))
+                                    Files.createDirectories(fileToExtract.getParent());
                                 Files.copy(zipArchive, fileToExtract);
                             }
                         }
