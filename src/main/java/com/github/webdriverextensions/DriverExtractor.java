@@ -20,12 +20,12 @@ class DriverExtractor {
         FileExtractor fileExtractor = new FileExtractorImpl(driver.getFileMatchInside());
 
         try {
+            Files.createDirectories(mojo.tempDirectory);
             if (fileExtractor.isExtractable(downloadedFile)) {
                 mojo.getLog().info("  Extracting " + quote(downloadedFile) + " to temp folder");
                 fileExtractor.extractFile(downloadedFile, mojo.tempDirectory);
             } else {
                 mojo.getLog().info("  Copying " + quote(downloadedFile) + " to temp folder");
-                Files.createDirectories(mojo.tempDirectory);
                 Files.copy(downloadedFile, mojo.tempDirectory.resolve(downloadedFile.getFileName()));
             }
             if (!mojo.keepDownloadedWebdrivers) {
