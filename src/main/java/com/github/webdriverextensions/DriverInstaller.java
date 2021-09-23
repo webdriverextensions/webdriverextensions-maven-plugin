@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import static com.github.webdriverextensions.Utils.quote;
@@ -77,7 +78,7 @@ public class DriverInstaller {
             Path singleFile = Paths.get(files.get(0));
             mojo.getLog().info("  Moving (one File) " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
             FileUtils.forceDelete(to.resolve(newFileName).toFile());
-            Files.move(singleFile, to.resolve(newFileName));
+            Files.move(singleFile, to.resolve(newFileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to.resolve(newFileName)), e);
         }
@@ -89,7 +90,13 @@ public class DriverInstaller {
             for (File file : from.toFile().listFiles()) {
                 mojo.getLog().info("  Moving (All Files) " + file + " to " + to.resolve(file.toPath().getFileName()));
                 FileUtils.forceDelete(to.resolve(file.toPath().getFileName()).toFile());
-                Files.move(file.toPath(), to.resolve(file.toPath().getFileName()));
+                if (Utils.isWindows() && file.isDirectory()) {
+                    // (on windows) it is not possible to move a non-empty directory (DirectoryNotEmptyException). copy and delete should be used instead.
+                    Files.copy(file.toPath(), to.resolve(file.toPath().getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                    FileUtils.forceDelete(file);
+                } else {
+                    Files.move(file.toPath(), to.resolve(file.toPath().getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                }
                 makeExecutable(to.resolve(file.toPath().getFileName()));
             }
         } catch (Exception e) {
