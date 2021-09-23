@@ -73,7 +73,7 @@ public class Utils {
                     return false;
             }
         }
-        return com.sun.jna.Platform.is64Bit();
+        return "64".equalsIgnoreCase(System.getProperty("sun.arch.data.model"));
     }
 
     public static String debugInfo(InstallDriversMojo mojo) {
