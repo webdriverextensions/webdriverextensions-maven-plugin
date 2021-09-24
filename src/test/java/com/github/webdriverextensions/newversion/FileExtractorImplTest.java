@@ -261,19 +261,17 @@ public class FileExtractorImplTest {
         assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
     }
 
-    @Test
-    public void test_unZipOldMS() throws Exception {
+    @Test(expected = Test.None.class /* no exception expected */)
+    public void test_unZipOldMS_does_not_fail() throws Exception {
         Path aNewZip = Paths.get("src/test/resources/file-extractor-test-data/edge80.zip");
         FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
         fileExtractor.extractFile(aNewZip,toDirectory);
-        assert(true);
     }
 
-    @Test
-    public void test_unZipNewMS() throws Exception {
+    @Test(expected = Test.None.class /* no exception expected */)
+    public void test_unZipNewMS_does_not_fail() throws Exception {
         Path aNewZip = Paths.get("src/test/resources/file-extractor-test-data/edge82.zip");
         FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
         fileExtractor.extractFile(aNewZip,toDirectory);
-        assert(true);
     }
 }

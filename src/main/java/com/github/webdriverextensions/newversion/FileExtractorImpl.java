@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.regex.Pattern;
 
-import static jdk.nashorn.internal.objects.Global.println;
 
 public class FileExtractorImpl implements FileExtractor {
 

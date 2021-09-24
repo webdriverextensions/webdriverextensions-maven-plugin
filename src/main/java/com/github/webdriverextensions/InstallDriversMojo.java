@@ -25,7 +25,7 @@ import static com.github.webdriverextensions.Utils.quote;
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class InstallDriversMojo extends AbstractMojo {
 
-    @Component
+    @Component //my maven complains that this is deprecated!
     MavenProject project;
 
     @Parameter(defaultValue = "${settings}", readonly = true)
