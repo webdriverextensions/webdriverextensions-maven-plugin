@@ -4,6 +4,7 @@ import static com.github.webdriverextensions.Utils.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -130,7 +131,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
                 foundDriverVersionFile = true;
                 if (version != null) {
                     try {
-                        String versionFileString = FileUtils.readFileToString(file);
+                        String versionFileString = FileUtils.readFileToString(file, Charset.defaultCharset());
                         if (!versionFileString.contains("\"version\": \"" + version + "\"")) {
                             fail("Version " + version + " was not found in version file, version file content: " + versionFileString);
                         }

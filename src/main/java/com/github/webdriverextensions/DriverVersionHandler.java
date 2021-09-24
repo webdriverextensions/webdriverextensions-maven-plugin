@@ -3,6 +3,7 @@ package com.github.webdriverextensions;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 class DriverVersionHandler {
@@ -17,7 +18,7 @@ class DriverVersionHandler {
         String versionString = createVersionString(driver);
 
         try {
-            org.apache.commons.io.FileUtils.writeStringToFile(file.toFile(), versionString);
+            org.apache.commons.io.FileUtils.writeStringToFile(file.toFile(), versionString, Charset.defaultCharset());
         } catch (IOException e) {
             throw new RuntimeException("Failed to create version file containing metadata about the installed driver" + Utils.debugInfo(driver), e);
         }
@@ -37,7 +38,7 @@ class DriverVersionHandler {
             if (!versionFile.toFile().exists()) {
                 return false;
             }
-            String savedVersion = org.apache.commons.io.FileUtils.readFileToString(versionFile.toFile());
+            String savedVersion = org.apache.commons.io.FileUtils.readFileToString(versionFile.toFile(), Charset.defaultCharset());
             String currentVersion = createVersionString(driver);
             return savedVersion.equals(currentVersion);
         } catch (IOException e) {
