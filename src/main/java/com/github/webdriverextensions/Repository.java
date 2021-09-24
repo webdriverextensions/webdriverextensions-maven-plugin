@@ -1,23 +1,23 @@
 package com.github.webdriverextensions;
 
-import static ch.lambdaj.Lambda.*;
 import static com.github.webdriverextensions.Utils.*;
-import static org.apache.commons.lang3.CharEncoding.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.*;
-import static org.hamcrest.Matchers.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ComparatorUtils;
+import org.apache.commons.collections4.PredicateUtils;
+import org.apache.commons.collections4.TransformerUtils;
+import org.apache.commons.collections4.functors.TransformedPredicate;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
 import com.google.gson.*;
-
-import ch.lambdaj.function.compare.ArgumentComparator;
 
 class Repository {
 
@@ -44,13 +44,16 @@ class Repository {
         return repository;
     }
 
-    @SuppressWarnings("unchecked")
     private static List<Driver> sortDrivers(List<Driver> drivers) {
-        Comparator byId = new ArgumentComparator(on(Driver.class).getId());
-        Comparator byVersion = new ArgumentComparator(on(Driver.class).getVersion());
-        Comparator orderByIdAndVersion = ComparatorUtils.chainedComparator(byId, byVersion);
+        Comparator<Driver> byId = new DriverComparator.ById();
+        // sort by version descending (newest first)
+        Comparator<Driver> byVersion = ComparatorUtils.reversedComparator(new DriverComparator.ByVersion());
+        @SuppressWarnings("unchecked")
+        Comparator<Driver> orderByIdAndVersion = ComparatorUtils.chainedComparator(byId, byVersion);
 
-        return sort(drivers, on(Driver.class), orderByIdAndVersion);
+        List<Driver> listToSort = new ArrayList<>(drivers);
+        Collections.sort(listToSort, orderByIdAndVersion);
+        return listToSort;
     }
 
     private static String downloadAsString(URL url, Proxy proxySettings) throws IOException {
@@ -77,21 +80,39 @@ class Repository {
     }
 
     List<Driver> getDrivers(String name, String platform, String bit, String version) {
-        List<Driver> drivers = this.drivers;
+        return filterDrivers(drivers, name, platform, bit, version);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Driver> filterDrivers(List<Driver> driversToFilter, String name, String platform, String bit, String version) {
+        List<Driver> filteredDrivers = new ArrayList<>(driversToFilter);
+        Class<?>[] toLowerArgTypes = {Locale.class};
+        Object[] toLowerArgs = {Locale.ROOT};
         if (name != null) {
-            drivers = select(drivers, having(on(Driver.class).getName(), is(equalToIgnoringCase(name))));
+            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
+                    TransformerUtils.chainedTransformer(TransformerUtils.invokerTransformer("getName"), TransformerUtils.invokerTransformer("toLowerCase", toLowerArgTypes, toLowerArgs)),
+                    PredicateUtils.equalPredicate(name.toLowerCase(Locale.ROOT)))
+            );
         }
         if (platform != null) {
-            drivers = select(drivers, having(on(Driver.class).getPlatform(), is(equalToIgnoringCase(platform))));
+            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
+                    TransformerUtils.chainedTransformer(TransformerUtils.invokerTransformer("getPlatform"), TransformerUtils.invokerTransformer("toLowerCase", toLowerArgTypes, toLowerArgs)),
+                    PredicateUtils.equalPredicate(platform.toLowerCase(Locale.ROOT)))
+            );
         }
         if (bit != null) {
-            drivers = select(drivers, having(on(Driver.class).getBit(), is(equalToIgnoringCase(bit))));
+            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
+                    TransformerUtils.chainedTransformer(TransformerUtils.invokerTransformer("getBit"), TransformerUtils.invokerTransformer("toLowerCase", toLowerArgTypes, toLowerArgs)),
+                    PredicateUtils.equalPredicate(bit.toLowerCase(Locale.ROOT)))
+            );
         }
         if (version != null) {
-            drivers = select(drivers,
-                             having(on(Driver.class).getComparableVersion(), is(new ComparableVersion(version))));
+            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
+                    TransformerUtils.invokerTransformer("getComparableVersion"),
+                    PredicateUtils.equalPredicate(new ComparableVersion(version)))
+            );
         }
-        return drivers;
+        return filteredDrivers;
     }
 
     Driver enrichDriver(Driver driver) throws MojoExecutionException {
@@ -103,7 +124,7 @@ class Repository {
         }
         if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {
             // Explicit driver config make sure it exists in repo
-            if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).size() == 0) {
+            if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).isEmpty()) {
                 throw new MojoExecutionException("Could not find driver: " + driver + System.lineSeparator()
                                                  + System.lineSeparator()
                                                  + "in repository: " + this);
@@ -155,16 +176,16 @@ class Repository {
     }
 
     List<Driver> getLatestDrivers() {
-        List<Driver> latestDrivers = new ArrayList<Driver>();
-        Collection<String> driverNames = selectDistinct(collect(drivers, on(Driver.class).getName()));
+        List<Driver> latestDrivers = new ArrayList<>();
+        Set<String> driverNames = new HashSet<>();
+        for (Driver driver : drivers) {
+            driverNames.add(driver.getName());
+        }
 
         String platform = detectPlatform();
 
         for (String driverName : driverNames) {
-            List<Driver> driversWithDriverName = select(drivers, having(on(Driver.class).getName(), is(driverName)));
-            List<Driver> driversWithDriverNameAndPlatform = select(driversWithDriverName,
-                                                                   having(on(Driver.class).getPlatform(),
-                                                                          is(platform)));
+            List<Driver> driversWithDriverNameAndPlatform = getDrivers(driverName, platform, null, null);
             String bit = detectBits(driverName);
             boolean is64Bit = bit.equals("64");
             Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);
@@ -182,11 +203,8 @@ class Repository {
     }
 
     private Driver getDriverByBit(String bit, List<Driver> driversWithDriverNameAndPlatform) {
-        List<Driver> driversWithDriverNameAndPlatformAndBit = select(driversWithDriverNameAndPlatform,
-                                                                     having(on(Driver.class).getBit(), is(bit)));
-
-        return selectMax(driversWithDriverNameAndPlatformAndBit,
-                         on(Driver.class).getComparableVersion());
+        List<Driver> driversWithDriverNameAndPlatformAndBit = filterDrivers(driversWithDriverNameAndPlatform, null, null, bit, null);
+        return filterLatestDriver(driversWithDriverNameAndPlatformAndBit);
     }
 
     private static String detectBits(String driverName) {
@@ -211,8 +229,13 @@ class Repository {
         return "windows";
     }
 
+    @SuppressWarnings("unchecked")
     private String getLatestDriverVersion(String driverId) {
-        List<Driver> allDriverVersions = select(drivers, having(on(Driver.class).getId(), is(driverId)));
+        List<Driver> allDriverVersions = new ArrayList<>(drivers);
+        CollectionUtils.filter(allDriverVersions, new TransformedPredicate(
+                TransformerUtils.invokerTransformer("getId"),
+                PredicateUtils.equalPredicate(driverId))
+        );
         Driver latestDriver = filterLatestDriver(allDriverVersions);
         if (latestDriver == null) {
             return null;
@@ -221,7 +244,8 @@ class Repository {
     }
 
     private Driver filterLatestDriver(List<Driver> drivers) {
-        return selectMax(drivers, on(Driver.class).getComparableVersion());
+        List<Driver> sortedDrivers = sortDrivers(drivers);
+        return sortedDrivers.size() > 0 ? sortedDrivers.get(0) : null;
     }
 
     @Override

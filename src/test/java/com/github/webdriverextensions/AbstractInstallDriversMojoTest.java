@@ -15,6 +15,7 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.Assert;
 
 public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
@@ -33,6 +34,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setPom(pom);
         ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
+        configuration.setRepositorySession(new DefaultRepositorySystemSession());
         return lookup(ProjectBuilder.class).build(pom, configuration).getProject();
     }
 
