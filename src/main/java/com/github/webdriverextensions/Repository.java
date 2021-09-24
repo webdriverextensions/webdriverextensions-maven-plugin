@@ -14,6 +14,16 @@ import org.apache.commons.collections4.PredicateUtils;
 import org.apache.commons.collections4.TransformerUtils;
 import org.apache.commons.collections4.functors.TransformedPredicate;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
@@ -26,16 +36,17 @@ class Repository {
     static Repository load(URL repositoryUrl, Proxy proxySettings) throws MojoExecutionException {
         String repositoryAsString;
         try {
-            repositoryAsString = downloadAsString(repositoryUrl, proxySettings);
-        } catch (IOException e) {
+            repositoryAsString = downloadAsString(repositoryUrl.toURI(), proxySettings);
+        } catch (IOException | URISyntaxException e) {
             throw new InstallDriversMojoExecutionException("Failed to download repository from url " + quote(
                     repositoryUrl), e);
         }
 
         Repository repository;
         try {
+            Objects.requireNonNull(trimToNull(repositoryAsString), "repository json is empty");
             repository = new Gson().fromJson(repositoryAsString, Repository.class);
-        } catch (JsonSyntaxException e) {
+        } catch (JsonSyntaxException | NullPointerException e) {
             throw new InstallDriversMojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
         }
 
@@ -56,22 +67,26 @@ class Repository {
         return listToSort;
     }
 
-    private static String downloadAsString(URL url, Proxy proxySettings) throws IOException {
-        URLConnection connection;
-        if (proxySettings != null) {
-            java.net.Proxy proxy = new java.net.Proxy(java.net.Proxy.Type.HTTP,
-                                                      new InetSocketAddress(proxySettings.getHost(),
-                                                                            proxySettings.getPort()));
-            if (proxySettings.getUsername() != null) {
-                ProxyUtils.setProxyAuthenticator(proxySettings);
-            }
-            connection = url.openConnection(proxy);
-        } else {
-            connection = url.openConnection();
+    private static String downloadAsString(URI url, Proxy proxySettings) throws IOException {
+        // kept vor backward compatibility
+        if ("file".equalsIgnoreCase(url.getScheme())) {
+            return IOUtils.toString(url, UTF_8);
         }
-
-        try (InputStream inputStream = connection.getInputStream()) {
-            return IOUtils.toString(inputStream, UTF_8);
+        RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
+        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+        httpClientBuilder.setDefaultRequestConfig(requestConfig);
+        HttpHost proxy = ProxyUtils.createProxyFromSettings(proxySettings);
+        if (proxy != null) {
+            httpClientBuilder.setProxy(proxy);
+            CredentialsProvider proxyCredentials = ProxyUtils.createProxyCredentialsFromSettings(proxySettings);
+            if (proxyCredentials != null) {
+                httpClientBuilder.setDefaultCredentialsProvider(proxyCredentials);
+            }
+        }
+        try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
+            try (CloseableHttpResponse response = httpClient.execute(new HttpGet(url))) {
+                return EntityUtils.toString(response.getEntity(), UTF_8);
+            }
         }
     }
 
