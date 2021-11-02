@@ -83,53 +83,43 @@
         </repository>
     </distributionManagement>
 
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
-
     <properties>
         <!-- File Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependency Versions -->
-        <maven-artifact.version>3.2.1</maven-artifact.version>
-        <maven-compat.version>3.2.1</maven-compat.version>
-        <maven-core.version>3.2.1</maven-core.version>
-        <maven-model.version>3.2.1</maven-model.version>
-        <maven-plugin-api.version>3.2.1</maven-plugin-api.version>
+        <maven-core.version>3.3.9</maven-core.version><!-- 1st official maven release that requires Java 1.7 -->
         <maven-plugin-annotations.version>3.3</maven-plugin-annotations.version>
-        <maven-plugin-testing-harness.version>3.1.0</maven-plugin-testing-harness.version>
+        <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
 
-        <commons-codec.version>1.10</commons-codec.version>
-        <commons-collections.version>20040616</commons-collections.version>
+        <commons-codec.version>1.15</commons-codec.version>
+        <commons-collections.version>4.2</commons-collections.version>
         <commons-exec.version>1.3</commons-exec.version>
-        <commons-io.version>2.7</commons-io.version>
-        <commons-lang3.version>3.4</commons-lang3.version>
-        <gson.version>2.3.1</gson.version>
+        <commons-io.version>2.6</commons-io.version><!-- latest for java 1.7 -->
+        <commons-lang3.version>3.8.1</commons-lang3.version><!-- latest for java 1.7 -->
+        <gson.version>2.8.8</gson.version>
         <httpclient.version>4.5.13</httpclient.version>
-        <junit.version>4.12</junit.version>
-        <lambdaj.version>2.3.3</lambdaj.version>
-        <selenium.version>2.53.0</selenium.version>
+        <junit.version>4.13.2</junit.version>
+        <selenium.version>2.53.1</selenium.version><!-- latest for java 1.7 -->
 
         <!-- Plugin Versions -->
         <github-site-maven-plugin.version>0.12</github-site-maven-plugin.version>
-        <maven-deploy-plugin.version>2.8.1</maven-deploy-plugin.version>
-        <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
-        <maven-plugin-plugin.version>3.4</maven-plugin-plugin.version>
-        <maven-project-info-reports-plugin.version>2.8.1</maven-project-info-reports-plugin.version>
-        <maven-release-plugin.version>2.5</maven-release-plugin.version>
-        <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.6</nexus-staging-maven-plugin.version>
-        <webdriverextensions-maven-plugin.version>2.1.0</webdriverextensions-maven-plugin.version>
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+        <maven-plugin-plugin.version>3.6.1</maven-plugin-plugin.version>
+        <maven-project-info-reports-plugin.version>3.1.2</maven-project-info-reports-plugin.version>
+        <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
-            <version>${maven-plugin-api.version}</version>
+            <version>${maven-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
@@ -157,12 +147,13 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-compat</artifactId>
-            <version>${maven-compat.version}</version>
+            <version>${maven-core.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-model</artifactId>
-            <version>${maven-model.version}</version>
+            <version>${maven-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -180,13 +171,8 @@
             <version>${gson.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.googlecode.lambdaj</groupId>
-            <artifactId>lambdaj</artifactId>
-            <version>${lambdaj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
             <version>${commons-collections.version}</version>
         </dependency>
         <dependency>
@@ -205,14 +191,27 @@
             <version>${httpclient.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${httpclient.version}</version>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-java</artifactId>
+            <artifactId>selenium-api</artifactId>
             <version>${selenium.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.21</version>
+            <version>1.20</version><!-- latest for java 1.7 -->
         </dependency>
         <dependency>
             <groupId>org.apache.tika</groupId>
@@ -231,10 +230,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <compilerArgs>
+                        <arg>-Xlint:unchecked</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 
@@ -242,6 +246,15 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>${maven-deploy-plugin.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                </configuration>
             </plugin>
 
             <plugin>

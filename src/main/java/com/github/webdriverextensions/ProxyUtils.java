@@ -12,14 +12,14 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
 public class ProxyUtils {
-    public static HttpHost createProxyFromSettings(Proxy proxySettings) throws MojoExecutionException {
+    public static HttpHost createProxyFromSettings(Proxy proxySettings) {
         if (proxySettings == null) {
             return null;
         }
         return new HttpHost(proxySettings.getHost(), proxySettings.getPort());
     }
 
-    static CredentialsProvider createProxyCredentialsFromSettings(Proxy proxySettings) throws MojoExecutionException {
+    static CredentialsProvider createProxyCredentialsFromSettings(Proxy proxySettings) {
         if (proxySettings.getUsername() == null) {
             return null;
         }

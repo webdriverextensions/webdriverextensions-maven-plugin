@@ -4,6 +4,7 @@ import static com.github.webdriverextensions.Utils.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -15,6 +16,7 @@ import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.Assert;
 
 public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
@@ -33,6 +35,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setPom(pom);
         ProjectBuildingRequest configuration = request.getProjectBuildingRequest();
+        configuration.setRepositorySession(new DefaultRepositorySystemSession());
         return lookup(ProjectBuilder.class).build(pom, configuration).getProject();
     }
 
@@ -128,7 +131,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
                 foundDriverVersionFile = true;
                 if (version != null) {
                     try {
-                        String versionFileString = FileUtils.readFileToString(file);
+                        String versionFileString = FileUtils.readFileToString(file, Charset.defaultCharset());
                         if (!versionFileString.contains("\"version\": \"" + version + "\"")) {
                             fail("Version " + version + " was not found in version file, version file content: " + versionFileString);
                         }
