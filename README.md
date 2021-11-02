@@ -1,4 +1,4 @@
-[![Travis Build Status](https://travis-ci.org/webdriverextensions/webdriverextensions-maven-plugin.svg?branch=master)](https://travis-ci.org/webdriverextensions/webdriverextensions-maven-plugin) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/g8qvts7p92iehkyu?svg=true)](https://ci.appveyor.com/project/andidev/webdriverextensions-maven-plugin) [![Maven Central](https://img.shields.io/maven-central/v/com.github.webdriverextensions/webdriverextensions-maven-plugin.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Acom.github.webdriverextensions)
+[![Build Status](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/workflows/CI%20build/badge.svg)](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/actions?query=workflow%3A%22CI+build%22) [![Maven Central](https://img.shields.io/maven-central/v/com.github.webdriverextensions/webdriverextensions-maven-plugin.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3Acom.github.webdriverextensions)
 
 WebDriver Extensions Maven Plugin
 ===================

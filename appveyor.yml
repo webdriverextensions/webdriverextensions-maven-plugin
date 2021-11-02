@@ -1,8 +1,0 @@
-version: '{build}'
-build_script:
-  - mvn clean verify --batch-mode -DskipTests
-test_script:
-  - mvn clean verify -e
-cache:
-  - C:\maven\
-  - C:\Users\appveyor\.m2
