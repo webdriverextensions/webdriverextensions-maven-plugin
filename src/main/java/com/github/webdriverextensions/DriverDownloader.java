@@ -3,6 +3,7 @@ package com.github.webdriverextensions;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -59,11 +60,16 @@ public class DriverDownloader {
             try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
                 try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
                     HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
-                    copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
-                    if (driverFileIsCorrupt(downloadFilePath)) {
-                        printXmlFileContentIfPresentInDownloadedFile(downloadFilePath);
-                        cleanupDriverDownloadDirectory(downloadDirectory);
-                        throw new InstallDriversMojoExecutionException("Failed to download a non corrupt driver", mojo, driver);
+                    final int statusCode = fileDownloadResponse.getStatusLine().getStatusCode();
+                    if (HttpStatus.SC_OK == statusCode) {
+                        copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
+                        if (driverFileIsCorrupt(downloadFilePath)) {
+                            printXmlFileContentIfPresentInDownloadedFile(downloadFilePath);
+                            cleanupDriverDownloadDirectory(downloadDirectory);
+                            throw new InstallDriversMojoExecutionException("Failed to download a non corrupt driver", mojo, driver);
+                        }
+                    } else {
+                        throw new InstallDriversMojoExecutionException("Download failed with status code " + statusCode, mojo, driver);
                     }
                 }
             } catch (InstallDriversMojoExecutionException e) {
