@@ -57,11 +57,13 @@
                             <name>operadriver</name>
                             <bit>32</bit>
                             <version>0.2.2</version>
+                            <fileMatchInside>.*/operadriver.exe$</fileMatchInside>
                         </driver>
                         <driver>
                             <name>operadriver</name>
                             <bit>64</bit>
                             <version>0.2.2</version>
+                            <fileMatchInside>.*/operadriver.exe$</fileMatchInside>
                         </driver>
                     </drivers>
                 </configuration>

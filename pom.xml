@@ -219,6 +219,12 @@
             <version>2.2.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.28.2</version><!-- latest for java 1.7 -->
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

@@ -114,7 +114,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("customdriver-windows-32bit.exe");
+        assertDriverIsInstalled("custom-chrome-driver-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(1);
     }
 
@@ -126,9 +126,9 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("customdriver-windows-32bit");
+        assertDriverIsInstalled("custom-phantomjs-driver-windows-32bit");
         assertNumberOfInstalledDriverIs(1);
-        File[] installedFiles = mojo.installationDirectory.toPath().resolve("customdriver-windows-32bit").toFile().listFiles();
+        File[] installedFiles = mojo.installationDirectory.toPath().resolve("custom-phantomjs-driver-windows-32bit").toFile().listFiles();
         assertThat(installedFiles).hasSize(6);
     }
 
@@ -141,7 +141,7 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("customdriver-filematchinside-windows-32bit.exe");
+        assertDriverIsInstalled("custom-phantomjs-driver-filematchinside-windows-32bit.exe");
         assertNumberOfInstalledDriverIs(1);
     }
 

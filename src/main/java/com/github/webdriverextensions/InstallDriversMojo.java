@@ -180,7 +180,7 @@ public class InstallDriversMojo extends AbstractMojo {
             getLog().info("Installing drivers from configuration");
         }
 
-        DriverDownloader driverDownloader = new DriverDownloader(this);
+        DriverDownloader driverDownloader = getDownloader();
         DriverExtractor driverExtractor = new DriverExtractor(this);
         DriverInstaller driverInstaller = new DriverInstaller(this);
 
@@ -204,6 +204,10 @@ public class InstallDriversMojo extends AbstractMojo {
                 getLog().info("  Already installed");
             }
         }
+    }
+
+    DriverDownloader getDownloader() throws MojoExecutionException {
+        return new DriverDownloader(this);
     }
 
     private void cleanupDownloadsDirectory() throws MojoExecutionException {
