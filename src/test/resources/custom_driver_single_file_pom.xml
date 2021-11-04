@@ -13,7 +13,7 @@
                 <configuration>
                     <drivers>
                         <driver>
-                            <name>customdriver</name>
+                            <name>custom-chrome-driver</name>
                             <platform>windows</platform>
                             <bit>32</bit>
                             <version>2.22</version>

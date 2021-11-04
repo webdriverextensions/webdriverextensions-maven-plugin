@@ -1,36 +1,55 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+
+import static com.github.webdriverextensions.Utils.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
 
     private InstallDriversMojo mojo;
 
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        tempFolder.create();
+    }
+
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        deleteTempDirectory();
-        deleteInstallationDirectory();
+        tempFolder.delete();
     }
 
-    private MavenProject getMavenProject(String pomPath) throws Exception {
+    protected MavenProject getMavenProject(String pomPath) throws Exception {
         File pom = new File(pomPath);
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setPom(pom);
@@ -39,35 +58,22 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return lookup(ProjectBuilder.class).build(pom, configuration).getProject();
     }
 
-    InstallDriversMojo getMojo(String pomPath) throws Exception {
+    protected InstallDriversMojo getMojo(String pomPath) throws Exception {
         MavenProject project = getMavenProject(pomPath);
-        InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
+        InstallDriversMojo mojo = Mockito.spy((InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers"));
 
         // some global test preparations
         this.mojo = mojo;
 
-        // delete download directories before running test
-        deleteTempDirectory();
-        deleteInstallationDirectory();
-
         logTestName(mojo);
 
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository-3.0.json");
-        mojo.keepDownloadedWebdrivers = true;
+        mojo.installationDirectory = tempFolder.getRoot();
+        DriverDownloader dlMock = Mockito.mock(DriverDownloader.class);
+        when(dlMock.downloadFile(any(Driver.class), any(Path.class))).thenAnswer(new DownloadAnswer());
+        doReturn(dlMock).when(mojo).getDownloader();
 
         return mojo;
-    }
-
-    private void deleteTempDirectory() throws IOException {
-        if (mojo.tempDirectory != null && mojo.tempDirectory.toFile().exists()) {
-            FileUtils.deleteDirectory(mojo.tempDirectory.toFile());
-        }
-    }
-
-    private void deleteInstallationDirectory() throws IOException {
-        if (mojo.installationDirectory.toPath() != null && mojo.installationDirectory.exists()) {
-            FileUtils.deleteDirectory(mojo.installationDirectory);
-        }
     }
 
     private void logTestName(InstallDriversMojo mojo) {
@@ -207,5 +213,88 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
 
     public static void fail(String message) {
         Assert.fail("[" + currentPlatform() + " " + currentBit() + "BIT] " + message);
+    }
+    
+    private class DownloadAnswer implements Answer<Path> {
+
+        @Override
+        public Path answer(InvocationOnMock invocation) throws Throwable {
+            Driver driver = invocation.getArgument(0);
+            Path downloadDirectory = invocation.getArgument(1);
+            Path downloadFilePath = downloadDirectory.resolve(driver.getFilenameFromUrl());
+            // copy matching fake-driver to downloadFilePath
+            Path fakeDriverDir = Paths.get("src/test/resources/fake-drivers");
+            Files.createDirectories(downloadDirectory);
+            switch (driver.getName()) {
+                case "chromedriver":
+                case "chromedriver-beta":
+                case "custom-chrome-driver":
+                    Files.copy(fakeDriverDir.resolve("chromedriver").resolve(driver.getFilenameFromUrl()), downloadFilePath);
+                    break;
+                case "geckodriver": {
+                    String osArch = "";
+                    if (driver.getPlatform().equalsIgnoreCase("linux")) {
+                        osArch = "linux" + driver.getBit() + ".tar.gz";
+                    }
+                    if (driver.getPlatform().equalsIgnoreCase("windows")) {
+                        osArch = "win" + driver.getBit() + ".zip";
+                    }
+                    if (driver.getPlatform().equalsIgnoreCase("mac")) {
+                        osArch = "macos.tar.gz";
+                    }
+                    Files.copy(fakeDriverDir.resolve("geckodriver").resolve("geckodriver-v0.11.1-" + osArch), downloadFilePath);
+                }
+                break;
+                case "internetexplorerdriver":
+                    if (driver.getBit().equalsIgnoreCase("32")) {
+                        Files.copy(fakeDriverDir.resolve("internetexplorerdriver").resolve("IEDriverServer_Win32_2.53.1.zip"), downloadFilePath);
+                    } else {
+                        Files.copy(fakeDriverDir.resolve("internetexplorerdriver").resolve("IEDriverServer_x64_2.53.1.zip"), downloadFilePath);
+                    }
+                    break;
+                case "phantomjs":
+                case "custom-phantomjs-driver-filematchinside":
+                case "custom-phantomjs-driver": {
+                    String osArch = "";
+                    if (driver.getPlatform().equalsIgnoreCase("linux")) {
+                        if (driver.getBit().equalsIgnoreCase("32")) {
+                            osArch = "linux-i686.tar.bz2";
+                        } else {
+                            osArch = "linux-x86_64.tar.bz2";
+                        }
+                    }
+                    if (driver.getPlatform().equalsIgnoreCase("windows")) {
+                        osArch = "windows.zip";
+                    }
+                    if (driver.getPlatform().equalsIgnoreCase("mac")) {
+                        osArch = "macosx.zip";
+                    }
+                    Files.copy(fakeDriverDir.resolve("phantomjs").resolve("phantomjs-2.1.1-" + osArch), downloadFilePath);
+                }
+                break;
+                case "edgedriver":
+                    Files.copy(fakeDriverDir.resolve("edgedriver").resolve("MicrosoftWebDriver.exe"), downloadFilePath);
+                    break;
+                case "operadriver": {
+                    String osArch = "";
+                    if (driver.getPlatform().equalsIgnoreCase("linux")) {
+                        osArch = "linux" + driver.getBit();
+                    }
+                    if (driver.getPlatform().equalsIgnoreCase("windows")) {
+                        osArch = "win" + driver.getBit();
+                    }
+                    if (driver.getPlatform().equalsIgnoreCase("mac")) {
+                        osArch = "mac" + driver.getBit();
+                    }
+                    Files.copy(fakeDriverDir.resolve("operadriver").resolve("operadriver_" + osArch + ".zip"), downloadFilePath);
+                }
+                break;
+                default:
+                    throw new MojoExecutionException("missing fake-driver: " + driver);
+            }
+            Files.createFile(downloadDirectory.resolve("download.completed"));
+            return downloadFilePath;
+        }
+        
     }
 }

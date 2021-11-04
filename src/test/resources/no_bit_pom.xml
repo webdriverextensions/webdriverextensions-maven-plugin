@@ -61,16 +61,19 @@
                             <name>operadriver</name>
                             <platform>windows</platform>
                             <version>0.2.2</version>
+                            <fileMatchInside>.*/operadriver.exe$</fileMatchInside>
                         </driver>
                         <driver>
                             <name>operadriver</name>
                             <platform>linux</platform>
                             <version>0.2.2</version>
+                            <fileMatchInside>.*/operadriver$</fileMatchInside>
                         </driver>
                         <driver>
                             <name>operadriver</name>
                             <platform>mac</platform>
                             <version>0.2.2</version>
+                            <fileMatchInside>.*/operadriver$</fileMatchInside>
                         </driver>
                     </drivers>
                 </configuration>

@@ -13,7 +13,7 @@
                 <configuration>
                     <drivers>
                         <driver>
-                            <name>customdriver</name>
+                            <name>custom-phantomjs-driver</name>
                             <platform>windows</platform>
                             <bit>32</bit>
                             <version>1.9.7</version>

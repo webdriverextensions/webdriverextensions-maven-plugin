@@ -13,7 +13,7 @@
                 <configuration>
                     <drivers>
                         <driver>
-                            <name>customdriver-filematchinside</name>
+                            <name>custom-phantomjs-driver-filematchinside</name>
                             <platform>windows</platform>
                             <bit>32</bit>
                             <version>1.9.7</version>

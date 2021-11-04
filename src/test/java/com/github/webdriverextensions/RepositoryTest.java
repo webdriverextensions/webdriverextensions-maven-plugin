@@ -8,8 +8,10 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.localserver.LocalServerTestBase;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.HttpRequestHandler;
@@ -60,6 +62,19 @@ public class RepositoryTest extends LocalServerTestBase {
                 Repository.load(new URL(String.format("http://%s:%d/404", host.getHostName(), host.getPort())), null);
             }
         });
+        assertThat(e.getMessage(), startsWith("Failed to download repository from url"));
+        assertThat(e.getCause(), instanceOf(HttpResponseException.class));
+        assertThat(e.getCause().getMessage(), is("status code: 404, reason phrase: Not Found"));
+    }
+
+    @Test
+    public void testLoadWithInvalidJson() {
+        InstallDriversMojoExecutionException e = assertThrows(InstallDriversMojoExecutionException.class, new ThrowingRunnable() {
+            @Override
+            public void run() throws Throwable {
+                Repository.load(new URL(String.format("http://%s:%d/invalid.json", host.getHostName(), host.getPort())), null);
+            }
+        });
         assertThat(e.getMessage(), startsWith("Failed to parse repository json"));
         assertThat(e.getCause(), instanceOf(NullPointerException.class));
         assertThat(e.getCause().getMessage(), is("repository json is empty"));
@@ -74,6 +89,19 @@ public class RepositoryTest extends LocalServerTestBase {
             public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
                 response.setStatusCode(HttpStatus.SC_OK);
                 response.setEntity(new InputStreamEntity(getClass().getResource("/repository-3.0.json").openStream(), ContentType.APPLICATION_JSON));
+            }
+        });
+        serverBootstrap.registerHandler("/404", new HttpRequestHandler() {
+            @Override
+            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+                response.setStatusCode(HttpStatus.SC_NOT_FOUND);
+            }
+        });
+        serverBootstrap.registerHandler("/invalid.json", new HttpRequestHandler() {
+            @Override
+            public void handle(HttpRequest request, HttpResponse response, HttpContext context) throws HttpException, IOException {
+                response.setStatusCode(HttpStatus.SC_OK);
+                response.setEntity(new StringEntity(""));
             }
         });
         host = start();

@@ -18,12 +18,11 @@ import org.apache.http.HttpHost;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
@@ -84,9 +83,7 @@ class Repository {
             }
         }
         try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
-            try (CloseableHttpResponse response = httpClient.execute(new HttpGet(url))) {
-                return EntityUtils.toString(response.getEntity(), UTF_8);
-            }
+            return httpClient.execute(new HttpGet(url), new BasicResponseHandler());
         }
     }
 
