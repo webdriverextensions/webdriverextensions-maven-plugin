@@ -19,6 +19,8 @@ import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingRequest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -32,14 +34,22 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
 
     private InstallDriversMojo mojo;
 
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        tempFolder.create();
+    }
+
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        deleteTempDirectory();
-        deleteInstallationDirectory();
+        tempFolder.delete();
     }
 
-    private MavenProject getMavenProject(String pomPath) throws Exception {
+    protected MavenProject getMavenProject(String pomPath) throws Exception {
         File pom = new File(pomPath);
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setPom(pom);
@@ -48,38 +58,22 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return lookup(ProjectBuilder.class).build(pom, configuration).getProject();
     }
 
-    InstallDriversMojo getMojo(String pomPath) throws Exception {
+    protected InstallDriversMojo getMojo(String pomPath) throws Exception {
         MavenProject project = getMavenProject(pomPath);
         InstallDriversMojo mojo = Mockito.spy((InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers"));
 
         // some global test preparations
         this.mojo = mojo;
 
-        // delete download directories before running test
-        deleteTempDirectory();
-        deleteInstallationDirectory();
-
         logTestName(mojo);
 
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository-3.0.json");
-        mojo.keepDownloadedWebdrivers = true;
+        mojo.installationDirectory = tempFolder.getRoot();
         DriverDownloader dlMock = Mockito.mock(DriverDownloader.class);
         when(dlMock.downloadFile(any(Driver.class), any(Path.class))).thenAnswer(new DownloadAnswer());
         doReturn(dlMock).when(mojo).getDownloader();
 
         return mojo;
-    }
-
-    private void deleteTempDirectory() throws IOException {
-        if (mojo.tempDirectory != null && mojo.tempDirectory.toFile().exists()) {
-            FileUtils.deleteDirectory(mojo.tempDirectory.toFile());
-        }
-    }
-
-    private void deleteInstallationDirectory() throws IOException {
-        if (mojo.installationDirectory.toPath() != null && mojo.installationDirectory.exists()) {
-            FileUtils.deleteDirectory(mojo.installationDirectory);
-        }
     }
 
     private void logTestName(InstallDriversMojo mojo) {

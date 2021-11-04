@@ -1,6 +1,7 @@
 package com.github.webdriverextensions;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.nio.file.attribute.FileTime;
@@ -94,16 +95,11 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
     public void test_that_installation_directory_configuration_installs_driver_into_custom_directory() throws Exception {
         // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/installation_directory_pom.xml");
-
-
-        // When
-        mojo.execute();
+        MavenProject project = getMavenProject("src/test/resources/installation_directory_pom.xml");
+        InstallDriversMojo mojo = (InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers");
 
         // Then
-        assertTrue(mojo.installationDirectory.toPath().toString().endsWith("custom-installation-directory"));
-        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
-        assertNumberOfInstalledDriverIs(1);
+        assertThat(mojo.installationDirectory).hasName("custom-installation-directory");
     }
 
     public void test_that_configuration_with_custom_driver_containing_single_file_not_in_repository_works() throws Exception {
