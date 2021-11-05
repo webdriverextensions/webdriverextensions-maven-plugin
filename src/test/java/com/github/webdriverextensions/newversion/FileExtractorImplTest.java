@@ -6,8 +6,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -259,5 +261,25 @@ public class FileExtractorImplTest {
         // Then
         assertThat(toDirectory.toFile().listFiles().length, is(1));
         assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
+    }
+
+    @Test
+    public void zipSlipShouldThrowExceptionForTar() throws Exception {
+        final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
+        final Path extractDir = toDirectory.resolve("subdir");
+        Files.createDirectories(extractDir);
+        fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/path-traversal.tar"), extractDir);
+        // temporaryFolder must only contain otherwise it would also contain "single-file" and "directories-and-files"
+        assertThat(Arrays.asList(temporaryFolder.getRoot().list()), is(Arrays.asList(toDirectory.getFileName().toString())));
+    }
+
+    @Test
+    public void zipSlipShouldThrowExceptionForZip() throws Exception {
+        final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
+        final Path extractDir = toDirectory.resolve("subdir");
+        Files.createDirectories(extractDir);
+        fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/path-traversal.zip"), extractDir);
+        // temporaryFolder must only contain otherwise it would also contain "single-file" and "directories-and-files"
+        assertThat(Arrays.asList(temporaryFolder.getRoot().list()), is(Arrays.asList(toDirectory.getFileName().toString())));
     }
 }

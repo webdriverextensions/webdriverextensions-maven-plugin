@@ -125,15 +125,15 @@ public class FileExtractorImpl implements FileExtractor {
     }
 
     private void extractPattern(Path toDirectory, TarArchiveInputStream tarArchive, TarArchiveEntry tarEntry) throws IOException {
+        Path fileToExtract = toDirectory.resolve(tarEntry.getName());
         if (extractPattern != null) {
             if (!extractPattern.matcher(tarEntry.getName()).matches()) {
                 return;
             }
             Path filename = Paths.get(tarEntry.getName()).getFileName();
-            Path fileToExtract = toDirectory.resolve(filename);
-            Files.copy(tarArchive, fileToExtract);
-        } else {
-            Path fileToExtract = toDirectory.resolve(tarEntry.getName());
+            fileToExtract = toDirectory.resolve(filename);
+        }
+        if (isPathSaveToUse(fileToExtract, toDirectory)) {
             Files.copy(tarArchive, fileToExtract);
         }
     }
@@ -157,12 +157,13 @@ public class FileExtractorImpl implements FileExtractor {
             try (BufferedInputStream bis = new BufferedInputStream(fis)) {
                 try (ZipArchiveInputStream zipArchive = new ZipArchiveInputStream(bis)) {
                     for (ZipArchiveEntry zipEntry = zipArchive.getNextZipEntry(); zipEntry != null; zipEntry = zipArchive.getNextZipEntry()) {
-
+                        
+                        Path fileToExtract = toDirectory.resolve(zipEntry.getName());
                         if (zipEntry.isDirectory()) {
-                            if (extractPattern != null) {
+                            if (extractPattern != null || !isPathSaveToUse(fileToExtract, toDirectory)) {
                                 continue;
                             }
-                            Files.createDirectories(toDirectory.resolve(zipEntry.getName()));
+                            Files.createDirectories(fileToExtract);
                         } else {
                             if (zipEntry.isUnixSymlink()) {
                                 continue;
@@ -172,10 +173,9 @@ public class FileExtractorImpl implements FileExtractor {
                                     continue;
                                 }
                                 Path filename = Paths.get(zipEntry.getName()).getFileName();
-                                Path fileToExtract = toDirectory.resolve(filename);
-                                Files.copy(zipArchive, fileToExtract);
-                            } else {
-                                Path fileToExtract = toDirectory.resolve(zipEntry.getName());
+                                fileToExtract = toDirectory.resolve(filename);
+                            }
+                            if (isPathSaveToUse(fileToExtract, toDirectory)) {
                                 Files.copy(zipArchive, fileToExtract);
                             }
                         }
@@ -183,5 +183,17 @@ public class FileExtractorImpl implements FileExtractor {
                 }
             }
         }
+    }
+
+    /**
+     * tests that {@code pathToTest} is not outside of {@code expectedParent}
+     *
+     * @param pathToTest the path to test
+     * @param expectedParent the directory {@code pathToTest} should be a child
+     * node
+     * @return if {@code pathToTest} is not outside of {@code expectedParent} and thus save to use
+     */
+    private static boolean isPathSaveToUse(Path pathToTest, Path expectedParent) {
+        return pathToTest.normalize().startsWith(expectedParent);
     }
 }
