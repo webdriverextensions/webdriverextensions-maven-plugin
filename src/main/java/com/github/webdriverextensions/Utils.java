@@ -110,7 +110,7 @@ public class Utils {
                 DirectoryFileFilter.DIRECTORY
         );
 
-        if (files.size() == 0) {
+        if (files.isEmpty()) {
             return path + " is empty" + System.lineSeparator();
         }
 
