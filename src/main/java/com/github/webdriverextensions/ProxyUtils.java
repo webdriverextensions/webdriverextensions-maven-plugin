@@ -1,10 +1,10 @@
 package com.github.webdriverextensions;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
@@ -20,13 +20,12 @@ class ProxyUtils {
         return new HttpHost(proxySettings.getHost(), proxySettings.getPort());
     }
 
-    static CredentialsProvider createProxyCredentialsFromSettings(Proxy proxySettings) {
+    static CredentialsProvider createProxyCredentialsFromSettings(Proxy proxySettings, HttpHost proxy) {
         if (proxySettings.getUsername() == null) {
             return null;
         }
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY,
-                new UsernamePasswordCredentials(proxySettings.getUsername(), proxySettings.getPassword()));
+        BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(new AuthScope(proxy), new UsernamePasswordCredentials(proxySettings.getUsername(), proxySettings.getPassword().toCharArray()));
 
         return credentialsProvider;
     }

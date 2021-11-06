@@ -10,15 +10,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpHost;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
@@ -69,19 +67,17 @@ class Repository {
         if ("file".equalsIgnoreCase(url.getScheme())) {
             return IOUtils.toString(url, UTF_8);
         }
-        RequestConfig requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES).build();
-        HttpClientBuilder httpClientBuilder = HttpClients.custom();
-        httpClientBuilder.setDefaultRequestConfig(requestConfig);
+        HttpClientBuilder httpClientBuilder = HttpClients.custom().disableCookieManagement();
         HttpHost proxy = ProxyUtils.createProxyFromSettings(proxySettings);
         if (proxy != null) {
             httpClientBuilder.setProxy(proxy);
-            CredentialsProvider proxyCredentials = ProxyUtils.createProxyCredentialsFromSettings(proxySettings);
+            CredentialsProvider proxyCredentials = ProxyUtils.createProxyCredentialsFromSettings(proxySettings, proxy);
             if (proxyCredentials != null) {
                 httpClientBuilder.setDefaultCredentialsProvider(proxyCredentials);
             }
         }
         try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
-            return httpClient.execute(new HttpGet(url), new BasicResponseHandler());
+            return httpClient.execute(new HttpGet(url), new BasicHttpClientResponseHandler());
         }
     }
 
