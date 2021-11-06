@@ -8,11 +8,12 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
+class ProxyUtils {
 
-public class ProxyUtils {
-    public static HttpHost createProxyFromSettings(Proxy proxySettings) {
+    private ProxyUtils() {
+    }
+    
+    static HttpHost createProxyFromSettings(Proxy proxySettings) {
         if (proxySettings == null) {
             return null;
         }
@@ -30,18 +31,7 @@ public class ProxyUtils {
         return credentialsProvider;
     }
 
-    public static void setProxyAuthenticator(final Proxy proxy) {
-        Authenticator authenticator = new Authenticator() {
-            @Override
-            public PasswordAuthentication getPasswordAuthentication() {
-                return (new PasswordAuthentication(proxy.getUsername(),
-                        proxy.getPassword().toCharArray()));
-            }
-        };
-        Authenticator.setDefault(authenticator);
-    }
-
-    public static Proxy getProxyFromSettings(InstallDriversMojo mojo) throws MojoExecutionException {
+    static Proxy getProxyFromSettings(InstallDriversMojo mojo) throws MojoExecutionException {
         if (mojo.settings == null) {
             return null;
         }

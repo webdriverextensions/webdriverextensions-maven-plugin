@@ -1,18 +1,26 @@
 package com.github.webdriverextensions;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 
 public class Driver {
 
+    @Expose
     private String name;
+    @Expose
     private String platform;
+    @Expose
     private String bit;
+    @Expose
     private String version;
+    @Expose
     private String url;
+    @Expose
     private String fileMatchInside;
+    @Expose
     private String customFileName;
 
     public String getId() {

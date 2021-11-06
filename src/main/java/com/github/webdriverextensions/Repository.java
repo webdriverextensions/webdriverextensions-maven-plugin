@@ -7,12 +7,8 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ComparatorUtils;
-import org.apache.commons.collections4.PredicateUtils;
-import org.apache.commons.collections4.TransformerUtils;
-import org.apache.commons.collections4.functors.TransformedPredicate;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CredentialsProvider;
@@ -27,9 +23,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
 import com.google.gson.*;
+import com.google.gson.annotations.Expose;
 
 class Repository {
 
+    @Expose
     private List<Driver> drivers;
 
     static Repository load(URL repositoryUrl, Proxy proxySettings) throws MojoExecutionException {
@@ -41,29 +39,29 @@ class Repository {
                     repositoryUrl), e);
         }
 
-        Repository repository;
+        final Repository repository = new Repository();
         try {
             Objects.requireNonNull(trimToNull(repositoryAsString), "repository json is empty");
-            repository = new Gson().fromJson(repositoryAsString, Repository.class);
+            repository.drivers = new GsonBuilder()
+                    .excludeFieldsWithoutExposeAnnotation()
+                    .create()
+                    .fromJson(repositoryAsString, Repository.class)
+                    .drivers;
         } catch (JsonSyntaxException | NullPointerException e) {
             throw new InstallDriversMojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
         }
 
-        repository.drivers = sortDrivers(repository.drivers);
+        repository.drivers.sort(driversComparator());
 
         return repository;
     }
 
-    private static List<Driver> sortDrivers(List<Driver> drivers) {
+    private static Comparator<Driver> driversComparator() {
         Comparator<Driver> byId = new DriverComparator.ById();
         // sort by version descending (newest first)
-        Comparator<Driver> byVersion = ComparatorUtils.reversedComparator(new DriverComparator.ByVersion());
-        @SuppressWarnings("unchecked")
-        Comparator<Driver> orderByIdAndVersion = ComparatorUtils.chainedComparator(byId, byVersion);
+        Comparator<Driver> byVersion = new DriverComparator.ByVersion().reversed();
 
-        List<Driver> listToSort = new ArrayList<>(drivers);
-        Collections.sort(listToSort, orderByIdAndVersion);
-        return listToSort;
+        return byId.thenComparing(byVersion);
     }
 
     private static String downloadAsString(URI url, Proxy proxySettings) throws IOException {
@@ -95,36 +93,13 @@ class Repository {
         return filterDrivers(drivers, name, platform, bit, version);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Driver> filterDrivers(List<Driver> driversToFilter, String name, String platform, String bit, String version) {
-        List<Driver> filteredDrivers = new ArrayList<>(driversToFilter);
-        Class<?>[] toLowerArgTypes = {Locale.class};
-        Object[] toLowerArgs = {Locale.ROOT};
-        if (name != null) {
-            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
-                    TransformerUtils.chainedTransformer(TransformerUtils.invokerTransformer("getName"), TransformerUtils.invokerTransformer("toLowerCase", toLowerArgTypes, toLowerArgs)),
-                    PredicateUtils.equalPredicate(name.toLowerCase(Locale.ROOT)))
-            );
-        }
-        if (platform != null) {
-            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
-                    TransformerUtils.chainedTransformer(TransformerUtils.invokerTransformer("getPlatform"), TransformerUtils.invokerTransformer("toLowerCase", toLowerArgTypes, toLowerArgs)),
-                    PredicateUtils.equalPredicate(platform.toLowerCase(Locale.ROOT)))
-            );
-        }
-        if (bit != null) {
-            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
-                    TransformerUtils.chainedTransformer(TransformerUtils.invokerTransformer("getBit"), TransformerUtils.invokerTransformer("toLowerCase", toLowerArgTypes, toLowerArgs)),
-                    PredicateUtils.equalPredicate(bit.toLowerCase(Locale.ROOT)))
-            );
-        }
-        if (version != null) {
-            CollectionUtils.filter(filteredDrivers, new TransformedPredicate(
-                    TransformerUtils.invokerTransformer("getComparableVersion"),
-                    PredicateUtils.equalPredicate(new ComparableVersion(version)))
-            );
-        }
-        return filteredDrivers;
+        return driversToFilter.stream()
+                .filter(driver -> name != null ? name.equalsIgnoreCase(driver.getName()) : true)
+                .filter(driver -> platform != null ? platform.equalsIgnoreCase(driver.getPlatform()) : true)
+                .filter(driver -> bit != null ? bit.equalsIgnoreCase(driver.getBit()) : true)
+                .filter(driver -> version != null ? new ComparableVersion(version).equals(driver.getComparableVersion()) : true)
+                .collect(Collectors.toList());
     }
 
     Driver enrichDriver(Driver driver) throws MojoExecutionException {
@@ -179,8 +154,7 @@ class Repository {
 
     private Driver transferCustomFileName(Driver driver, Driver foundDriver) {
 
-        if (isNotBlank(driver.getCustomFileName()))
-        {
+        if (isNotBlank(driver.getCustomFileName())) {
             foundDriver.setCustomFileName(driver.getCustomFileName());
         }
 
@@ -188,30 +162,28 @@ class Repository {
     }
 
     List<Driver> getLatestDrivers() {
-        List<Driver> latestDrivers = new ArrayList<>();
-        Set<String> driverNames = new HashSet<>();
-        for (Driver driver : drivers) {
-            driverNames.add(driver.getName());
-        }
-
         String platform = detectPlatform();
-
-        for (String driverName : driverNames) {
-            List<Driver> driversWithDriverNameAndPlatform = getDrivers(driverName, platform, null, null);
-            String bit = detectBits(driverName);
-            boolean is64Bit = bit.equals("64");
-            Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);
-            if (latestDriver != null) {
-                latestDrivers.add(latestDriver);
-            } else if (is64Bit) {
-                Driver latestDriverComplement = getDriverByBit("32", driversWithDriverNameAndPlatform);
-                if (latestDriverComplement != null) {
-                    latestDrivers.add(latestDriverComplement);
-                }
-            }
-        }
-
-        return sortDrivers(latestDrivers);
+        return drivers.stream()
+                .map(Driver::getName)
+                .distinct()
+                .map(driverName -> {
+                    List<Driver> driversWithDriverNameAndPlatform = getDrivers(driverName, platform, null, null);
+                    String bit = detectBits(driverName);
+                    boolean is64Bit = bit.equals("64");
+                    Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);
+                    if (latestDriver != null) {
+                        return latestDriver;
+                    } else if (is64Bit) {
+                        Driver latestDriverComplement = getDriverByBit("32", driversWithDriverNameAndPlatform);
+                        if (latestDriverComplement != null) {
+                            return latestDriverComplement;
+                        }
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .sorted(driversComparator())
+                .collect(Collectors.toList());
     }
 
     private Driver getDriverByBit(String bit, List<Driver> driversWithDriverNameAndPlatform) {
@@ -241,23 +213,16 @@ class Repository {
         return "windows";
     }
 
-    @SuppressWarnings("unchecked")
     private String getLatestDriverVersion(String driverId) {
-        List<Driver> allDriverVersions = new ArrayList<>(drivers);
-        CollectionUtils.filter(allDriverVersions, new TransformedPredicate(
-                TransformerUtils.invokerTransformer("getId"),
-                PredicateUtils.equalPredicate(driverId))
-        );
-        Driver latestDriver = filterLatestDriver(allDriverVersions);
-        if (latestDriver == null) {
-            return null;
-        }
-        return latestDriver.getVersion();
+        return drivers.stream()
+                .filter(driver -> driverId.equalsIgnoreCase(driver.getId()))
+                .sorted(driversComparator())
+                .findFirst()
+                .map(Driver::getVersion).orElse(null);
     }
 
     private Driver filterLatestDriver(List<Driver> drivers) {
-        List<Driver> sortedDrivers = sortDrivers(drivers);
-        return sortedDrivers.size() > 0 ? sortedDrivers.get(0) : null;
+        return drivers.stream().sorted(driversComparator()).findFirst().orElse(null);
     }
 
     @Override
