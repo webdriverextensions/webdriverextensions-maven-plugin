@@ -15,7 +15,6 @@ import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
@@ -66,12 +65,7 @@ public class Utils {
 
     public static boolean is64Bit() {
         if (System.getProperty(FAKED_BIT_PROPERTY_KEY) != null) {
-            switch (System.getProperty(FAKED_BIT_PROPERTY_KEY)) {
-                case "64":
-                    return true;
-                case "32":
-                    return false;
-            }
+            return "64".equalsIgnoreCase(System.getProperty(FAKED_BIT_PROPERTY_KEY));
         }
         return "64".equalsIgnoreCase(System.getProperty("sun.arch.data.model"));
     }
@@ -119,10 +113,10 @@ public class Utils {
         stringBuilder.append(path);
         stringBuilder.append(System.lineSeparator());
 
-        int padSize = longestPath(files, path.toFile());
+        int padSize = longestPath(files, path);
         for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {
             File file = (File) iterator.next();
-            String relativePath = getRelativePath(file, path.toFile());
+            String relativePath = getRelativePath(file, path);
             if (iterator.hasNext()) {
                 stringBuilder.append("├── ");
             } else {
@@ -136,19 +130,14 @@ public class Utils {
         return stringBuilder.toString();
     }
 
-    private static int longestPath(Collection<File> files, File relativeToPath) {
-        int max = 0;
-        for (File file : files) {
-            int currentPathLength = getRelativePath(file, relativeToPath).length();
-            if (currentPathLength > max) {
-                max = currentPathLength;
-            }
-        }
-        return max;
+    private static int longestPath(Collection<File> files, Path relativeToPath) {
+        return files.stream()
+                .mapToInt(file -> getRelativePath(file, relativeToPath).length())
+                .max().orElse(0);
     }
 
-    private static String getRelativePath(File file, File relativeToPath) {
-        return StringUtils.replaceOnce(file.getAbsolutePath(), relativeToPath.getAbsolutePath() + File.separator, "");
+    private static String getRelativePath(File file, Path relativeToPath) {
+        return file.toPath().relativize(relativeToPath).toString();
     }
 
     private static String readableFileSize(File file) {
@@ -157,7 +146,7 @@ public class Utils {
             return "0";
         }
 
-        final String[] units = new String[]{"B", "kB", "MB", "GB", "TB"};
+        final String[] units = new String[]{"B", "KiB", "MiB", "GiB", "TiB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return StringUtils.leftPad(new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)), 8) + " " + units[digitGroups];
     }
@@ -167,11 +156,10 @@ public class Utils {
     }
 
     public static boolean validateZipFile(Path filePath) {
-        ZipFile zipfile = null;
-        ZipInputStream zis = null;
-        try {
-            zipfile = new ZipFile(filePath.toFile());
-            zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
+        try (
+                ZipFile zipfile = new ZipFile(filePath.toFile());
+                ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
+        ) {
             ZipEntry ze = zis.getNextEntry();
             if (ze == null) {
                 return false;
@@ -185,26 +173,8 @@ public class Utils {
                 ze = zis.getNextEntry();
             }
             return true;
-        } catch (ZipException e) {
-            return false;
         } catch (IOException e) {
             return false;
-        } finally {
-            try {
-                if (zipfile != null) {
-                    zipfile.close();
-                }
-            } catch (IOException e) {
-                return false;
-            }
-            try {
-                if (zis != null) {
-                    zis.close();
-                }
-            } catch (IOException e) {
-                return false;
-            }
-
         }
     }
 
@@ -214,8 +184,6 @@ public class Utils {
                 try (BZip2CompressorInputStream ignored = new BZip2CompressorInputStream(bin)) {
                 }
             }
-        } catch (FileNotFoundException e) {
-            return false;
         } catch (IOException e) {
             return false;
         }
