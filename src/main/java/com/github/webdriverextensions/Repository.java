@@ -10,13 +10,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpHost;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
@@ -28,7 +26,7 @@ class Repository {
     @Expose
     private List<Driver> drivers;
 
-    static Repository load(URL repositoryUrl, Proxy proxySettings) throws MojoExecutionException {
+    static Repository load(URL repositoryUrl, Optional<Proxy> proxySettings) throws MojoExecutionException {
         String repositoryAsString;
         try {
             repositoryAsString = downloadAsString(repositoryUrl.toURI(), proxySettings);
@@ -62,27 +60,19 @@ class Repository {
         return byId.thenComparing(byVersion);
     }
 
-    private static String downloadAsString(URI url, Proxy proxySettings) throws IOException {
+    private static String downloadAsString(URI url, Optional<Proxy> proxySettings) throws IOException {
         // kept vor backward compatibility
         if ("file".equalsIgnoreCase(url.getScheme())) {
             return IOUtils.toString(url, UTF_8);
         }
         HttpClientBuilder httpClientBuilder = HttpClients.custom().disableCookieManagement();
-        HttpHost proxy = ProxyUtils.createProxyFromSettings(proxySettings);
-        if (proxy != null) {
-            httpClientBuilder.setProxy(proxy);
-            CredentialsProvider proxyCredentials = ProxyUtils.createProxyCredentialsFromSettings(proxySettings, proxy);
-            if (proxyCredentials != null) {
-                httpClientBuilder.setDefaultCredentialsProvider(proxyCredentials);
-            }
-        }
+        proxySettings.ifPresent(proxy -> {
+            ProxyUtils.createProxyFromSettings(proxy).ifPresent(httpClientBuilder::setProxy);
+            ProxyUtils.createProxyCredentialsFromSettings(proxy).ifPresent(httpClientBuilder::setDefaultCredentialsProvider);
+        });
         try (CloseableHttpClient httpClient = httpClientBuilder.build()) {
             return httpClient.execute(new HttpGet(url), new BasicHttpClientResponseHandler());
         }
-    }
-
-    public List<Driver> getDrivers() {
-        return drivers;
     }
 
     List<Driver> getDrivers(String name, String platform, String bit, String version) {

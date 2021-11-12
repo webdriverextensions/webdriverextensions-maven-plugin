@@ -8,6 +8,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
+import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.UncheckedException;
+import org.jooq.lambda.tuple.Tuple;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.quote;
@@ -143,12 +147,15 @@ public class InstallDriversMojo extends AbstractMojo {
     Repository repository;
 
     public InstallDriversMojo() {
+    }
+
+    private void setupDirectories() throws MojoExecutionException {
         try {
             pluginWorkingDirectory = Files.createTempDirectory("webdriverextensions-maven-plugin");
             downloadDirectory = pluginWorkingDirectory.resolve("downloads");
             tempDirectory = pluginWorkingDirectory.resolve("temp");
         } catch (IOException e) {
-            throw new RuntimeException("error while creating folders", e);
+            throw new MojoExecutionException("error while creating folders", e);
         }
     }
 
@@ -165,14 +172,14 @@ public class InstallDriversMojo extends AbstractMojo {
             return;
         }
 
-        for (String property : new String[] { "skipTests", "skipITs", "maven.test.skip" }) {
+        for (String property : new String[]{"skipTests", "skipITs", "maven.test.skip"}) {
             if (Boolean.getBoolean(property)) {
                 getLog().info("Skipping install-drivers goal execution (" + property + ")");
                 return;
             }
         }
 
-        repository = Repository.load(repositoryUrl, getProxyFromSettings(this));
+        repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
         getLog().info("Installation directory " + quote(installationDirectory.toPath()));
         if (drivers.isEmpty()) {
             getLog().info("Installing latest drivers for current platform");
@@ -181,29 +188,47 @@ public class InstallDriversMojo extends AbstractMojo {
             getLog().info("Installing drivers from configuration");
         }
 
-        DriverDownloader driverDownloader = getDownloader();
-        DriverExtractor driverExtractor = new DriverExtractor(this);
-        DriverInstaller driverInstaller = new DriverInstaller(this);
+        setupDirectories();
+        performInstallation();
+        if (keepDownloadedWebdrivers) {
+            cleanupTempDirectory();
+        } else {
+            cleanupWorkingDirectory();
+        }
+    }
 
-        cleanupTempDirectory();
-        for (Driver _driver : drivers) {
-            Driver driver = repository.enrichDriver(_driver);
-            if (driver == null) {
-                continue;
+    private void performInstallation() throws MojoExecutionException {
+        final DriverExtractor driverExtractor = new DriverExtractor(this);
+        final DriverInstaller driverInstaller = new DriverInstaller(this);
+
+        try (final DriverDownloader driverDownloader = getDownloader()) {
+            drivers.stream()
+                    .map(Unchecked.function(repository::enrichDriver))
+                    .filter(Objects::nonNull)
+                    .filter(driverInstaller::needInstallation)
+                    .peek(driver -> getLog().info(driver.getId() + " version " + driver.getVersion()))
+                    // download
+                    .map(Unchecked.function(driver -> {
+                        Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
+                        Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
+                        return Tuple.tuple(driver, downloadLocation);
+                    }))
+                    // extract
+                    .map(Unchecked.function(t -> {
+                        Path extractLocation = driverExtractor.extractDriver(t.v1, t.v2);
+                        return Tuple.tuple(t.v1, extractLocation);
+                    }))
+                    // and finally install the driver
+                    .forEach(Unchecked.consumer(t -> {
+                        driverInstaller.install(t.v1, t.v2);
+                    }));
+        } catch (IOException ex) {
+            // ignored. close operation of downloader
+        } catch (UncheckedException ex) {
+            if (ex.getCause() instanceof MojoExecutionException) {
+                throw (MojoExecutionException) ex.getCause();
             }
-            getLog().info(driver.getId() + " version " + driver.getVersion());
-            if (driverInstaller.needInstallation(driver)) {
-                Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
-                Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
-                Path extractLocation = driverExtractor.extractDriver(driver, downloadLocation);
-                driverInstaller.install(driver, extractLocation);
-                if (!keepDownloadedWebdrivers) {
-                    cleanupDownloadsDirectory();
-                }
-                cleanupTempDirectory();
-            } else {
-                getLog().info("  Already installed");
-            }
+            throw new InstallDriversMojoExecutionException(ex.getMessage(), ex);
         }
     }
 
@@ -211,12 +236,12 @@ public class InstallDriversMojo extends AbstractMojo {
         return new DriverDownloader(this);
     }
 
-    private void cleanupDownloadsDirectory() throws MojoExecutionException {
+    private void cleanupWorkingDirectory() throws MojoExecutionException {
         try {
-            FileUtils.deleteDirectory(downloadDirectory.toFile());
+            FileUtils.deleteDirectory(pluginWorkingDirectory.toFile());
         } catch (IOException e) {
-            throw new InstallDriversMojoExecutionException("Failed to delete downloads directory:" + System.lineSeparator()
-                    + Utils.directoryToString(downloadDirectory), e);
+            throw new InstallDriversMojoExecutionException("Failed to delete plugin working directory:" + System.lineSeparator()
+                    + Utils.directoryToString(pluginWorkingDirectory), e);
         }
     }
 

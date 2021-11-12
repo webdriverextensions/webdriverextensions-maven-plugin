@@ -1,8 +1,6 @@
 package com.github.webdriverextensions;
 
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +12,9 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
+import lombok.experimental.UtilityClass;
 
+@UtilityClass
 public class Utils {
 
     public static final String FAKED_OS_NAME_PROPERTY_KEY = "webdriverextensions.faked.os.name";
@@ -149,48 +146,5 @@ public class Utils {
         final String[] units = new String[]{"B", "KiB", "MiB", "GiB", "TiB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return StringUtils.leftPad(new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)), 8) + " " + units[digitGroups];
-    }
-
-    public static boolean hasExtension(Path downloadFilePath, String zip) {
-        return zip.toUpperCase().equals(FilenameUtils.getExtension(downloadFilePath.toString()).toUpperCase());
-    }
-
-    public static boolean validateZipFile(Path filePath) {
-        try (
-                ZipFile zipfile = new ZipFile(filePath.toFile());
-                ZipInputStream zis = new ZipInputStream(new FileInputStream(filePath.toFile()));
-        ) {
-            ZipEntry ze = zis.getNextEntry();
-            if (ze == null) {
-                return false;
-            }
-            while (ze != null) {
-                // if it throws an exception fetching any of the following then we know the file is corrupted.
-                zipfile.getInputStream(ze);
-                ze.getCrc();
-                ze.getCompressedSize();
-                ze.getName();
-                ze = zis.getNextEntry();
-            }
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    public static boolean validateBz2File(Path filePath) {
-        try (FileInputStream fin = new FileInputStream(filePath.toFile())) {
-            try (BufferedInputStream bin = new BufferedInputStream(fin)) {
-                try (BZip2CompressorInputStream ignored = new BZip2CompressorInputStream(bin)) {
-                }
-            }
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean validateFileIsLargerThanBytes(Path filePath, int bytes) {
-        return FileUtils.sizeOf(filePath.toFile()) > bytes;
     }
 }

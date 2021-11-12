@@ -3,20 +3,15 @@ package com.github.webdriverextensions;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.core5.http.ContentType;
-import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.core5.http.URIScheme;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
-import org.apache.hc.core5.io.CloseMode;
-import org.apache.hc.core5.testing.classic.ClassicTestServer;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 
 import static org.junit.Assert.assertThrows;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -24,35 +19,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class RepositoryTest {
-    private HttpHost host;
-    private ClassicTestServer server;
-
-    @Rule
-    public ExternalResource serverResource = new ExternalResource() {
-
-        @Override
-        protected void before() throws Throwable {
-            server = new ClassicTestServer();
-        }
-
-        @Override
-        protected void after() {
-            if (server != null) {
-                try {
-                    server.shutdown(CloseMode.IMMEDIATE);
-                    server = null;
-                } catch (final Exception ignore) {
-                }
-            }
-        }
-
-    };
+public class RepositoryTest extends LocalServerTestBase {
 
     @Test
     public void testConstructor() throws MojoExecutionException, MalformedURLException {
-        URL repositoryFile = new URL(String.format("http://%s:%d/repository-3.0.json", host.getHostName(), host.getPort()));
-        Driver driver = Repository.load(repositoryFile, null).getDrivers("chromedriver", "linux", "32", "2.9").get(0);
+        URL repositoryFile = getCompleteUrlFor("/repository-3.0.json");
+        Driver driver = Repository.load(repositoryFile, Optional.empty()).getDrivers("chromedriver", "linux", "32", "2.9").get(0);
 
         assertThat(driver.getName(), is("chromedriver"));
         assertThat(driver.getPlatform(), is("linux"));
@@ -65,7 +37,7 @@ public class RepositoryTest {
     public void testLoadWithInvalidUrl() {
         InstallDriversMojoExecutionException e = assertThrows(InstallDriversMojoExecutionException.class, () -> {
             // hostname missing
-            Repository.load(new URL("ftp:///"), null);
+            Repository.load(new URL("ftp:///"), Optional.empty());
         });
         assertThat(e.getMessage(), startsWith("Failed to download repository from url"));
         assertThat(e.getCause(), instanceOf(IOException.class));
@@ -74,7 +46,7 @@ public class RepositoryTest {
     @Test
     public void testLoadWithFileNotFound() {
         InstallDriversMojoExecutionException e = assertThrows(InstallDriversMojoExecutionException.class, () -> {
-            Repository.load(new URL(String.format("http://%s:%d/404", host.getHostName(), host.getPort())), null);
+            Repository.load(getCompleteUrlFor("/404"), Optional.empty());
         });
         assertThat(e.getMessage(), startsWith("Failed to download repository from url"));
         assertThat(e.getCause(), instanceOf(HttpResponseException.class));
@@ -84,7 +56,7 @@ public class RepositoryTest {
     @Test
     public void testLoadWithInvalidJson() {
         InstallDriversMojoExecutionException e = assertThrows(InstallDriversMojoExecutionException.class, () -> {
-            Repository.load(new URL(String.format("http://%s:%d/invalid.json", host.getHostName(), host.getPort())), null);
+            Repository.load(getCompleteUrlFor("/invalid.json"), Optional.empty());
         });
         assertThat(e.getMessage(), startsWith("Failed to parse repository json"));
         assertThat(e.getCause(), instanceOf(NullPointerException.class));
@@ -92,7 +64,7 @@ public class RepositoryTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() throws IOException {
         server.registerHandler("/repository-3.0.json", (request, response, context) -> {
             response.setCode(HttpStatus.SC_OK);
             response.setEntity(new InputStreamEntity(getClass().getResource("/repository-3.0.json").openStream(), ContentType.APPLICATION_JSON));
@@ -104,8 +76,7 @@ public class RepositoryTest {
             response.setCode(HttpStatus.SC_OK);
             response.setEntity(new StringEntity(""));
         });
-        server.start();
-        host = new HttpHost(URIScheme.HTTP.getId(), "localhost", server.getPort());
+        start();
     }
-    
+
 }
