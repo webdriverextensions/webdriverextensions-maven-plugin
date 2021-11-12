@@ -366,6 +366,7 @@ For more details on how to further configure this plugin please see the
 ## Changelog
 
 #### Unreleased
+- IMPROVEMENT configure download timeouts and retry attempts
 - IMPROVEMENT Added support for Java 17 [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
 - BUGFIX failed to move non-empty directories of downloaded drivers on Windows [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
 - BUGFIX download directory was not always created [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)

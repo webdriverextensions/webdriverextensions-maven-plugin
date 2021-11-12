@@ -105,7 +105,7 @@ public class DriverDownloaderTest extends LocalServerTestBase {
             assertThatCode(() -> uut.downloadFile(driver, mojo.downloadDirectory))
                     .isInstanceOf(InstallDriversMojoExecutionException.class).hasMessageStartingWith("Download failed with status code %d", HttpStatus.SC_TOO_MANY_REQUESTS);
             assertThat(mojo.downloadDirectory).isEmptyDirectory();
-            assertThat(driverDownloadServerInvocations).isEqualTo(1 + DriverDownloader.FILE_DOWNLOAD_RETRY_ATTEMPTS);
+            assertThat(driverDownloadServerInvocations).isEqualTo(1 + mojo.downloadMaxRetries);
         }
     }
 

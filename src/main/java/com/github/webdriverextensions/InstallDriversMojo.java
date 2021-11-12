@@ -129,11 +129,50 @@ public class InstallDriversMojo extends AbstractMojo {
      */
     @Parameter
     List<Driver> drivers = new ArrayList<>();
+
     /**
      * Skips installation of drivers.
      */
     @Parameter(defaultValue = "false")
     boolean skip;
+
+    /**
+     * Determines the timeout in seconds until arrival of a response from the
+     * download host.<br/>
+     * A timeout value of zero is interpreted as an infinite timeout.
+     */
+    @Parameter(defaultValue = "1800")
+    int downloadResponseTimeout;
+
+    /**
+     * Determines the timeout in seconds until a new connection is fully established.<br/>
+     * A timeout value of zero is interpreted as an infinite timeout.
+     */
+    @Parameter(defaultValue = "30")
+    int downloadConnectTimeout;
+
+    /**
+     * Number of retry attempts to download a driver.<br/>
+     * A value of zero means no retries.<br/>
+     * Retriable HTTP status codes are 429 and 503.<br/>
+     * Retries may also happen for the following exceptions:
+     * <ul>
+     * <li>InterruptedIOException</li>
+     * <li>UnknownHostException</li>
+     * <li>ConnectException</li>
+     * <li>ConnectionClosedException</li>
+     * <li>NoRouteToHostException</li>
+     * <li>SSLException</li>
+     * </ul>
+     */
+    @Parameter(defaultValue = "3")
+    int downloadMaxRetries;
+
+    /**
+     * retry interval in seconds between subsequent retries 
+     */
+    @Parameter(defaultValue = "3")
+    int downloadRetryDelay;
 
     /**
      * Keep downloaded files as local cache

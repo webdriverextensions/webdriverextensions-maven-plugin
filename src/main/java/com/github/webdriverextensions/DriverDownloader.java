@@ -23,9 +23,6 @@ import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 class DriverDownloader implements Closeable {
 
-    static final int FILE_DOWNLOAD_READ_TIMEOUT = 30 * 60 * 1000; // 30 min
-    static final int FILE_DOWNLOAD_CONNECT_TIMEOUT = 30 * 1000; // 30 seconds
-    static final int FILE_DOWNLOAD_RETRY_ATTEMPTS = 3;
     private final InstallDriversMojo mojo;
     private final CloseableHttpClient httpClient;
 
@@ -68,13 +65,13 @@ class DriverDownloader implements Closeable {
 
     private CloseableHttpClient createHttpClient() {
         HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(FILE_DOWNLOAD_CONNECT_TIMEOUT))
-                .setResponseTimeout(Timeout.ofMilliseconds(FILE_DOWNLOAD_READ_TIMEOUT))
+                .setConnectTimeout(Timeout.ofSeconds(mojo.downloadConnectTimeout))
+                .setResponseTimeout(Timeout.ofSeconds(mojo.downloadResponseTimeout))
                 .build()
         )
                 .disableCookieManagement()
                 .disableContentCompression()
-                .setRetryStrategy(new DefaultHttpRequestRetryStrategy(FILE_DOWNLOAD_RETRY_ATTEMPTS, TimeValue.ofSeconds(1)));
+                .setRetryStrategy(new DefaultHttpRequestRetryStrategy(mojo.downloadMaxRetries, TimeValue.ofSeconds(mojo.downloadRetryDelay)));
 
         ProxyUtils.getProxyFromSettings(mojo.settings, mojo.proxyId).ifPresent(proxy -> {
             ProxyUtils.createProxyFromSettings(proxy).ifPresent(httpClientBuilder::setProxy);
