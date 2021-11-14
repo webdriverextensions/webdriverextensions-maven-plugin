@@ -18,18 +18,15 @@ package com.github.webdriverextensions;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-public class DriverVersionHandlerTest {
-
-    @Rule
-    public TemporaryFolder tempFolder = new TemporaryFolder();
+class DriverVersionHandlerTest {
 
     private Driver createDummy() {
         Driver driver = new Driver();
@@ -42,47 +39,61 @@ public class DriverVersionHandlerTest {
     }
 
     @Test
-    public void testWriteFileWithNonExistingFile() {
+    void testWriteFileWithNonExistingFile(@TempDir Path tempFolder) {
         Driver driver = createDummy();
 
-        DriverVersionHandler uut = new DriverVersionHandler(tempFolder.getRoot().toPath());
+        DriverVersionHandler uut = new DriverVersionHandler(tempFolder);
         assertThatCode(() -> uut.writeVersionFile(driver)).doesNotThrowAnyException();
 
-        assertThat(tempFolder.getRoot().toPath().resolve(driver.getId() + ".version")).content(StandardCharsets.UTF_8).isEqualToIgnoringNewLines(driver.toString());
+        assertThat(tempFolder.resolve(driver.getId() + ".version")).content(StandardCharsets.UTF_8).isEqualToIgnoringNewLines(driver.toString());
     }
 
     @Test
-    public void testWriteFileWithExistingFile() throws IOException {
+    void testWriteFileWithExistingFile(@TempDir Path tempFolder) throws IOException {
         Driver driver = createDummy();
-        Files.write(tempFolder.newFile(driver.getId() + ".version").toPath(), "test".getBytes(StandardCharsets.UTF_8));
+        Files.write(tempFolder.resolve(driver.getId() + ".version"), "test".getBytes(StandardCharsets.UTF_8));
 
-        DriverVersionHandler uut = new DriverVersionHandler(tempFolder.getRoot().toPath());
+        DriverVersionHandler uut = new DriverVersionHandler(tempFolder);
         assertThatCode(() -> uut.writeVersionFile(driver)).doesNotThrowAnyException();
         final String toString = driver.toString();
 
-        assertThat(tempFolder.getRoot().toPath().resolve(driver.getId() + ".version")).content(StandardCharsets.UTF_8).isEqualToIgnoringNewLines(toString);
+        assertThat(tempFolder.resolve(driver.getId() + ".version")).content(StandardCharsets.UTF_8).isEqualToIgnoringNewLines(toString);
     }
 
     @Test
-    public void testIsSameVersionWithNonExistingFile() throws MojoExecutionException {
+    void testWriteFileWithExistingReadonlyFile(@TempDir Path tempFolder) throws Exception {
         Driver driver = createDummy();
-        DriverVersionHandler uut = new DriverVersionHandler(tempFolder.getRoot().toPath());
+        final Path exisitingFile = tempFolder.resolve(driver.getId() + ".version");
+        Files.write(exisitingFile, "test".getBytes(StandardCharsets.UTF_8));
+        exisitingFile.toFile().setReadOnly();
+
+        DriverVersionHandler uut = new DriverVersionHandler(tempFolder);
+        assertThatCode(() -> uut.writeVersionFile(driver)).isInstanceOf(InstallDriversMojoExecutionException.class).hasCauseInstanceOf(IOException.class);
+
+        exisitingFile.toFile().setWritable(true);
+        assertThat(exisitingFile).content(StandardCharsets.UTF_8).isEqualTo("test");
+    }
+
+    @Test
+    void testIsSameVersionWithNonExistingFile(@TempDir Path tempFolder) throws MojoExecutionException {
+        Driver driver = createDummy();
+        DriverVersionHandler uut = new DriverVersionHandler(tempFolder);
         assertThat(uut.isSameVersion(driver)).isFalse();
     }
 
     @Test
-    public void testIsSameVersionWithExistingFile() throws Exception {
+    void testIsSameVersionWithExistingFile(@TempDir Path tempFolder) throws Exception {
         Driver driver = createDummy();
-        Files.write(tempFolder.newFile(driver.getId() + ".version").toPath(), "{\"name\":\"test\",\"platform\":\"test-platform\",\"bit\":\"42\",\"version\":\"1.2.3-alpha01\",\"url\":\"foo://bar.tld\"}".getBytes(StandardCharsets.UTF_8));
-        DriverVersionHandler uut = new DriverVersionHandler(tempFolder.getRoot().toPath());
+        Files.write(tempFolder.resolve(driver.getId() + ".version"), "{\"name\":\"test\",\"platform\":\"test-platform\",\"bit\":\"42\",\"version\":\"1.2.3-alpha01\",\"url\":\"foo://bar.tld\"}".getBytes(StandardCharsets.UTF_8));
+        DriverVersionHandler uut = new DriverVersionHandler(tempFolder);
         assertThat(uut.isSameVersion(driver)).isTrue();
     }
 
     @Test
-    public void testIsSameVersionWithExistingButInvalidFile() throws Exception {
+    void testIsSameVersionWithExistingButInvalidFile(@TempDir Path tempFolder) throws Exception {
         Driver driver = createDummy();
-        Files.write(tempFolder.newFile(driver.getId() + ".version").toPath(), "test".getBytes(StandardCharsets.UTF_8));
-        DriverVersionHandler uut = new DriverVersionHandler(tempFolder.getRoot().toPath());
+        Files.write(tempFolder.resolve(driver.getId() + ".version"), "test".getBytes(StandardCharsets.UTF_8));
+        DriverVersionHandler uut = new DriverVersionHandler(tempFolder);
         assertThat(uut.isSameVersion(driver)).isFalse();
     }
 }

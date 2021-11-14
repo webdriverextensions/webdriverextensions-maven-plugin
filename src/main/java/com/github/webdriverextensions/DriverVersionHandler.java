@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 class DriverVersionHandler {
     private final Path installationDirectory;
 
-    public DriverVersionHandler(Path installationDirectory) {
+    DriverVersionHandler(Path installationDirectory) {
         this.installationDirectory = installationDirectory;
     }
 
@@ -31,10 +31,10 @@ class DriverVersionHandler {
         return installationDirectory.resolve(driver.getId() + ".version");
     }
 
-    public boolean isSameVersion(Driver driver) throws MojoExecutionException {
+    boolean isSameVersion(Driver driver) throws MojoExecutionException {
         try {
             Path versionFile = getVersionFile(driver);
-            if (!versionFile.toFile().exists()) {
+            if (!versionFile.toFile().isFile() || !versionFile.toFile().canRead()) {
                 return false;
             }
             String savedVersion = Files.lines(versionFile).collect(Collectors.joining());
