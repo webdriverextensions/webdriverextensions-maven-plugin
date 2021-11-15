@@ -18,20 +18,18 @@ class DriverExtractor {
 
     Path extractDriver(Driver driver, Path downloadedFile) throws MojoExecutionException {
         FileExtractor fileExtractor = new FileExtractorImpl(driver.getFileMatchInside());
+        Path extractDirectory = mojo.tempDirectory.resolve(driver.getDriverDownloadDirectoryName());
 
         try {
-            Files.createDirectories(mojo.tempDirectory);
+            Files.createDirectories(extractDirectory);
             if (fileExtractor.isExtractable(downloadedFile)) {
                 mojo.getLog().info("  Extracting " + quote(downloadedFile) + " to temp folder");
-                fileExtractor.extractFile(downloadedFile, mojo.tempDirectory);
+                fileExtractor.extractFile(downloadedFile, extractDirectory);
             } else {
                 mojo.getLog().info("  Copying " + quote(downloadedFile) + " to temp folder");
-                Files.copy(downloadedFile, mojo.tempDirectory.resolve(downloadedFile.getFileName()));
+                Files.copy(downloadedFile, extractDirectory.resolve(downloadedFile.getFileName()));
             }
-            if (!mojo.keepDownloadedWebdrivers) {
-                Files.delete(downloadedFile);
-            }
-            return mojo.tempDirectory;
+            return extractDirectory;
         } catch (Exception e) {
             throw new InstallDriversMojoExecutionException("Failed to extract driver from " + quote(downloadedFile) + " cause of " + e.getMessage(), e, mojo, driver);
         }

@@ -22,8 +22,13 @@ public class DriverInstaller {
         this.versionHandler = new DriverVersionHandler(mojo.installationDirectory.toPath());
     }
 
-    public boolean needInstallation(Driver driver) throws MojoExecutionException {
-        return !isInstalled(driver) || !versionHandler.isSameVersion(driver);
+    public boolean needInstallation(Driver driver) {
+        try {
+            return !isInstalled(driver) || !versionHandler.isSameVersion(driver);
+        } catch (MojoExecutionException ex) {
+            mojo.getLog().warn("Could not determine if same version of driver is already installed, will install it again", ex);
+            return true;
+        }
     }
 
     public void install(Driver driver, Path extractLocation) throws MojoExecutionException {
@@ -46,7 +51,7 @@ public class DriverInstaller {
             }
 
             versionHandler.writeVersionFile(driver);
-        } catch (Exception e) {
+        } catch (IOException | MojoExecutionException e) {
             throw new InstallDriversMojoExecutionException("Failed to install driver cause of " + e.getMessage(), e, mojo, driver);
         }
 
@@ -80,7 +85,7 @@ public class DriverInstaller {
             FileUtils.forceDelete(to.resolve(newFileName).toFile());
             Files.move(singleFile, to.resolve(newFileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to move file in directory " + quote(from) + " to " + quote(to.resolve(newFileName)), e);
+            throw new InstallDriversMojoExecutionException("Failed to move file in directory " + quote(from) + " to " + quote(to.resolve(newFileName)), e);
         }
     }
 
@@ -99,8 +104,8 @@ public class DriverInstaller {
                 }
                 makeExecutable(to.resolve(file.toPath().getFileName()));
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to move directory " + quote(from) + " to " + quote(to), e);
+        } catch (IOException e) {
+            throw new InstallDriversMojoExecutionException("Failed to move directory " + quote(from) + " to " + quote(to), e);
         }
     }
 
