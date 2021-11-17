@@ -68,7 +68,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         logTestName(mojo);
 
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository-3.0.json");
-        mojo.installationDirectory = tempFolder.getRoot();
+        mojo.installationDirectory = tempFolder.newFolder();
         DriverDownloader dlMock = Mockito.mock(DriverDownloader.class);
         when(dlMock.downloadFile(any(Driver.class), any(Path.class))).thenAnswer(new DownloadAnswer());
         doReturn(dlMock).when(mojo).getDownloader();

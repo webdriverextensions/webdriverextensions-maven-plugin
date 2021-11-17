@@ -264,7 +264,7 @@ path through the configuration parameter named `installationDirectory`.
 
 ### Keeping downloaded data in the cache
 To avoid downloading the drivers more than once if you switch between 
-driver versions or something similar you could set `<keepDownloadedWebdrivers>true</keepDownloadedWebdrivers>` configuration paramter.
+driver versions or something similar you could set `<keepDownloadedWebdrivers>true</keepDownloadedWebdrivers>` configuration paramter. Please note that you must also provide a fixed path for `pluginWorkingDirectory` otherwise `keepDownloadedWebdrivers=true` will be ignored!
 ```xml
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
@@ -279,6 +279,7 @@ driver versions or something similar you could set `<keepDownloadedWebdrivers>tr
     </executions>
     <configuration>
         <keepDownloadedWebdrivers>true</keepDownloadedWebdrivers>
+        <pluginWorkingDirectory>/some/directory</pluginWorkingDirectory>
         <drivers>
             ... drivers to install
         </drivers>
@@ -366,6 +367,7 @@ For more details on how to further configure this plugin please see the
 ## Changelog
 
 #### Unreleased
+- BUGFIX `keepDownloadedWebdrivers` did not work as expected
 - IMPROVEMENT configure download timeouts and retry attempts
 - IMPROVEMENT Added support for Java 17 [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
 - BUGFIX failed to move non-empty directories of downloaded drivers on Windows [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
