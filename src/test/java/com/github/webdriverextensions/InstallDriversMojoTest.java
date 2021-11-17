@@ -129,6 +129,36 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         assertNumberOfInstalledDriverIs(1);
     }
 
+    public void test_that_configuration_with_keepDownloadedWebdrivers_keeps_workdingDirectory() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_single_file_pom.xml");
+        mojo.keepDownloadedWebdrivers = true;
+        mojo.pluginWorkingDirectory = tempFolder.newFolder();
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("custom-chrome-driver-windows-32bit.exe");
+        assertNumberOfInstalledDriverIs(1);
+        assertThat(mojo.pluginWorkingDirectory).isDirectory();
+    }
+
+    public void test_that_configuration_without_keepDownloadedWebdrivers_deletes_workdingDirectory() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_single_file_pom.xml");
+        mojo.keepDownloadedWebdrivers = false;
+        mojo.pluginWorkingDirectory = tempFolder.newFolder();
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("custom-chrome-driver-windows-32bit.exe");
+        assertNumberOfInstalledDriverIs(1);
+        assertThat(mojo.pluginWorkingDirectory).doesNotExist();
+    }
+
     public void test_that_configuration_with_custom_driver_containing_directory_not_in_repository_works() throws Exception {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/custom_driver_directory_pom.xml");

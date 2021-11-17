@@ -175,12 +175,22 @@ public class InstallDriversMojo extends AbstractMojo {
     int downloadRetryDelay;
 
     /**
-     * Keep downloaded files as local cache
+     * Keep downloaded files as local cache.<br/>
+     * <b>If set to <code>true</code>, one should also provide a known and
+     * non-random value for <code>pluginWorkingDirectory</code>!</b>
      */
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
 
-    Path pluginWorkingDirectory;
+    /**
+     * The working directory where downloaded drivers will be saved until they
+     * are moved to <code>installationDirectory</code>.<br/>
+     * <b>This defaults to a random temporary directory</b> prefixed with
+     * <q>webdriverextensions-maven-plugin</q> below the default temporary-file
+     * directory (<code>java.io.tmpdir</code>).
+     */
+    @Parameter
+    File pluginWorkingDirectory;
     Path downloadDirectory;
     Path tempDirectory;
     Repository repository;
@@ -190,9 +200,14 @@ public class InstallDriversMojo extends AbstractMojo {
 
     private void setupDirectories() throws MojoExecutionException {
         try {
-            pluginWorkingDirectory = Files.createTempDirectory("webdriverextensions-maven-plugin");
-            downloadDirectory = pluginWorkingDirectory.resolve("downloads");
-            tempDirectory = pluginWorkingDirectory.resolve("temp");
+            if (pluginWorkingDirectory == null) {
+                pluginWorkingDirectory = Files.createTempDirectory("webdriverextensions-maven-plugin").toFile();
+            }
+            if (!Files.isDirectory(pluginWorkingDirectory.toPath())) {
+                Files.createDirectories(pluginWorkingDirectory.toPath());
+            }
+            downloadDirectory = pluginWorkingDirectory.toPath().resolve("downloads");
+            tempDirectory = Files.createTempDirectory(pluginWorkingDirectory.toPath(), "temp");
         } catch (IOException e) {
             throw new MojoExecutionException("error while creating folders", e);
         }
@@ -227,6 +242,11 @@ public class InstallDriversMojo extends AbstractMojo {
             getLog().info("Installing drivers from configuration");
         }
 
+        
+        if (keepDownloadedWebdrivers && pluginWorkingDirectory == null) {
+            getLog().warn("keepDownloadedWebdrivers is true but pluginWorkingDirectory is not set! Please configure pluginWorkingDirectory as well.");
+            keepDownloadedWebdrivers = false;
+        }
         setupDirectories();
         performInstallation();
         if (keepDownloadedWebdrivers) {
@@ -277,10 +297,10 @@ public class InstallDriversMojo extends AbstractMojo {
 
     private void cleanupWorkingDirectory() throws MojoExecutionException {
         try {
-            FileUtils.deleteDirectory(pluginWorkingDirectory.toFile());
+            FileUtils.deleteDirectory(pluginWorkingDirectory);
         } catch (IOException e) {
             throw new InstallDriversMojoExecutionException("Failed to delete plugin working directory:" + System.lineSeparator()
-                    + Utils.directoryToString(pluginWorkingDirectory), e);
+                    + Utils.directoryToString(pluginWorkingDirectory.toPath()), e);
         }
     }
 

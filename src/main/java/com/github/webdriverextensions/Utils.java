@@ -88,6 +88,9 @@ public class Utils {
     }
 
     public static String directoryToString(Path path) {
+        if (path == null) {
+            return "null";
+        }
         if (!path.toFile().exists()) {
             return path + " does not exist" + System.lineSeparator();
         }
