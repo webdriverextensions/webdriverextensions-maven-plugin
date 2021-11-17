@@ -36,7 +36,7 @@ public class InstallDriversMojo extends AbstractMojo {
     /**
      * URL to where the repository file is located. The repository file is a
      * json file containing information of available drivers and their
-     * locations, checksums, etc.
+     * locations etc.
      */
     @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository-3.0.json")
     URL repositoryUrl;
@@ -56,7 +56,7 @@ public class InstallDriversMojo extends AbstractMojo {
 
     /**
      * List of drivers to install. Each driver has a name, platform, bit,
-     * version, URL and checksum that can be provided.<br/>
+     * version and URL that can be provided.<br/>
      * <br/>
      * If no drivers are provided the latest drivers will be installed for the
      * running platform and the bit version will be chosen as if it has not
@@ -72,9 +72,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * <br/>
      * If the driver is not available in the repository the plugin does not know
      * from which URL to download the driver. In that case the URL should be
-     * provided for the driver together with a checksum (to retrieve the
-     * checksum run the plugin without providing a checksum once, the plugin
-     * will then calculate and print the checksum for you). The default
+     * provided for the driver. The default
      * repository with all available drivers can be found <a href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json">here</a>.<br/>
      * <br/>
      * <strong>Some Examples</strong><br/>
@@ -123,7 +121,6 @@ public class InstallDriversMojo extends AbstractMojo {
      *   &lt;bit&gt;32&lt;/bit&gt;
      *   &lt;version&gt;1.9.7&lt;/version&gt;
      *   &lt;url&gt;http://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-macosx.zip&lt;/url&gt;
-     *   &lt;checksum&gt;0f4a64db9327d19a387446d43bbf5186&lt;/checksum&gt;
      * &lt;/driver&gt;
      * </pre>
      */
