@@ -10,7 +10,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import org.assertj.core.api.Assertions;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
@@ -281,5 +283,21 @@ public class FileExtractorImplTest {
         fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/path-traversal.zip"), extractDir);
         // temporaryFolder must only contain otherwise it would also contain "single-file" and "directories-and-files"
         assertThat(Arrays.asList(temporaryFolder.getRoot().list()), is(Arrays.asList(toDirectory.getFileName().toString())));
+    }
+
+    @Test
+    public void extractZipWithDirectoryWithoutDAttribShouldSucceed() throws Exception {
+        final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
+        assertThatCode(() -> fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/directory-without-D-attribute.zip"), toDirectory))
+                .doesNotThrowAnyException();
+        Assertions.assertThat(toDirectory.resolve("directories-and-files").resolve("a-file.txt")).isRegularFile();
+    }
+
+    @Test
+    public void extractTarWithDirectoryWithoutDAttribShouldSucceed() throws Exception {
+        final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
+        assertThatCode(() -> fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/directory-without-D-attribute.tar"), toDirectory))
+                .doesNotThrowAnyException();
+        Assertions.assertThat(toDirectory.resolve("directories-and-files").resolve("a-file.txt")).isRegularFile();
     }
 }

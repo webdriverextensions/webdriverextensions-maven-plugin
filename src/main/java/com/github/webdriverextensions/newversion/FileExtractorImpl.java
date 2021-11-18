@@ -134,6 +134,10 @@ public class FileExtractorImpl implements FileExtractor {
             fileToExtract = toDirectory.resolve(filename);
         }
         if (isPathSaveToUse(fileToExtract, toDirectory)) {
+            // issue #50: directory entries may not have the D attribute set. we may have to create the directory first.
+            if (!Files.isDirectory(fileToExtract.getParent())) {
+                Files.createDirectories(fileToExtract.getParent());
+            }
             Files.copy(tarArchive, fileToExtract);
         }
     }
@@ -157,7 +161,7 @@ public class FileExtractorImpl implements FileExtractor {
             try (BufferedInputStream bis = new BufferedInputStream(fis)) {
                 try (ZipArchiveInputStream zipArchive = new ZipArchiveInputStream(bis)) {
                     for (ZipArchiveEntry zipEntry = zipArchive.getNextZipEntry(); zipEntry != null; zipEntry = zipArchive.getNextZipEntry()) {
-                        
+
                         Path fileToExtract = toDirectory.resolve(zipEntry.getName());
                         if (zipEntry.isDirectory()) {
                             if (extractPattern != null || !isPathSaveToUse(fileToExtract, toDirectory)) {
@@ -176,6 +180,10 @@ public class FileExtractorImpl implements FileExtractor {
                                 fileToExtract = toDirectory.resolve(filename);
                             }
                             if (isPathSaveToUse(fileToExtract, toDirectory)) {
+                                // issue #50: directory entries may not have the D attribute set. we may have to create the directory first.
+                                if (!Files.isDirectory(fileToExtract.getParent())) {
+                                    Files.createDirectories(fileToExtract.getParent());
+                                }
                                 Files.copy(zipArchive, fileToExtract);
                             }
                         }
