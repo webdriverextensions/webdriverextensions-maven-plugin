@@ -1,0 +1,157 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "https://webdriverextensions.github.io/webdriverextensions-maven-plugin/drivers-schema.json",
+    "type": "object",
+    "title": "Drivers repository schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "drivers": [
+                {
+                    "name": "chromedriver-beta",
+                    "platform": "linux",
+                    "bit": "64",
+                    "version": "75.0.3770.8",
+                    "url": "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip",
+                    "fileMatchInside": ".+/foo\\.exe",
+                    "customFileName": "my-driver.exe"
+                }
+            ]
+        }
+    ],
+    "required": [
+        "drivers"
+    ],
+    "properties": {
+        "drivers": {
+            "$id": "#/properties/drivers",
+            "type": "array",
+            "title": "The drivers schema",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "name": "chromedriver-beta",
+                        "platform": "linux",
+                        "bit": "64",
+                        "version": "75.0.3770.8",
+                        "url": "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip",
+                        "fileMatchInside": ".+/foo",
+                        "customFileName": "my-driver.exe"
+                    }
+                ]
+            ],
+            "additionalItems": false,
+            "items": {
+                "$id": "#/properties/drivers/items",
+                "anyOf": [
+                    {
+                        "$id": "#/properties/drivers/items/anyOf/0",
+                        "type": "object",
+                        "title": "The driver schema",
+                        "default": {},
+                        "examples": [
+                            {
+                                "name": "chromedriver-beta",
+                                "platform": "linux",
+                                "bit": "64",
+                                "version": "75.0.3770.8",
+                                "url": "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip",
+                                "fileMatchInside": ".+/foo",
+                                "customFileName": "my-driver.exe"
+                            }
+                        ],
+                        "required": [
+                            "name",
+                            "platform",
+                            "bit",
+                            "version",
+                            "url"
+                        ],
+                        "properties": {
+                            "name": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/name",
+                                "type": "string",
+                                "title": "The name of the driver",
+                                "default": "",
+                                "examples": [
+                                    "chromedriver"
+                                ]
+                            },
+                            "platform": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/platform",
+                                "type": "string",
+                                "title": "driver platform",
+                                "default": "",
+                                "enum": [
+                                    "linux",
+                                    "windows",
+                                    "mac"
+                                ],
+                                "examples": [
+                                    "linux"
+                                ]
+                            },
+                            "bit": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/bit",
+                                "type": "string",
+                                "title": "driver platform architecture",
+                                "description": "64-bit or 32-bit variant?",
+                                "enum": [
+                                    "64",
+                                    "32"
+                                ],
+                                "default": "32",
+                                "examples": [
+                                    "64"
+                                ]
+                            },
+                            "version": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/version",
+                                "type": "string",
+                                "title": "driver version",
+                                "default": "",
+                                "examples": [
+                                    "75.0.3770.8"
+                                ]
+                            },
+                            "url": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/url",
+                                "type": "string",
+                                "title": "URL",
+                                "description": "The download url of the driver",
+                                "default": "",
+                                "examples": [
+                                    "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip"
+                                ]
+                            },
+                            "fileMatchInside": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/fileMatchInside",
+                                "type": "string",
+                                "title": "fileMatchInside",
+                                "description": "A regular expression for selecting only the files matching the given pattern.",
+                                "default": "",
+                                "examples": [
+                                    ".+/foo\\.exe"
+                                ]
+                            },
+                            "customFileName": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/customFileName",
+                                "type": "string",
+                                "title": "custom filename",
+                                "description": "A custom name of the driver file in the installation directory",
+                                "default": "",
+                                "examples": [
+                                    "my-driver.exe"
+                                ]
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": false
+}

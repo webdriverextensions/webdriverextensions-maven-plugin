@@ -358,6 +358,28 @@ To set a custom file name for the specified driver configuration.
 </plugin>
 ```
 
+### Setting a custom repository URL
+To set a custom URL to the JSON repository file. The supported URL schemes are: http, https and file. The content of the file must validate against [the drivers repository JSON schema](drivers-schema.json).
+
+**Example for local file**
+```xml
+<plugin>
+    <groupId>com.github.webdriverextensions</groupId>
+    <artifactId>webdriverextensions-maven-plugin</artifactId>
+    <version>3.2.0</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>install-drivers</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+        <repositoryUrl>file:///some/path/to/repo.json</repositoryUrl>
+    </configuration>
+</plugin>
+```
+
 ### Further Configurations
 For more details on how to further configure this plugin please see the
 [plugin goal documentation](http://webdriverextensions.github.io/webdriverextensions-maven-plugin/install-drivers-mojo.html).

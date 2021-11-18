@@ -35,8 +35,11 @@ public class InstallDriversMojo extends AbstractMojo {
 
     /**
      * URL to where the repository file is located. The repository file is a
-     * json file containing information of available drivers and their
-     * locations etc.
+     * json file containing information of available drivers and their locations
+     * etc. Supported protocols are: http, https and file. The content of the
+     * file must validate against
+     * <a href="https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/drivers-schema.json">the
+     * drivers repository JSON schema</a>.
      */
     @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository-3.0.json")
     URL repositoryUrl;
