@@ -24,6 +24,9 @@ import java.util.Objects;
 import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.quote;
 
+/**
+ * Download and install WebDriver drivers.
+ */
 @Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class InstallDriversMojo extends AbstractMojo {
 
