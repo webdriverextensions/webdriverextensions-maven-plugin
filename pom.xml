@@ -50,6 +50,11 @@
                 <role>developer</role>
             </roles>
         </developer>
+        <developer>
+            <name>Ronny Perinke</name>
+            <id>sephirothj</id>
+            <timezone>1</timezone>
+        </developer>
     </developers>
 
     <contributors>
