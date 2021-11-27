@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>InstallDriversMojo.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">WebDriver Extensions Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">com.github.webdriverextensions</a> &gt; <span class="el_source">InstallDriversMojo.java</span></div><h1>InstallDriversMojo.java</h1><pre class="source lang-java linenums">package com.github.webdriverextensions;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Settings;
+import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.UncheckedException;
+import org.jooq.lambda.tuple.Tuple;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
+import static com.github.webdriverextensions.Utils.quote;
+
+/**
+ * Download and install WebDriver drivers.
+ */
+@Mojo(name = &quot;install-drivers&quot;, defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+public class InstallDriversMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = &quot;${project}&quot;, readonly = true)
+    MavenProject project;
+
+    @Parameter(defaultValue = &quot;${settings}&quot;, readonly = true)
+    Settings settings;
+
+    /**
+     * URL to where the repository file is located. The repository file is a
+     * json file containing information of available drivers and their locations
+     * etc. Supported protocols are: http, https and file. The content of the
+     * file must validate against
+     * &lt;a href=&quot;https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/drivers-schema.json&quot;&gt;the
+     * drivers repository JSON schema&lt;/a&gt;.
+     */
+    @Parameter(defaultValue = &quot;https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository-3.0.json&quot;)
+    URL repositoryUrl;
+
+    /**
+     * The path to the directory where the drivers are going to be installed.
+     */
+    @Parameter(defaultValue = &quot;${basedir}/drivers&quot;)
+    File installationDirectory;
+
+    /**
+     * The id of the proxy to use if it is configured in settings.xml. If not provided the first
+     * active proxy in settings.xml will be used.
+     */
+    @Parameter
+    String proxyId;
+
+    /**
+     * List of drivers to install. Each driver has a name, platform, bit,
+     * version and URL that can be provided.&lt;br/&gt;
+     * &lt;br/&gt;
+     * If no drivers are provided the latest drivers will be installed for the
+     * running platform and the bit version will be chosen as if it has not
+     * been provided (see rule below).&lt;br/&gt;
+     * &lt;br/&gt;
+     * If no platform is provided for a driver the platform will automatically
+     * be set to the running platform.&lt;br/&gt;
+     * &lt;br/&gt;
+     * If no bit version is provided for a driver the bit will automatically
+     * be set to 32 if running the plugin on a windows or mac platform. However
+     * if running the plugin from a linux platform the bit will be determined
+     * from the OS bit version.&lt;br/&gt;
+     * &lt;br/&gt;
+     * If the driver is not available in the repository the plugin does not know
+     * from which URL to download the driver. In that case the URL should be
+     * provided for the driver. The default
+     * repository with all available drivers can be found &lt;a href=&quot;https://github.com/webdriverextensions/webdriverextensions-maven-plugin-repository/blob/master/repository-3.0.json&quot;&gt;here&lt;/a&gt;.&lt;br/&gt;
+     * &lt;br/&gt;
+     * &lt;strong&gt;Some Examples&lt;/strong&gt;&lt;br/&gt;
+     * Installing all latest drivers&lt;br/&gt;
+     * &lt;pre&gt;
+     * &amp;lt;drivers&amp;gt;
+     *   &amp;lt;driver&amp;gt;
+     *     &amp;lt;name&amp;gt;chromedriver&amp;lt;/name&amp;gt;
+     *     &amp;lt;platform&amp;gt;windows&amp;lt;/platform&amp;gt;
+     *     &amp;lt;bit&amp;gt;32&amp;lt;/bit&amp;gt;
+     *   &amp;lt;/driver&amp;gt;
+     *   &amp;lt;driver&amp;gt;
+     *     &amp;lt;name&amp;gt;chromedriver&amp;lt;/name&amp;gt;
+     *     &amp;lt;platform&amp;gt;mac&amp;lt;/platform&amp;gt;
+     *     &amp;lt;bit&amp;gt;32&amp;lt;/bit&amp;gt;
+     *   &amp;lt;/driver&amp;gt;
+     *   &amp;lt;driver&amp;gt;
+     *     &amp;lt;name&amp;gt;chromedriver&amp;lt;/name&amp;gt;
+     *     &amp;lt;platform&amp;gt;linux&amp;lt;/platform&amp;gt;
+     *     &amp;lt;bit&amp;gt;32&amp;lt;/bit&amp;gt;
+     *   &amp;lt;/driver&amp;gt;
+     *   &amp;lt;driver&amp;gt;
+     *     &amp;lt;name&amp;gt;chromedriver&amp;lt;/name&amp;gt;
+     *     &amp;lt;platform&amp;gt;linux&amp;lt;/platform&amp;gt;
+     *     &amp;lt;bit&amp;gt;64&amp;lt;/bit&amp;gt;
+     *   &amp;lt;/driver&amp;gt;
+     *   &amp;lt;driver&amp;gt;
+     *     &amp;lt;name&amp;gt;internetexplorerdriver&amp;lt;/name&amp;gt;
+     *     &amp;lt;platform&amp;gt;windows&amp;lt;/platform&amp;gt;
+     *     &amp;lt;bit&amp;gt;32&amp;lt;/bit&amp;gt;
+     *   &amp;lt;/driver&amp;gt;
+     *   &amp;lt;driver&amp;gt;
+     *     &amp;lt;name&amp;gt;internetexplorerdriver&amp;lt;/name&amp;gt;
+     *     &amp;lt;platform&amp;gt;windows&amp;lt;/platform&amp;gt;
+     *     &amp;lt;bit&amp;gt;64&amp;lt;/bit&amp;gt;
+     *   &amp;lt;/driver&amp;gt;
+     * &amp;lt;/drivers&amp;gt;
+     * &lt;/pre&gt;
+     * &lt;br/&gt;
+     * &lt;p/&gt;
+     * Installing a driver not available in the repository, e.g. PhantomJS&lt;br/&gt;
+     * &lt;pre&gt;
+     * &amp;lt;driver&amp;gt;
+     *   &amp;lt;name&amp;gt;phanthomjs&amp;lt;/name&amp;gt;
+     *   &amp;lt;platform&amp;gt;mac&amp;lt;/platform&amp;gt;
+     *   &amp;lt;bit&amp;gt;32&amp;lt;/bit&amp;gt;
+     *   &amp;lt;version&amp;gt;1.9.7&amp;lt;/version&amp;gt;
+     *   &amp;lt;url&amp;gt;http://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-macosx.zip&amp;lt;/url&amp;gt;
+     * &amp;lt;/driver&amp;gt;
+     * &lt;/pre&gt;
+     */
+<span class="fc" id="L133">    @Parameter</span>
+    List&lt;Driver&gt; drivers = new ArrayList&lt;&gt;();
+
+    /**
+     * Skips installation of drivers.
+     */
+    @Parameter(defaultValue = &quot;false&quot;)
+    boolean skip;
+
+    /**
+     * Determines the timeout in seconds until arrival of a response from the
+     * download host.&lt;br/&gt;
+     * A timeout value of zero is interpreted as an infinite timeout.
+     */
+    @Parameter(defaultValue = &quot;1800&quot;)
+    int downloadResponseTimeout;
+
+    /**
+     * Determines the timeout in seconds until a new connection is fully established.&lt;br/&gt;
+     * A timeout value of zero is interpreted as an infinite timeout.
+     */
+    @Parameter(defaultValue = &quot;30&quot;)
+    int downloadConnectTimeout;
+
+    /**
+     * Number of retry attempts to download a driver.&lt;br/&gt;
+     * A value of zero means no retries.&lt;br/&gt;
+     * Retriable HTTP status codes are 429 and 503.&lt;br/&gt;
+     * Retries may also happen for the following exceptions:
+     * &lt;ul&gt;
+     * &lt;li&gt;InterruptedIOException&lt;/li&gt;
+     * &lt;li&gt;UnknownHostException&lt;/li&gt;
+     * &lt;li&gt;ConnectException&lt;/li&gt;
+     * &lt;li&gt;ConnectionClosedException&lt;/li&gt;
+     * &lt;li&gt;NoRouteToHostException&lt;/li&gt;
+     * &lt;li&gt;SSLException&lt;/li&gt;
+     * &lt;/ul&gt;
+     */
+    @Parameter(defaultValue = &quot;3&quot;)
+    int downloadMaxRetries;
+
+    /**
+     * retry interval in seconds between subsequent retries 
+     */
+    @Parameter(defaultValue = &quot;3&quot;)
+    int downloadRetryDelay;
+
+    /**
+     * Keep downloaded files as local cache.&lt;br/&gt;
+     * &lt;b&gt;If set to &lt;code&gt;true&lt;/code&gt;, one should also provide a known and
+     * non-random value for &lt;code&gt;pluginWorkingDirectory&lt;/code&gt;!&lt;/b&gt;
+     */
+    @Parameter(defaultValue = &quot;false&quot;)
+    boolean keepDownloadedWebdrivers;
+
+    /**
+     * The working directory where downloaded drivers will be saved until they
+     * are moved to &lt;code&gt;installationDirectory&lt;/code&gt;.&lt;br/&gt;
+     * &lt;b&gt;This defaults to a random temporary directory&lt;/b&gt; prefixed with
+     * &lt;q&gt;webdriverextensions-maven-plugin&lt;/q&gt; below the default temporary-file
+     * directory (&lt;code&gt;java.io.tmpdir&lt;/code&gt;).
+     */
+    @Parameter
+    File pluginWorkingDirectory;
+    Path downloadDirectory;
+    Path tempDirectory;
+    Repository repository;
+
+<span class="fc" id="L201">    public InstallDriversMojo() {</span>
+<span class="fc" id="L202">    }</span>
+
+    private void setupDirectories() throws MojoExecutionException {
+        try {
+<span class="fc bfc" id="L206" title="All 2 branches covered.">            if (pluginWorkingDirectory == null) {</span>
+<span class="fc" id="L207">                pluginWorkingDirectory = Files.createTempDirectory(&quot;webdriverextensions-maven-plugin&quot;).toFile();</span>
+            }
+<span class="fc bfc" id="L209" title="All 2 branches covered.">            if (!Files.isDirectory(pluginWorkingDirectory.toPath())) {</span>
+<span class="fc" id="L210">                Files.createDirectories(pluginWorkingDirectory.toPath());</span>
+            }
+<span class="fc" id="L212">            downloadDirectory = pluginWorkingDirectory.toPath().resolve(&quot;downloads&quot;);</span>
+<span class="fc" id="L213">            tempDirectory = Files.createTempDirectory(pluginWorkingDirectory.toPath(), &quot;temp&quot;);</span>
+<span class="nc" id="L214">        } catch (IOException e) {</span>
+<span class="nc" id="L215">            throw new MojoExecutionException(&quot;error while creating folders&quot;, e);</span>
+<span class="fc" id="L216">        }</span>
+<span class="fc" id="L217">    }</span>
+
+    @Override
+    public void execute() throws MojoExecutionException {
+
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        if (settings.isOffline()) {</span>
+<span class="fc" id="L223">            getLog().info(&quot;Skipping install-drivers goal execution (maven in offline mode)&quot;);</span>
+<span class="fc" id="L224">            return;</span>
+        }
+
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if (skip) {</span>
+<span class="fc" id="L228">            getLog().info(&quot;Skipping install-drivers goal execution&quot;);</span>
+<span class="fc" id="L229">            return;</span>
+        }
+
+<span class="fc bfc" id="L232" title="All 2 branches covered.">        for (String property : new String[]{&quot;skipTests&quot;, &quot;skipITs&quot;, &quot;maven.test.skip&quot;}) {</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">            if (Boolean.getBoolean(property)) {</span>
+<span class="nc" id="L234">                getLog().info(&quot;Skipping install-drivers goal execution (&quot; + property + &quot;)&quot;);</span>
+<span class="nc" id="L235">                return;</span>
+            }
+        }
+
+<span class="fc" id="L239">        repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));</span>
+<span class="fc" id="L240">        getLog().info(&quot;Installation directory &quot; + quote(installationDirectory.toPath()));</span>
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        if (drivers.isEmpty()) {</span>
+<span class="fc" id="L242">            getLog().info(&quot;Installing latest drivers for current platform&quot;);</span>
+<span class="fc" id="L243">            drivers = repository.getLatestDrivers();</span>
+        } else {
+<span class="fc" id="L245">            getLog().info(&quot;Installing drivers from configuration&quot;);</span>
+        }
+
+        
+<span class="pc bpc" id="L249" title="1 of 4 branches missed.">        if (keepDownloadedWebdrivers &amp;&amp; pluginWorkingDirectory == null) {</span>
+<span class="nc" id="L250">            getLog().warn(&quot;keepDownloadedWebdrivers is true but pluginWorkingDirectory is not set! Please configure pluginWorkingDirectory as well.&quot;);</span>
+<span class="nc" id="L251">            keepDownloadedWebdrivers = false;</span>
+        }
+<span class="fc" id="L253">        setupDirectories();</span>
+<span class="fc" id="L254">        performInstallation();</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">        if (keepDownloadedWebdrivers) {</span>
+<span class="fc" id="L256">            cleanupTempDirectory();</span>
+        } else {
+<span class="fc" id="L258">            cleanupWorkingDirectory();</span>
+        }
+<span class="fc" id="L260">    }</span>
+
+    private void performInstallation() throws MojoExecutionException {
+<span class="fc" id="L263">        final DriverExtractor driverExtractor = new DriverExtractor(this);</span>
+<span class="fc" id="L264">        final DriverInstaller driverInstaller = new DriverInstaller(this);</span>
+
+<span class="fc" id="L266">        try (final DriverDownloader driverDownloader = getDownloader()) {</span>
+<span class="fc" id="L267">            drivers.stream()</span>
+<span class="fc" id="L268">                    .map(Unchecked.function(repository::enrichDriver))</span>
+<span class="fc" id="L269">                    .filter(Objects::nonNull)</span>
+<span class="fc" id="L270">                    .filter(driverInstaller::needInstallation)</span>
+<span class="fc" id="L271">                    .peek(driver -&gt; getLog().info(driver.getId() + &quot; version &quot; + driver.getVersion()))</span>
+                    // download
+<span class="fc" id="L273">                    .map(Unchecked.function(driver -&gt; {</span>
+<span class="fc" id="L274">                        Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());</span>
+<span class="fc" id="L275">                        Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);</span>
+<span class="fc" id="L276">                        return Tuple.tuple(driver, downloadLocation);</span>
+                    }))
+                    // extract
+<span class="fc" id="L279">                    .map(Unchecked.function(t -&gt; {</span>
+<span class="fc" id="L280">                        Path extractLocation = driverExtractor.extractDriver(t.v1, t.v2);</span>
+<span class="fc" id="L281">                        return Tuple.tuple(t.v1, extractLocation);</span>
+                    }))
+                    // and finally install the driver
+<span class="fc" id="L284">                    .forEach(Unchecked.consumer(t -&gt; {</span>
+<span class="fc" id="L285">                        driverInstaller.install(t.v1, t.v2);</span>
+<span class="fc" id="L286">                    }));</span>
+<span class="nc" id="L287">        } catch (IOException ex) {</span>
+            // ignored. close operation of downloader
+<span class="fc" id="L289">        } catch (UncheckedException ex) {</span>
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">            if (ex.getCause() instanceof MojoExecutionException) {</span>
+<span class="fc" id="L291">                throw (MojoExecutionException) ex.getCause();</span>
+            }
+<span class="nc" id="L293">            throw new InstallDriversMojoExecutionException(ex.getMessage(), ex);</span>
+<span class="pc" id="L294">        }</span>
+<span class="fc" id="L295">    }</span>
+
+    DriverDownloader getDownloader() throws MojoExecutionException {
+<span class="nc" id="L298">        return new DriverDownloader(this);</span>
+    }
+
+    private void cleanupWorkingDirectory() throws MojoExecutionException {
+        try {
+<span class="fc" id="L303">            FileUtils.deleteDirectory(pluginWorkingDirectory);</span>
+<span class="nc" id="L304">        } catch (IOException e) {</span>
+<span class="nc" id="L305">            throw new InstallDriversMojoExecutionException(&quot;Failed to delete plugin working directory:&quot; + System.lineSeparator()</span>
+<span class="nc" id="L306">                    + Utils.directoryToString(pluginWorkingDirectory.toPath()), e);</span>
+<span class="fc" id="L307">        }</span>
+<span class="fc" id="L308">    }</span>
+
+    private void cleanupTempDirectory() throws MojoExecutionException {
+        try {
+<span class="fc" id="L312">            FileUtils.deleteDirectory(tempDirectory.toFile());</span>
+<span class="nc" id="L313">        } catch (IOException e) {</span>
+<span class="nc" id="L314">            throw new InstallDriversMojoExecutionException(&quot;Failed to delete temp directory:&quot; + System.lineSeparator()</span>
+<span class="nc" id="L315">                    + Utils.directoryToString(tempDirectory), e);</span>
+<span class="fc" id="L316">        }</span>
+<span class="fc" id="L317">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

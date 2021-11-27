@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Repository.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">WebDriver Extensions Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">com.github.webdriverextensions</a> &gt; <span class="el_source">Repository.java</span></div><h1>Repository.java</h1><pre class="source lang-java linenums">package com.github.webdriverextensions;
+
+import static com.github.webdriverextensions.Utils.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.lang3.StringUtils.*;
+
+import java.io.*;
+import java.net.*;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.settings.Proxy;
+
+import com.google.gson.*;
+import com.google.gson.annotations.Expose;
+
+<span class="fc" id="L24">class Repository {</span>
+
+    @Expose
+    private List&lt;Driver&gt; drivers;
+
+    static Repository load(URL repositoryUrl, Optional&lt;Proxy&gt; proxySettings) throws MojoExecutionException {
+        String repositoryAsString;
+        try {
+<span class="fc" id="L32">            repositoryAsString = downloadAsString(repositoryUrl.toURI(), proxySettings);</span>
+<span class="fc" id="L33">        } catch (IOException | URISyntaxException e) {</span>
+<span class="fc" id="L34">            throw new InstallDriversMojoExecutionException(&quot;Failed to download repository from url &quot; + quote(</span>
+                    repositoryUrl), e);
+<span class="fc" id="L36">        }</span>
+
+<span class="fc" id="L38">        final Repository repository = new Repository();</span>
+        try {
+<span class="fc" id="L40">            Objects.requireNonNull(trimToNull(repositoryAsString), &quot;repository json is empty&quot;);</span>
+<span class="fc" id="L41">            repository.drivers = new GsonBuilder()</span>
+<span class="fc" id="L42">                    .excludeFieldsWithoutExposeAnnotation()</span>
+<span class="fc" id="L43">                    .create()</span>
+<span class="fc" id="L44">                    .fromJson(repositoryAsString, Repository.class)</span>
+                    .drivers;
+<span class="fc" id="L46">        } catch (JsonSyntaxException | NullPointerException e) {</span>
+<span class="fc" id="L47">            throw new InstallDriversMojoExecutionException(&quot;Failed to parse repository json &quot; + repositoryAsString, e);</span>
+<span class="fc" id="L48">        }</span>
+
+<span class="fc" id="L50">        repository.drivers.sort(driversComparator());</span>
+
+<span class="fc" id="L52">        return repository;</span>
+    }
+
+    private static Comparator&lt;Driver&gt; driversComparator() {
+<span class="fc" id="L56">        Comparator&lt;Driver&gt; byId = new DriverComparator.ById();</span>
+        // sort by version descending (newest first)
+<span class="fc" id="L58">        Comparator&lt;Driver&gt; byVersion = new DriverComparator.ByVersion().reversed();</span>
+
+<span class="fc" id="L60">        return byId.thenComparing(byVersion);</span>
+    }
+
+    private static String downloadAsString(URI url, Optional&lt;Proxy&gt; proxySettings) throws IOException {
+        // kept vor backward compatibility
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (&quot;file&quot;.equalsIgnoreCase(url.getScheme())) {</span>
+<span class="fc" id="L66">            return IOUtils.toString(url, UTF_8);</span>
+        }
+<span class="fc" id="L68">        HttpClientBuilder httpClientBuilder = HttpClients.custom().disableCookieManagement();</span>
+<span class="fc" id="L69">        proxySettings.ifPresent(proxy -&gt; {</span>
+<span class="nc" id="L70">            ProxyUtils.createProxyFromSettings(proxy).ifPresent(httpClientBuilder::setProxy);</span>
+<span class="nc" id="L71">            ProxyUtils.createProxyCredentialsFromSettings(proxy).ifPresent(httpClientBuilder::setDefaultCredentialsProvider);</span>
+<span class="nc" id="L72">        });</span>
+<span class="fc" id="L73">        try (CloseableHttpClient httpClient = httpClientBuilder.build()) {</span>
+<span class="fc" id="L74">            return httpClient.execute(new HttpGet(url), new BasicHttpClientResponseHandler());</span>
+        }
+    }
+
+    List&lt;Driver&gt; getDrivers(String name, String platform, String bit, String version) {
+<span class="fc" id="L79">        return filterDrivers(drivers, name, platform, bit, version);</span>
+    }
+
+    private List&lt;Driver&gt; filterDrivers(List&lt;Driver&gt; driversToFilter, String name, String platform, String bit, String version) {
+<span class="fc" id="L83">        return driversToFilter.stream()</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">                .filter(driver -&gt; name != null ? name.equalsIgnoreCase(driver.getName()) : true)</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">                .filter(driver -&gt; platform != null ? platform.equalsIgnoreCase(driver.getPlatform()) : true)</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">                .filter(driver -&gt; bit != null ? bit.equalsIgnoreCase(driver.getBit()) : true)</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">                .filter(driver -&gt; version != null ? new ComparableVersion(version).equals(driver.getComparableVersion()) : true)</span>
+<span class="fc" id="L88">                .collect(Collectors.toList());</span>
+    }
+
+    Driver enrichDriver(Driver driver) throws MojoExecutionException {
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (isBlank(driver.getName())) {</span>
+<span class="nc" id="L93">            throw new InstallDriversMojoExecutionException(&quot;Driver name must be set in configuration, driver: &quot; + driver);</span>
+        }
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (isNotBlank(driver.getUrl())) {</span>
+<span class="fc" id="L96">            return driver;</span>
+        }
+<span class="pc bpc" id="L98" title="1 of 6 branches missed.">        if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {</span>
+            // Explicit driver config make sure it exists in repo
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).isEmpty()) {</span>
+<span class="fc" id="L101">                throw new MojoExecutionException(&quot;Could not find driver: &quot; + driver + System.lineSeparator()</span>
+<span class="fc" id="L102">                                                 + System.lineSeparator()</span>
+                                                 + &quot;in repository: &quot; + this);
+            }
+        }
+
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        if (isBlank(driver.getPlatform())) {</span>
+<span class="fc" id="L108">            driver.setPlatform(detectPlatform());</span>
+        }
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if (isBlank(driver.getBit())) {</span>
+<span class="fc" id="L111">            driver.setBit(detectBits(driver.getName()));</span>
+        }
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (isBlank(driver.getVersion())) {</span>
+<span class="fc" id="L114">            driver.setVersion(getLatestDriverVersion(driver.getId()));</span>
+        }
+
+<span class="fc" id="L117">        List&lt;Driver&gt; drivers = getDrivers(driver.getName(),</span>
+<span class="fc" id="L118">                                          driver.getPlatform(),</span>
+<span class="fc" id="L119">                                          driver.getBit(),</span>
+<span class="fc" id="L120">                                          driver.getVersion());</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (drivers.isEmpty()) {</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">            if (&quot;64&quot;.equals(driver.getBit())) {</span>
+                // toogle bits and try the other bit to get a driver configuration
+<span class="fc" id="L124">                drivers = getDrivers(driver.getName(),</span>
+<span class="fc" id="L125">                                     driver.getPlatform(),</span>
+                                     &quot;32&quot;,
+<span class="fc" id="L127">                                     driver.getVersion());</span>
+
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                if (drivers.isEmpty()) {</span>
+                    // Could not find any driver for the current platform/bit/version in repo
+<span class="fc" id="L131">                    return null;</span>
+                }
+<span class="fc" id="L133">                return transferCustomFileName(driver,filterLatestDriver(drivers));</span>
+            }
+<span class="fc" id="L135">            return null;</span>
+        }
+
+<span class="fc" id="L138">        return transferCustomFileName(driver, drivers.get(0));</span>
+    }
+
+    private Driver transferCustomFileName(Driver driver, Driver foundDriver) {
+
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        if (isNotBlank(driver.getCustomFileName())) {</span>
+<span class="fc" id="L144">            foundDriver.setCustomFileName(driver.getCustomFileName());</span>
+        }
+
+<span class="fc" id="L147">        return foundDriver;</span>
+    }
+
+    List&lt;Driver&gt; getLatestDrivers() {
+<span class="fc" id="L151">        String platform = detectPlatform();</span>
+<span class="fc" id="L152">        return drivers.stream()</span>
+<span class="fc" id="L153">                .map(Driver::getName)</span>
+<span class="fc" id="L154">                .distinct()</span>
+<span class="fc" id="L155">                .map(driverName -&gt; {</span>
+<span class="fc" id="L156">                    List&lt;Driver&gt; driversWithDriverNameAndPlatform = getDrivers(driverName, platform, null, null);</span>
+<span class="fc" id="L157">                    String bit = detectBits(driverName);</span>
+<span class="fc" id="L158">                    boolean is64Bit = bit.equals(&quot;64&quot;);</span>
+<span class="fc" id="L159">                    Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);</span>
+<span class="fc bfc" id="L160" title="All 2 branches covered.">                    if (latestDriver != null) {</span>
+<span class="fc" id="L161">                        return latestDriver;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">                    } else if (is64Bit) {</span>
+<span class="fc" id="L163">                        Driver latestDriverComplement = getDriverByBit(&quot;32&quot;, driversWithDriverNameAndPlatform);</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">                        if (latestDriverComplement != null) {</span>
+<span class="fc" id="L165">                            return latestDriverComplement;</span>
+                        }
+                    }
+<span class="fc" id="L168">                    return null;</span>
+                })
+<span class="fc" id="L170">                .filter(Objects::nonNull)</span>
+<span class="fc" id="L171">                .sorted(driversComparator())</span>
+<span class="fc" id="L172">                .collect(Collectors.toList());</span>
+    }
+
+    private Driver getDriverByBit(String bit, List&lt;Driver&gt; driversWithDriverNameAndPlatform) {
+<span class="fc" id="L176">        List&lt;Driver&gt; driversWithDriverNameAndPlatformAndBit = filterDrivers(driversWithDriverNameAndPlatform, null, null, bit, null);</span>
+<span class="fc" id="L177">        return filterLatestDriver(driversWithDriverNameAndPlatformAndBit);</span>
+    }
+
+    private static String detectBits(String driverName) {
+        // Default installed internetexplorer bit version on &lt; Windows 10 versions is 32 bit
+<span class="fc bfc" id="L182" title="All 4 branches covered.">        if (driverName.equals(&quot;internetexplorerdriver&quot;) &amp;&amp; !isWindows10()) {</span>
+<span class="fc" id="L183">            return &quot;32&quot;;</span>
+        }
+
+        // Detect bit version from os
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (is64Bit()) {</span>
+<span class="fc" id="L188">            return &quot;64&quot;;</span>
+        }
+<span class="fc" id="L190">        return &quot;32&quot;;</span>
+    }
+
+    private static String detectPlatform() {
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        if (isMac()) {</span>
+<span class="fc" id="L195">            return &quot;mac&quot;;</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">        } else if (isLinux()) {</span>
+<span class="fc" id="L197">            return &quot;linux&quot;;</span>
+        }
+<span class="fc" id="L199">        return &quot;windows&quot;;</span>
+    }
+
+    private String getLatestDriverVersion(String driverId) {
+<span class="fc" id="L203">        return drivers.stream()</span>
+<span class="fc" id="L204">                .filter(driver -&gt; driverId.equalsIgnoreCase(driver.getId()))</span>
+<span class="fc" id="L205">                .sorted(driversComparator())</span>
+<span class="fc" id="L206">                .findFirst()</span>
+<span class="fc" id="L207">                .map(Driver::getVersion).orElse(null);</span>
+    }
+
+    private Driver filterLatestDriver(List&lt;Driver&gt; drivers) {
+<span class="fc" id="L211">        return drivers.stream().sorted(driversComparator()).findFirst().orElse(null);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L216">        return new GsonBuilder().setPrettyPrinting().create().toJson(this);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

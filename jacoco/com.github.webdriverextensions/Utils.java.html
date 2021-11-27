@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Utils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">WebDriver Extensions Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">com.github.webdriverextensions</a> &gt; <span class="el_source">Utils.java</span></div><h1>Utils.java</h1><pre class="source lang-java linenums">package com.github.webdriverextensions;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.RegexFileFilter;
+import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.Platform;
+
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.Iterator;
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class Utils {
+
+    public static final String FAKED_OS_NAME_PROPERTY_KEY = &quot;webdriverextensions.faked.os.name&quot;;
+    public static final String FAKED_BIT_PROPERTY_KEY = &quot;webdriverextensions.faked.bit&quot;;
+
+    public static String quote(String text) {
+<span class="fc" id="L24">        return &quot;\&quot;&quot; + text + &quot;\&quot;&quot;;</span>
+    }
+
+    public static String quote(Path path) {
+<span class="fc" id="L28">        return quote(path.toString());</span>
+    }
+
+    public static String quote(URL url) {
+<span class="fc" id="L32">        return quote(url.toString());</span>
+    }
+
+    public static boolean isWindows() {
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {</span>
+<span class="fc" id="L37">            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals(&quot;windows&quot;);</span>
+        }
+<span class="fc" id="L39">        return Platform.getCurrent().is(Platform.WINDOWS);</span>
+    }
+
+    public static boolean isWindows10() {
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {</span>
+<span class="fc" id="L44">            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals(&quot;windows10&quot;);</span>
+        }
+<span class="fc" id="L46">        return Platform.getCurrent().is(Platform.WIN10);</span>
+    }
+
+    public static boolean isMac() {
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {</span>
+<span class="fc" id="L51">            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals(&quot;mac&quot;);</span>
+        }
+<span class="fc" id="L53">        return Platform.getCurrent().is(Platform.MAC);</span>
+    }
+
+    public static boolean isLinux() {
+<span class="pc bpc" id="L57" title="1 of 2 branches missed.">        if (System.getProperty(FAKED_OS_NAME_PROPERTY_KEY) != null) {</span>
+<span class="fc" id="L58">            return System.getProperty(FAKED_OS_NAME_PROPERTY_KEY).equals(&quot;linux&quot;);</span>
+        }
+<span class="nc" id="L60">        return Platform.getCurrent().is(Platform.LINUX);</span>
+    }
+
+    public static boolean is64Bit() {
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (System.getProperty(FAKED_BIT_PROPERTY_KEY) != null) {</span>
+<span class="fc" id="L65">            return &quot;64&quot;.equalsIgnoreCase(System.getProperty(FAKED_BIT_PROPERTY_KEY));</span>
+        }
+<span class="fc" id="L67">        return &quot;64&quot;.equalsIgnoreCase(System.getProperty(&quot;sun.arch.data.model&quot;));</span>
+    }
+
+    public static String debugInfo(InstallDriversMojo mojo) {
+<span class="nc" id="L71">        return System.lineSeparator()</span>
+<span class="nc" id="L72">                + &quot;downloadDirectory: &quot; + System.lineSeparator() + directoryToString(mojo.downloadDirectory) + System.lineSeparator()</span>
+<span class="nc" id="L73">                + &quot;tempDirectory: &quot; + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()</span>
+<span class="nc" id="L74">                + &quot;installationDirectory: &quot; + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath());</span>
+    }
+
+    public static String debugInfo(Driver driver) {
+<span class="fc" id="L78">        return System.lineSeparator()</span>
+                + &quot;driver: &quot; + driver;
+    }
+
+    public static String debugInfo(InstallDriversMojo mojo, Driver driver) {
+<span class="fc" id="L83">        return System.lineSeparator() + System.lineSeparator()</span>
+<span class="fc" id="L84">                + &quot;driver: &quot; + driver + System.lineSeparator() + System.lineSeparator()</span>
+<span class="fc" id="L85">                + &quot;downloadDirectory: &quot; + System.lineSeparator() + directoryToString(mojo.downloadDirectory) + System.lineSeparator()</span>
+<span class="fc" id="L86">                + &quot;tempDirectory: &quot; + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()</span>
+<span class="fc" id="L87">                + &quot;installationDirectory: &quot; + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath());</span>
+    }
+
+    public static String directoryToString(Path path) {
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L92">            return &quot;null&quot;;</span>
+        }
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if (!path.toFile().exists()) {</span>
+<span class="nc" id="L95">            return path + &quot; does not exist&quot; + System.lineSeparator();</span>
+        }
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (!path.toFile().isDirectory()) {</span>
+<span class="nc" id="L98">            throw new IllegalArgumentException(&quot;The path is not a directory: &quot; + path);</span>
+        }
+
+<span class="fc" id="L101">        Collection&lt;File&gt; files = FileUtils.listFiles(</span>
+<span class="fc" id="L102">                path.toFile(),</span>
+                new RegexFileFilter(&quot;^(.*?)&quot;),
+                DirectoryFileFilter.DIRECTORY
+        );
+
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (files.isEmpty()) {</span>
+<span class="fc" id="L108">            return path + &quot; is empty&quot; + System.lineSeparator();</span>
+        }
+
+<span class="nc" id="L111">        StringBuilder stringBuilder = new StringBuilder();</span>
+
+<span class="nc" id="L113">        stringBuilder.append(path);</span>
+<span class="nc" id="L114">        stringBuilder.append(System.lineSeparator());</span>
+
+<span class="nc" id="L116">        int padSize = longestPath(files, path);</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        for (Iterator iterator = files.iterator(); iterator.hasNext(); ) {</span>
+<span class="nc" id="L118">            File file = (File) iterator.next();</span>
+<span class="nc" id="L119">            String relativePath = getRelativePath(file, path);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">            if (iterator.hasNext()) {</span>
+<span class="nc" id="L121">                stringBuilder.append(&quot;├── &quot;);</span>
+            } else {
+<span class="nc" id="L123">                stringBuilder.append(&quot;└── &quot;);</span>
+            }
+<span class="nc" id="L125">            stringBuilder.append(StringUtils.rightPad(relativePath, padSize));</span>
+<span class="nc" id="L126">            stringBuilder.append(readableFileSize(file));</span>
+<span class="nc" id="L127">            stringBuilder.append(System.lineSeparator());</span>
+<span class="nc" id="L128">        }</span>
+
+<span class="nc" id="L130">        return stringBuilder.toString();</span>
+    }
+
+    private static int longestPath(Collection&lt;File&gt; files, Path relativeToPath) {
+<span class="nc" id="L134">        return files.stream()</span>
+<span class="nc" id="L135">                .mapToInt(file -&gt; getRelativePath(file, relativeToPath).length())</span>
+<span class="nc" id="L136">                .max().orElse(0);</span>
+    }
+
+    private static String getRelativePath(File file, Path relativeToPath) {
+<span class="nc" id="L140">        return file.toPath().relativize(relativeToPath).toString();</span>
+    }
+
+    private static String readableFileSize(File file) {
+<span class="nc" id="L144">        long size = FileUtils.sizeOf(file);</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (size &lt;= 0) {</span>
+<span class="nc" id="L146">            return &quot;0&quot;;</span>
+        }
+
+<span class="nc" id="L149">        final String[] units = new String[]{&quot;B&quot;, &quot;KiB&quot;, &quot;MiB&quot;, &quot;GiB&quot;, &quot;TiB&quot;};</span>
+<span class="nc" id="L150">        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));</span>
+<span class="nc" id="L151">        return StringUtils.leftPad(new DecimalFormat(&quot;#,##0.#&quot;).format(size / Math.pow(1024, digitGroups)), 8) + &quot; &quot; + units[digitGroups];</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

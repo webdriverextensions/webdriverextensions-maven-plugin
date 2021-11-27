@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DriverDownloader.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">WebDriver Extensions Maven Plugin</a> &gt; <a href="index.source.html" class="el_package">com.github.webdriverextensions</a> &gt; <span class="el_source">DriverDownloader.java</span></div><h1>DriverDownloader.java</h1><pre class="source lang-java linenums">package com.github.webdriverextensions;
+
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
+import org.apache.maven.plugin.MojoExecutionException;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+import static com.github.webdriverextensions.Utils.quote;
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+
+class DriverDownloader implements Closeable {
+
+    private final InstallDriversMojo mojo;
+    private final CloseableHttpClient httpClient;
+
+<span class="fc" id="L29">    public DriverDownloader(InstallDriversMojo mojo) throws MojoExecutionException {</span>
+<span class="fc" id="L30">        this.mojo = mojo;</span>
+<span class="fc" id="L31">        httpClient = createHttpClient();</span>
+<span class="fc" id="L32">    }</span>
+
+    @Override
+    public void close() throws IOException {
+<span class="fc" id="L36">        httpClient.close();</span>
+<span class="fc" id="L37">    }</span>
+
+    public Path downloadFile(Driver driver, Path downloadDirectory) throws MojoExecutionException {
+
+<span class="fc" id="L41">        String url = driver.getUrl();</span>
+<span class="fc" id="L42">        Path downloadFilePath = downloadDirectory.resolve(driver.getFilenameFromUrl());</span>
+
+<span class="pc bpc" id="L44" title="1 of 4 branches missed.">        if (downloadFilePath.toFile().exists() &amp;&amp; downloadCompletedFileExists(downloadDirectory)) {</span>
+<span class="fc" id="L45">            mojo.getLog().info(&quot;  Using cached driver from &quot; + quote(downloadFilePath));</span>
+        } else {
+<span class="fc" id="L47">            mojo.getLog().info(&quot;  Downloading &quot; + quote(url) + &quot; to &quot; + quote(downloadFilePath));</span>
+<span class="fc" id="L48">            try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {</span>
+<span class="fc" id="L49">                HttpEntity remoteFileStream = fileDownloadResponse.getEntity();</span>
+<span class="fc" id="L50">                final int statusCode = fileDownloadResponse.getCode();</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">                if (HttpStatus.SC_OK == statusCode) {</span>
+<span class="fc" id="L52">                    copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());</span>
+                } else {
+<span class="fc" id="L54">                    throw new InstallDriversMojoExecutionException(&quot;Download failed with status code &quot; + statusCode, mojo, driver);</span>
+                }
+<span class="fc" id="L56">            } catch (InstallDriversMojoExecutionException e) {</span>
+<span class="fc" id="L57">                throw e;</span>
+<span class="nc" id="L58">            } catch (Exception e) {</span>
+<span class="nc" id="L59">                throw new InstallDriversMojoExecutionException(&quot;Failed to download driver from &quot; + quote(url) + &quot; to &quot; + quote(downloadFilePath) + &quot; cause of &quot; + e.getCause(), e, mojo, driver);</span>
+<span class="fc" id="L60">            }</span>
+<span class="fc" id="L61">            createDownloadCompletedFile(downloadDirectory);</span>
+        }
+<span class="fc" id="L63">        return downloadFilePath;</span>
+    }
+
+    private CloseableHttpClient createHttpClient() {
+<span class="fc" id="L67">        HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()</span>
+<span class="fc" id="L68">                .setConnectTimeout(Timeout.ofSeconds(mojo.downloadConnectTimeout))</span>
+<span class="fc" id="L69">                .setResponseTimeout(Timeout.ofSeconds(mojo.downloadResponseTimeout))</span>
+<span class="fc" id="L70">                .build()</span>
+        )
+<span class="fc" id="L72">                .disableCookieManagement()</span>
+<span class="fc" id="L73">                .disableContentCompression()</span>
+<span class="fc" id="L74">                .setRetryStrategy(new DefaultHttpRequestRetryStrategy(mojo.downloadMaxRetries, TimeValue.ofSeconds(mojo.downloadRetryDelay)));</span>
+
+<span class="fc" id="L76">        ProxyUtils.getProxyFromSettings(mojo.settings, mojo.proxyId).ifPresent(proxy -&gt; {</span>
+<span class="fc" id="L77">            ProxyUtils.createProxyFromSettings(proxy).ifPresent(httpClientBuilder::setProxy);</span>
+<span class="fc" id="L78">            ProxyUtils.createProxyCredentialsFromSettings(proxy).ifPresent(httpClientBuilder::setDefaultCredentialsProvider);</span>
+<span class="fc" id="L79">        });</span>
+<span class="fc" id="L80">        return httpClientBuilder.build();</span>
+    }
+
+    private boolean downloadCompletedFileExists(Path downloadDirectory) {
+<span class="fc" id="L84">        Path downloadCompletedFile = downloadDirectory.resolve(&quot;download.completed&quot;);</span>
+<span class="fc" id="L85">        return Files.exists(downloadCompletedFile);</span>
+    }
+
+    private void createDownloadCompletedFile(Path downloadDirectory) throws InstallDriversMojoExecutionException {
+<span class="fc" id="L89">        Path downloadCompletedFile = downloadDirectory.resolve(&quot;download.completed&quot;);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (!Files.exists(downloadCompletedFile)) {</span>
+            try {
+<span class="fc" id="L92">                Files.createFile(downloadCompletedFile);</span>
+<span class="nc" id="L93">            } catch (IOException e) {</span>
+<span class="nc" id="L94">                throw new InstallDriversMojoExecutionException(&quot;Failed to create download.completed file at &quot; + downloadCompletedFile, e);</span>
+<span class="fc" id="L95">            }</span>
+        }
+<span class="fc" id="L97">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
