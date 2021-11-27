@@ -1,303 +1,93 @@
 package com.github.webdriverextensions.newversion;
 
-import com.github.webdriverextensions.LoggedTemporaryFolder;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 
-public class FileExtractorImplTest {
+class FileExtractorImplTest {
 
-    @Rule
-    public TemporaryFolder temporaryFolder = new LoggedTemporaryFolder();
-
-    private Path toDirectory;
-
-    @Before
-    public void setUp() throws Exception {
-        toDirectory = temporaryFolder.newFolder("to-directory").toPath();
+    private Path getTestArchive(final String archiveName) {
+        return Paths.get("src/test/resources/file-extractor-test-data", archiveName);
     }
 
-    @Test
-    public void extractFile_should_extract_bz2_file_containing_a_single_file() throws Exception {
+    @DisplayName("extractFile should extract archive containing a single file")
+    @ParameterizedTest(name = "{index} ==> for file type/name {0}")
+    @ValueSource(strings = {"single-file.bz2", "single-file.gz", "single-file.tar", "single-file.tar.bz2", "single-file.zip", "single-file.tar.gz"})
+    void extractFile_should_extract_file_containing_a_single_file(final String archiveName, @TempDir final Path toDirectory) throws Exception {
         // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/single-file.bz2");
+        Path singleFileZip = getTestArchive(archiveName);
         FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
 
         // When
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("single-file").toFile().exists(), is(true));
+        assertThat(toDirectory.toFile().list()).containsExactly("single-file");
+        assertThat(toDirectory.resolve("single-file")).isNotEmptyFile();
     }
 
-
-    @Test
-    public void extractFile_should_extract_gz_file_containing_a_single_file() throws Exception {
+    @DisplayName("extractFile should extract archive containing directory structure")
+    @ParameterizedTest(name = "{index} ==> for file type/name {0}")
+    @ValueSource(strings = {"directories-and-files.tar", "directories-and-files.tar.bz2", "directories-and-files.tar.gz", "directories-and-files.zip"})
+    void extractFile_should_extract_file_containing_directory_structure(final String archiveName, @TempDir final Path toDirectory) throws Exception {
         // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/single-file.gz");
+        Path singleFileZip = getTestArchive(archiveName);
         FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
 
         // When
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("single-file").toFile().exists(), is(true));
+        assertThat(toDirectory.toFile().list()).containsExactlyInAnyOrder("a-file.txt", "a-directory");
+        assertThat(toDirectory.resolve("a-file.txt")).isNotEmptyFile();
+        assertThat(toDirectory.resolve("a-directory")).isNotEmptyDirectory().satisfies(dir -> {
+            assertThat(dir.toFile().list()).containsExactlyInAnyOrder("another-directory", "a-file-in-directory.txt", "another-file-in-directory.txt");
+        });
+        assertThat(toDirectory.resolve("a-directory").resolve("another-directory")).isNotEmptyDirectory().satisfies(dir -> {
+            assertThat(dir.toFile().list()).containsExactly("a-file-in-another-directory.txt");
+        });
     }
 
-
-    @Test
-    public void extractFile_should_extract_tar_file_containing_a_single_file() throws Exception {
+    @DisplayName("extractFile should extract archive with extract pattern")
+    @ParameterizedTest(name = "{index} ==> for file type/name {0}")
+    @ValueSource(strings = {"directories-and-files.tar", "directories-and-files.tar.bz2", "directories-and-files.tar.gz", "directories-and-files.zip"})
+    void extractFile_should_extract_file_with_extract_pattern(final String archiveName, @TempDir final Path toDirectory) throws Exception {
         // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/single-file.tar");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_tar_file_containing_directory_structure() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.tar");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(2));
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().listFiles().length, is(3));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "a-file-in-directory.txt")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-file-in-directory.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory", "a-file-in-another-directory.txt")).toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_tar_file_with_extract_pattern() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.tar");
+        Path singleFileZip = getTestArchive(archiveName);
         FileExtractorImpl fileExtractor = new FileExtractorImpl(".*a-file-in-directory.txt$");
 
         // When
         fileExtractor.extractFile(singleFileZip, toDirectory);
 
         // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
+        assertThat(toDirectory.toFile().list()).containsExactly("a-file-in-directory.txt");
+        assertThat(toDirectory.resolve("a-file-in-directory.txt")).isNotEmptyFile();
     }
 
-
-    @Test
-    public void extractFile_should_extract_tar_bz2_file_containing_a_single_file() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/single-file.tar.bz2");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_tar_bz2_file_containing_directory_structure() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.tar.bz2");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(2));
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().listFiles().length, is(3));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "a-file-in-directory.txt")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-file-in-directory.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory", "a-file-in-another-directory.txt")).toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_tar_bz2_file_with_extract_pattern() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.tar.bz2");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(".*a-file-in-directory.txt$");
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
-    }
-
-
-    @Test
-    public void extractFile_should_extract_tar_gz_file_containing_a_single_file() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/single-file.tar.gz");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_tar_gz_file_containing_directory_structure() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.tar.gz");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(2));
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().listFiles().length, is(3));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "a-file-in-directory.txt")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-file-in-directory.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory", "a-file-in-another-directory.txt")).toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_tar_gz_file_with_extract_pattern() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.tar.gz");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(".*a-file-in-directory.txt$");
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
-    }
-
-
-    @Test
-    public void extractFile_should_extract_zip_file_containing_a_single_file() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/single-file.zip");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file.txt").toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_zip_file_containing_directory_structure() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.zip");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(2));
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-file.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory")).toFile().listFiles().length, is(3));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "a-file-in-directory.txt")).toFile().exists(), is(true));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-file-in-directory.txt")).toFile().exists(), is(true));
-
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory")).toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve(Paths.get("a-directory", "another-directory", "a-file-in-another-directory.txt")).toFile().exists(), is(true));
-    }
-
-    @Test
-    public void extractFile_should_extract_zip_file_with_extract_pattern() throws Exception {
-        // Given
-        Path singleFileZip = Paths.get("src/test/resources/file-extractor-test-data/directories-and-files.zip");
-        FileExtractorImpl fileExtractor = new FileExtractorImpl(".*a-file-in-directory.txt$");
-
-        // When
-        fileExtractor.extractFile(singleFileZip, toDirectory);
-
-        // Then
-        assertThat(toDirectory.toFile().listFiles().length, is(1));
-        assertThat(toDirectory.resolve("a-file-in-directory.txt").toFile().exists(), is(true));
-    }
-
-    @Test
-    public void zipSlipShouldThrowExceptionForTar() throws Exception {
+    @ParameterizedTest(name = "{index} ==> for file type/name {0}")
+    @ValueSource(strings = {"path-traversal.tar", "path-traversal.zip"})
+    void zipSlipShouldThrowException(final String archiveName, @TempDir final Path toDirectory) throws Exception {
         final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-        final Path extractDir = toDirectory.resolve("subdir");
+        final Path extractDir = toDirectory.resolve("sub1").resolve("sub2");
         Files.createDirectories(extractDir);
-        fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/path-traversal.tar"), extractDir);
-        // temporaryFolder must only contain otherwise it would also contain "single-file" and "directories-and-files"
-        assertThat(Arrays.asList(temporaryFolder.getRoot().list()), is(Arrays.asList(toDirectory.getFileName().toString())));
+        fileExtractor.extractFile(getTestArchive(archiveName), extractDir);
+        // temporaryFolder must only contain "sub1" otherwise it would also contain "single-file" and "directories-and-files"
+        assertThat(toDirectory.toFile().list()).containsExactly("sub1");
     }
 
-    @Test
-    public void zipSlipShouldThrowExceptionForZip() throws Exception {
+    @ParameterizedTest(name = "{index} ==> for file type/name {0}")
+    @ValueSource(strings = {"directory-without-D-attribute.zip", "directory-without-D-attribute.tar"})
+    void extractZipWithDirectoryWithoutDAttribShouldSucceed(final String archiveName, @TempDir final Path toDirectory) throws Exception {
         final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-        final Path extractDir = toDirectory.resolve("subdir");
-        Files.createDirectories(extractDir);
-        fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/path-traversal.zip"), extractDir);
-        // temporaryFolder must only contain otherwise it would also contain "single-file" and "directories-and-files"
-        assertThat(Arrays.asList(temporaryFolder.getRoot().list()), is(Arrays.asList(toDirectory.getFileName().toString())));
-    }
-
-    @Test
-    public void extractZipWithDirectoryWithoutDAttribShouldSucceed() throws Exception {
-        final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-        assertThatCode(() -> fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/directory-without-D-attribute.zip"), toDirectory))
+        assertThatCode(() -> fileExtractor.extractFile(getTestArchive(archiveName), toDirectory))
                 .doesNotThrowAnyException();
-        Assertions.assertThat(toDirectory.resolve("directories-and-files").resolve("a-file.txt")).isRegularFile();
-    }
-
-    @Test
-    public void extractTarWithDirectoryWithoutDAttribShouldSucceed() throws Exception {
-        final FileExtractorImpl fileExtractor = new FileExtractorImpl(null);
-        assertThatCode(() -> fileExtractor.extractFile(Paths.get("src/test/resources/file-extractor-test-data/directory-without-D-attribute.tar"), toDirectory))
-                .doesNotThrowAnyException();
-        Assertions.assertThat(toDirectory.resolve("directories-and-files").resolve("a-file.txt")).isRegularFile();
+        assertThat(toDirectory.resolve("directories-and-files").resolve("a-file.txt")).isRegularFile();
     }
 }
