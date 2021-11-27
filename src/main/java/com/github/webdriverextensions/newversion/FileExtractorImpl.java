@@ -111,10 +111,11 @@ public class FileExtractorImpl implements FileExtractor {
     private void extractTar(Path toDirectory, TarArchiveInputStream tarArchive) throws IOException {
         for (TarArchiveEntry tarEntry = tarArchive.getNextTarEntry(); tarEntry != null; tarEntry = tarArchive.getNextTarEntry()) {
             if (tarEntry.isDirectory()) {
-                if (extractPattern != null) {
+                Path fileToExtract = toDirectory.resolve(tarEntry.getName());
+                if (extractPattern != null || !isPathSaveToUse(fileToExtract, toDirectory)) {
                     continue;
                 }
-                Files.createDirectories(toDirectory.resolve(tarEntry.getName()));
+                Files.createDirectories(fileToExtract);
             } else {
                 if (tarEntry.isSymbolicLink()) {
                     continue;
