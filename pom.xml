@@ -52,7 +52,7 @@
         </developer>
         <developer>
             <name>Ronny Perinke</name>
-            <id>sephirothj</id>
+            <id>sephiroth-j</id>
             <timezone>1</timezone>
             <url>https://github.com/sephiroth-j</url>
             <roles>
@@ -107,8 +107,8 @@
         <maven-plugin-annotations.version>3.6.1</maven-plugin-annotations.version>
         <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
 
-        <httpclient.version>5.1.1</httpclient.version>
-        <junit.version>5.8.1</junit.version>
+        <httpclient.version>5.1.2</httpclient.version>
+        <junit.version>5.8.2</junit.version>
 
         <!-- Plugin Versions -->
         <maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
@@ -180,7 +180,7 @@
         <dependency>
             <groupId>org.junit-pioneer</groupId>
             <artifactId>junit-pioneer</artifactId>
-            <version>1.4.2</version>
+            <version>1.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -239,7 +239,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-api</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
@@ -272,7 +272,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>[4.0.0,4.1.99]</version>
+            <version>[4.1.0,4.1.99]</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
