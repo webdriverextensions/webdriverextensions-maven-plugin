@@ -56,6 +56,8 @@ public class InstallDriversMojo extends AbstractMojo {
     /**
      * The id of the proxy to use if it is configured in settings.xml. If not provided the first
      * active proxy in settings.xml will be used.
+     * 
+     * @since 1.1.0
      */
     @Parameter
     String proxyId;
@@ -143,6 +145,8 @@ public class InstallDriversMojo extends AbstractMojo {
      * Determines the timeout in seconds until arrival of a response from the
      * download host.<br/>
      * A timeout value of zero is interpreted as an infinite timeout.
+     * 
+     * @since 3.3.0
      */
     @Parameter(defaultValue = "1800")
     int downloadResponseTimeout;
@@ -150,6 +154,8 @@ public class InstallDriversMojo extends AbstractMojo {
     /**
      * Determines the timeout in seconds until a new connection is fully established.<br/>
      * A timeout value of zero is interpreted as an infinite timeout.
+     * 
+     * @since 3.3.0
      */
     @Parameter(defaultValue = "30")
     int downloadConnectTimeout;
@@ -167,12 +173,16 @@ public class InstallDriversMojo extends AbstractMojo {
      * <li>NoRouteToHostException</li>
      * <li>SSLException</li>
      * </ul>
+     * 
+     * @since 3.3.0
      */
     @Parameter(defaultValue = "3")
     int downloadMaxRetries;
 
     /**
      * retry interval in seconds between subsequent retries 
+     * 
+     * @since 3.3.0
      */
     @Parameter(defaultValue = "3")
     int downloadRetryDelay;
@@ -181,6 +191,8 @@ public class InstallDriversMojo extends AbstractMojo {
      * Keep downloaded files as local cache.<br/>
      * <b>If set to <code>true</code>, one should also provide a known and
      * non-random value for <code>pluginWorkingDirectory</code>!</b>
+     * 
+     * @since 2.0.0
      */
     @Parameter(defaultValue = "false")
     boolean keepDownloadedWebdrivers;
@@ -191,6 +203,8 @@ public class InstallDriversMojo extends AbstractMojo {
      * <b>This defaults to a random temporary directory</b> prefixed with
      * <q>webdriverextensions-maven-plugin</q> below the default temporary-file
      * directory (<code>java.io.tmpdir</code>).
+     * 
+     * @since 3.3.0
      */
     @Parameter
     File pluginWorkingDirectory;
