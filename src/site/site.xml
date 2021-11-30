@@ -33,7 +33,7 @@
 
    <menu name="External Links">
      <item name="WebDriver Extensions" href="https://github.com/webdriverextensions/webdriverextensions#webdriver-extensions" />
-     <item name="Selenium/WebDriver" href="https://docs.seleniumhq.org" />
+     <item name="Selenium/WebDriver" href="https://www.selenium.dev/" />
    </menu>
 
   </body>
