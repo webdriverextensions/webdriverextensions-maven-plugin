@@ -6,6 +6,7 @@
 - BUGFIX failed to move non-empty directories of downloaded drivers on Windows [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
 - BUGFIX download directory was not always created [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
 - BUGFIX file extraction may fail for archives with directory entries without the D attribute [Issue 50](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/50). Thanks to [@ikucheryavenkov](https://github.com/ikucheryavenkov)
+- IMPROVEMENT Added user properties for most of the settings
 
 ## 3.2.0 (2019 June 2)
 - IMPROVEMENT Capability for custom file name with binaries [PR 42](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/42)

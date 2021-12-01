@@ -44,13 +44,13 @@ public class InstallDriversMojo extends AbstractMojo {
      * <a href="https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/drivers-schema.json">the
      * drivers repository JSON schema</a>.
      */
-    @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository-3.0.json")
+    @Parameter(defaultValue = "https://raw.githubusercontent.com/webdriverextensions/webdriverextensions-maven-plugin-repository/master/repository-3.0.json", property = "webdriverextensions.repoUrl")
     URL repositoryUrl;
 
     /**
      * The path to the directory where the drivers are going to be installed.
      */
-    @Parameter(defaultValue = "${basedir}/drivers")
+    @Parameter(defaultValue = "${basedir}/drivers", property = "webdriverextensions.installDirectory")
     File installationDirectory;
 
     /**
@@ -59,7 +59,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 1.1.0
      */
-    @Parameter
+    @Parameter(property = "webdriverextensions.proxyId")
     String proxyId;
 
     /**
@@ -138,7 +138,7 @@ public class InstallDriversMojo extends AbstractMojo {
     /**
      * Skips installation of drivers.
      */
-    @Parameter(defaultValue = "false")
+    @Parameter(defaultValue = "false", property = "webdriverextensions.skip")
     boolean skip;
 
     /**
@@ -148,7 +148,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 3.3.0
      */
-    @Parameter(defaultValue = "1800")
+    @Parameter(defaultValue = "1800", property = "webdriverextensions.download.responseTimeout")
     int downloadResponseTimeout;
 
     /**
@@ -157,7 +157,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 3.3.0
      */
-    @Parameter(defaultValue = "30")
+    @Parameter(defaultValue = "30", property = "webdriverextensions.download.connectTimeout")
     int downloadConnectTimeout;
 
     /**
@@ -176,7 +176,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 3.3.0
      */
-    @Parameter(defaultValue = "3")
+    @Parameter(defaultValue = "3", property = "webdriverextensions.download.maxRetries")
     int downloadMaxRetries;
 
     /**
@@ -184,7 +184,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 3.3.0
      */
-    @Parameter(defaultValue = "3")
+    @Parameter(defaultValue = "3", property = "webdriverextensions.download.retryDelay")
     int downloadRetryDelay;
 
     /**
@@ -194,7 +194,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 2.0.0
      */
-    @Parameter(defaultValue = "false")
+    @Parameter(defaultValue = "false", property = "webdriverextensions.download.keepFiles")
     boolean keepDownloadedWebdrivers;
 
     /**
@@ -206,7 +206,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * 
      * @since 3.3.0
      */
-    @Parameter
+    @Parameter(property = "webdriverextensions.workingDirectory")
     File pluginWorkingDirectory;
     Path downloadDirectory;
     Path tempDirectory;
