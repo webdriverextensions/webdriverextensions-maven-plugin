@@ -97,7 +97,7 @@ public class DriverInstaller {
                 FileUtils.forceDelete(to.resolve(file.toPath().getFileName()).toFile());
                 if (Utils.isWindows() && file.isDirectory()) {
                     // (on windows) it is not possible to move a non-empty directory (DirectoryNotEmptyException). copy and delete should be used instead.
-                    Files.copy(file.toPath(), to.resolve(file.toPath().getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                    FileUtils.copyDirectory(file, to.resolve(file.toPath().getFileName()).toFile());
                     FileUtils.forceDelete(file);
                 } else {
                     Files.move(file.toPath(), to.resolve(file.toPath().getFileName()), StandardCopyOption.REPLACE_EXISTING);
