@@ -6,7 +6,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Settings;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.UncheckedException;
@@ -27,13 +26,10 @@ import static com.github.webdriverextensions.Utils.quote;
 /**
  * Download and install WebDriver drivers.
  */
-@Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "install-drivers", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresOnline = true)
 public class InstallDriversMojo extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project}", readonly = true)
-    MavenProject project;
-
-    @Parameter(defaultValue = "${settings}", readonly = true)
+    @Parameter(defaultValue = "${settings}", readonly = true, required = true)
     Settings settings;
 
     /**
@@ -232,12 +228,6 @@ public class InstallDriversMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException {
-
-        if (settings.isOffline()) {
-            getLog().info("Skipping install-drivers goal execution (maven in offline mode)");
-            return;
-        }
-
         if (skip) {
             getLog().info("Skipping install-drivers goal execution");
             return;

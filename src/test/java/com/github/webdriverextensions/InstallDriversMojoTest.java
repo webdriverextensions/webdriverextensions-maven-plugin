@@ -5,10 +5,8 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.File;
 import java.nio.file.attribute.FileTime;
-import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
@@ -87,19 +85,6 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/skip_pom.xml");
 
-
-        // When
-        mojo.execute();
-
-        // Then
-        assertThat(mojo.installationDirectory.listFiles()).isNullOrEmpty();
-    }
-
-    public void test_that_offlineMode_does_not_install_configured_drivers() throws Exception {
-        // Given
-        InstallDriversMojo mojo = getMojo("src/test/resources/no_configuration_pom.xml");
-        mojo.settings = Mockito.spy(mojo.settings);
-        when(mojo.settings.isOffline()).thenReturn(true);
 
         // When
         mojo.execute();
