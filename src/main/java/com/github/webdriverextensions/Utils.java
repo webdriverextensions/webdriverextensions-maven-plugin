@@ -60,6 +60,15 @@ public class Utils {
         return Platform.getCurrent().is(Platform.LINUX);
     }
 
+    public static String detectPlatform() {
+        if (isMac()) {
+            return "mac";
+        } else if (isLinux()) {
+            return "linux";
+        }
+        return "windows";
+    }
+
     public static boolean is64Bit() {
         if (System.getProperty(FAKED_BIT_PROPERTY_KEY) != null) {
             return "64".equalsIgnoreCase(System.getProperty(FAKED_BIT_PROPERTY_KEY));

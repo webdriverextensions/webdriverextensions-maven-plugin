@@ -1,6 +1,7 @@
 package com.github.webdriverextensions;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -32,6 +33,9 @@ public class InstallDriversMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${settings}", readonly = true, required = true)
     Settings settings;
+
+    @Parameter(defaultValue = "${session}", readonly = true, required = true)
+    MavenSession session;
 
     /**
      * URL to where the repository file is located. The repository file is a
@@ -221,6 +225,27 @@ public class InstallDriversMojo extends AbstractMojo {
      */
     @Parameter(property = "webdriverextensions.workingDirectory")
     File pluginWorkingDirectory;
+  
+    /**
+     * Sets
+     * <a href="https://www.selenium.dev/documentation/getting_started/installing_browser_drivers/">the
+     * webdriver properties</a> with the path to the downloaded/installed
+     * drivers.<br/>
+     * <b>This setting should not be used if these properties are set
+     * elsewhere</b>
+     * (e.g.
+     * <a href="https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#systemPropertyVariables">with
+     * "systemPropertyVariables"</a>) because they will be overwritten!<br/>
+     * For custom defined drivers: the driver name should start with one of the
+     * known prefixes ("chrome", "chromium", "edge", "firefox", "gecho",
+     * "opera", "internetexplorer"), otherwise the plugin will not know which
+     * property to set.
+     *
+     * @since 3.3.0
+     */
+    @Parameter(defaultValue = "false", property = "webdriverextensions.setWebdriverPath")
+    boolean setWebdriverPath;
+  
     Path downloadDirectory;
     Path tempDirectory;
     Repository repository;
@@ -295,6 +320,9 @@ public class InstallDriversMojo extends AbstractMojo {
             drivers.stream()
                     .map(Unchecked.function(repository::enrichDriver))
                     .filter(Objects::nonNull)
+                    // if driver is already installed, just set webdriver property
+                    .peek(driverInstaller::setDriverPathPropertyIfInstalled)
+                    // proceed with drivers that need installation
                     .filter(driverInstaller::needInstallation)
                     .peek(driver -> getLog().info(driver.getId() + " version " + driver.getVersion()))
                     // download

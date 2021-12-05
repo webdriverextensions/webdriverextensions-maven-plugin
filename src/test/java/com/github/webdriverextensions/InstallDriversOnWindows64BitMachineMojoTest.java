@@ -1,5 +1,8 @@
 package com.github.webdriverextensions;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstallDriversMojoTest {
 
     @Override
@@ -25,6 +28,31 @@ public class InstallDriversOnWindows64BitMachineMojoTest extends AbstractInstall
         assertDriverIsInstalled("edgedriver-windows-64bit.exe");
 //        assertDriverIsInstalled("operadriver-windows-64bit.exe");
         assertNumberOfInstalledDriverIs(7);
+
+        assertThat(mojo.session.getUserProperties())
+                .doesNotContainKeys("webdriver.gecko.driver", "webdriver.chrome.driver", "webdriver.ie.driver", "webdriver.edge.driver", "webdriver.opera.driver");
+    }
+
+    public void test_that_setWebdriverPath_sets_webdriver_properties() throws Exception {
+        // Given
+        InstallDriversMojo mojo = getMojo("src/test/resources/setWebdriverPath.xml");
+
+        // When
+        mojo.execute();
+
+        // Then
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe");
+        assertDriverIsInstalled("phantomjs-windows-64bit.exe");
+        assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
+        assertDriverIsInstalled("geckodriver-windows-64bit.exe");
+        assertDriverIsInstalled("edgedriver-windows-64bit.exe");
+        assertNumberOfInstalledDriverIs(7);
+
+        assertThat(mojo.session.getUserProperties())
+                .contains(entry("webdriver.gecko.driver", mojo.installationDirectory.toPath().resolve("geckodriver-windows-64bit.exe").toString()))
+                .contains(entry("webdriver.ie.driver", mojo.installationDirectory.toPath().resolve("internetexplorerdriver-windows-32bit.exe").toString()))
+                .contains(entry("webdriver.edge.driver", mojo.installationDirectory.toPath().resolve("edgedriver-windows-64bit.exe").toString()))
+                .containsKey("webdriver.chrome.driver");
     }
 
     public void test_that_driver_configuration_with_no_platform_downloads_the_driver_only_for_the_current_platform() throws Exception {

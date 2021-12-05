@@ -46,6 +46,7 @@ public class DriverInstaller {
                 String newFileName = driver.getFileName();
                 moveFileInDirectory(extractLocation, mojo.installationDirectory.toPath(), newFileName);
                 makeExecutable(mojo.installationDirectory.toPath().resolve(newFileName));
+                setDriverPathProperty(driver, mojo.installationDirectory.toPath().resolve(newFileName));
             } else {
                 moveAllFilesInDirectory(extractLocation, mojo.installationDirectory.toPath().resolve(driver.getId()));
             }
@@ -55,6 +56,31 @@ public class DriverInstaller {
             throw new InstallDriversMojoExecutionException("Failed to install driver cause of " + e.getMessage(), e, mojo, driver);
         }
 
+    }
+
+    void setDriverPathPropertyIfInstalled(Driver driver) {
+        if (isInstalled(driver)) {
+            setDriverPathProperty(driver, mojo.installationDirectory.toPath().resolve(driver.getFileName()));
+        }
+    }
+    
+    private void setDriverPathProperty(Driver driver, Path location) {
+        final String driverName = driver.getName().toLowerCase();
+        String propertyName = "";
+        if (driverName.startsWith("chrome") || driverName.startsWith("chromium")) {
+            propertyName = "chrome";
+        } else if (driverName.startsWith("opera")) {
+            propertyName = "opera";
+        } else if (driverName.startsWith("internetexplorer")) {
+            propertyName = "ie";
+        } else if (driverName.startsWith("edge")) {
+            propertyName = "edge";
+        } else if (driverName.startsWith("gecko") || driverName.startsWith("firefox")) {
+            propertyName = "gecko";
+        }
+        if (mojo.setWebdriverPath && !propertyName.isEmpty() && driver.getPlatform().equalsIgnoreCase(Utils.detectPlatform())) {
+            mojo.session.getUserProperties().putIfAbsent(String.format("webdriver.%s.driver", propertyName), location.toAbsolutePath().toString());
+        }
     }
 
     private boolean isInstalled(Driver driver) {

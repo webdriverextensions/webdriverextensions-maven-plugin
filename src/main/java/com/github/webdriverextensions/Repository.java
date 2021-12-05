@@ -190,15 +190,6 @@ class Repository {
         return "32";
     }
 
-    private static String detectPlatform() {
-        if (isMac()) {
-            return "mac";
-        } else if (isLinux()) {
-            return "linux";
-        }
-        return "windows";
-    }
-
     private String getLatestDriverVersion(String driverId) {
         return drivers.stream()
                 .filter(driver -> driverId.equalsIgnoreCase(driver.getId()))
