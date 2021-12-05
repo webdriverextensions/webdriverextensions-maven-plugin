@@ -17,12 +17,12 @@ package com.github.webdriverextensions;
 
 import java.io.File;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.settings.Settings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junitpioneer.jupiter.SetSystemProperty;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class InstallDriversMojoTest2 {
 
@@ -31,13 +31,22 @@ class InstallDriversMojoTest2 {
     void test_that_skipTests_does_not_install_configured_drivers(@TempDir File tmp) throws MojoExecutionException {
         // Given
         InstallDriversMojo mojo = new InstallDriversMojo();
-        mojo.settings = new Settings();
         mojo.installationDirectory = tmp;
 
         // When
-        mojo.execute();
+        assertThatCode(() -> mojo.execute()).doesNotThrowAnyException();
 
         // Then
         assertThat(mojo.installationDirectory.listFiles()).isNullOrEmpty();
+    }
+
+    @Test
+    @SetSystemProperty(key = "skipTests", value = "true")
+    void test_that_skipIgnore_ignores_skipTests(@TempDir File tmp) throws MojoExecutionException {
+        InstallDriversMojo mojo = new InstallDriversMojo();
+        mojo.skipIgnore = true;
+
+        // When
+        assertThatCode(() -> mojo.execute()).isInstanceOf(NullPointerException.class);
     }
 }

@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.quote;
@@ -132,10 +133,26 @@ public class InstallDriversMojo extends AbstractMojo {
     List<Driver> drivers = new ArrayList<>();
 
     /**
-     * Skips installation of drivers.
+     * Skips installation of drivers. Execution will also be skipped if one of
+     * the following properties is <code>true</code>:
+     * <ul>
+     * <li>skipTests</li>
+     * <li>skipITs</li>
+     * <li>maven.test.skip</li>
+     * </ul>
      */
     @Parameter(defaultValue = "false", property = "webdriverextensions.skip")
     boolean skip;
+    
+    /**
+     * Do not skip execution even if one of the skip-properties (see
+     * {@link #skip}) is <code>true</code>. This is useful for downloading
+     * drivers even when test execution is skipped.
+     *
+     * @since 3.3.0
+     */
+    @Parameter(defaultValue = "false", property = "webdriverextensions.skipIgnore")
+    boolean skipIgnore;
 
     /**
      * Determines the timeout in seconds until arrival of a response from the
@@ -226,18 +243,25 @@ public class InstallDriversMojo extends AbstractMojo {
         }
     }
 
+    private boolean doSkip() {
+        if (skipIgnore) {
+            return false;
+        } else {
+            if (skip) {
+                return true;
+            } else {
+                return Stream.of("skipTests", "skipITs", "maven.test.skip")
+                        .map(Boolean::getBoolean)
+                        .anyMatch(Boolean.TRUE::equals);
+            }
+        }
+    }
+
     @Override
     public void execute() throws MojoExecutionException {
-        if (skip) {
+        if (doSkip()) {
             getLog().info("Skipping install-drivers goal execution");
             return;
-        }
-
-        for (String property : new String[]{"skipTests", "skipITs", "maven.test.skip"}) {
-            if (Boolean.getBoolean(property)) {
-                getLog().info("Skipping install-drivers goal execution (" + property + ")");
-                return;
-            }
         }
 
         repository = Repository.load(repositoryUrl, getProxyFromSettings(settings, proxyId));
