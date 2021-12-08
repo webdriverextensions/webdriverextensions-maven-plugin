@@ -24,9 +24,9 @@
    <menu name="Overview">
       <item name="Introduction" href="index.html"/>
       <item name="Goals" href="plugin-info.html"/>
-      <item name="Usage" href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin#usage" />
+      <item name="Usage" href="usage.html" />
       <item name="Releases" href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin/releases" />
-      <item name="Changelog" href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin/CHANGELOG.md" />
+      <item name="Changelog" href="changelog.html" />
    </menu>
 
    <menu ref="reports"/>
