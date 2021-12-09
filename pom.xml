@@ -382,6 +382,7 @@
                 <configuration>
                     <content>${project.reporting.outputDirectory}</content>
                     <scmBranch>gh-pages</scmBranch>
+                    <checkinComment>Site checkin for ${project.name} v${project.version}</checkinComment>
                 </configuration>
                 <executions>
                     <execution>
