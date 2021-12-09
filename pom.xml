@@ -103,7 +103,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Dependency Versions -->
-        <maven-core.version>3.6.3</maven-core.version>
+        <maven-core.version>3.8.4</maven-core.version>
         <maven-plugin-annotations.version>3.6.1</maven-plugin-annotations.version>
         <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
 
