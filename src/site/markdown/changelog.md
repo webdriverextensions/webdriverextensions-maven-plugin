@@ -1,5 +1,7 @@
 ## Changelog
 ### Unreleased
+
+### 3.3.0 (2021 December 13)
 - BUGFIX `keepDownloadedWebdrivers` did not work as expected
 - IMPROVEMENT configure download timeouts and retry attempts
 - IMPROVEMENT Added support for Java 17 [Issue 56](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/56)
