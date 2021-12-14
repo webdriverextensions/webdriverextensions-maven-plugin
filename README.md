@@ -60,7 +60,7 @@ version add the plugin configured to execute the install-drivers goal.
 Please refer to [the plugin usage page](https://webdriverextensions.github.io/webdriverextensions-maven-plugin/usage.html) for more examples.
 
 ## Changelog
-Please refer to [changelog.md](site/markdown/changelog.md) for a list of changes.
+Please refer to [changelog.md](src/site/markdown/changelog.md) for a list of changes.
 
 ## License 
 
