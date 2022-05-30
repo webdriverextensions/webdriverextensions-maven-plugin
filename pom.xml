@@ -229,7 +229,7 @@
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-api</artifactId>
-            <version>4.1.4</version>
+            <version>4.2.0</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>
