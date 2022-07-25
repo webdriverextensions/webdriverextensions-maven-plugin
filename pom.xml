@@ -106,7 +106,7 @@
         <junit-platform.version>1.8.2</junit-platform.version>
 
         <!-- Plugin Versions -->
-        <maven-deploy-plugin.version>3.0.0-M2</maven-deploy-plugin.version>
+        <maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
         <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
         <maven-project-info-reports-plugin.version>3.4.0</maven-project-info-reports-plugin.version>
