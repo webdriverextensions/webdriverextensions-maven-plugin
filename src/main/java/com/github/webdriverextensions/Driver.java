@@ -24,6 +24,8 @@ public class Driver {
     private String fileMatchInside;
     @Expose
     private String customFileName;
+   
+    private transient ComparableVersion comparableVersion;
 
     public String getId() {
 
@@ -42,7 +44,7 @@ public class Driver {
     }
 
     public ComparableVersion getComparableVersion() {
-        return new ComparableVersion(version != null ? version : "");
+        return comparableVersion != null ? comparableVersion : new ComparableVersion(version != null ? version : "");
     }
 
     public String getFileName() {
@@ -62,9 +64,14 @@ public class Driver {
         }
     }
 
+    public void setVersion(String version) {
+        this.version = version;
+        comparableVersion = new ComparableVersion(version != null ? version : "");
+    }
+
     @Override
     public String toString() {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+        return new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create().toJson(this);
     }
 
     static Driver fromJson(String json) {
