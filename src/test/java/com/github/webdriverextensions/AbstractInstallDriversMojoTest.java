@@ -60,15 +60,13 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
 
     protected InstallDriversMojo getMojo(String pomPath) throws Exception {
         MavenProject project = getMavenProject(pomPath);
-        InstallDriversMojo mojo = Mockito.spy((InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers"));
+        mojo = Mockito.spy((InstallDriversMojo) lookupConfiguredMojo(project, "install-drivers"));
 
-        // some global test preparations
-        this.mojo = mojo;
-
-        logTestName(mojo);
+        logTestName();
 
         mojo.repositoryUrl = Thread.currentThread().getContextClassLoader().getResource("repository-3.0.json");
         mojo.installationDirectory = tempFolder.newFolder();
+        mojo.pluginWorkingDirectory = tempFolder.newFolder();
         DriverDownloader dlMock = Mockito.mock(DriverDownloader.class);
         when(dlMock.downloadFile(any(Driver.class), any(Path.class))).thenAnswer(new DownloadAnswer());
         doReturn(dlMock).when(mojo).getDownloader();
@@ -76,7 +74,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return mojo;
     }
 
-    private void logTestName(InstallDriversMojo mojo) {
+    private void logTestName() {
         System.out.println("");
         System.out.println("");
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
@@ -106,14 +104,13 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     FileTime getDriverCreationTime(String driver) {
         for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driver)) {
-                BasicFileAttributes attr = null;
                 try {
-                    attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                    BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                    return attr.creationTime();
                 } catch (IOException e) {
                     fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
                          + System.lineSeparator() + Utils.debugInfo(mojo));
                 }
-                return attr.creationTime();
             }
         }
         fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
@@ -220,7 +217,8 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         @Override
         public Path answer(InvocationOnMock invocation) throws Throwable {
             Driver driver = invocation.getArgument(0);
-            Path downloadDirectory = invocation.getArgument(1);
+            Path baseDownloadDirectory = invocation.getArgument(1);
+            Path downloadDirectory = baseDownloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
             Path downloadFilePath = downloadDirectory.resolve(driver.getFilenameFromUrl());
             // copy matching fake-driver to downloadFilePath
             Path fakeDriverDir = Paths.get("src/test/resources/fake-drivers");

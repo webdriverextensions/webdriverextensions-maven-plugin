@@ -15,7 +15,7 @@
  */
 package com.github.webdriverextensions;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -70,8 +70,8 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     public void downloadFileWithCompleteFileAlreadyPresent() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/foo.zip").toString());
-        File completed = mojo.downloadDirectory.resolve("download.completed").toFile();
-        completed.createNewFile();
+        Files.createDirectory(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()));
+        Files.createFile(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("download.completed"));
 
         try (final DriverDownloader uut = new DriverDownloader(mojo)) {
             Path downloadFilePath = uut.downloadFile(driver, mojo.downloadDirectory);
@@ -84,10 +84,9 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     public void downloadFileWithValidCachedShouldNotDownloadAnything() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/foo.zip").toString());
-        File completed = mojo.downloadDirectory.resolve("download.completed").toFile();
-        completed.createNewFile();
-        File downloaded = mojo.downloadDirectory.resolve("foo.zip").toFile();
-        downloaded.createNewFile();
+        Files.createDirectory(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()));
+        Files.createFile(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("download.completed"));
+        Files.createFile(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("foo.zip"));
         mojo.keepDownloadedWebdrivers = true;
 
         try (final DriverDownloader uut = new DriverDownloader(mojo)) {

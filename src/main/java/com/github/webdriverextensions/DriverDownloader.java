@@ -36,9 +36,9 @@ class DriverDownloader implements Closeable {
         httpClient.close();
     }
 
-    public Path downloadFile(Driver driver, Path downloadDirectory) throws MojoExecutionException {
-
+    public Path downloadFile(Driver driver, Path baseDownloadDirectory) throws MojoExecutionException {
         String url = driver.getUrl();
+        Path downloadDirectory = baseDownloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
         Path downloadFilePath = downloadDirectory.resolve(driver.getFilenameFromUrl());
 
         if (downloadFilePath.toFile().exists() && downloadCompletedFileExists(downloadDirectory)) {

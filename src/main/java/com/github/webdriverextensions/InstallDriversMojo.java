@@ -327,8 +327,7 @@ public class InstallDriversMojo extends AbstractMojo {
                     .peek(driver -> getLog().info(driver.getId() + " version " + driver.getVersion()))
                     // download
                     .map(Unchecked.function(driver -> {
-                        Path downloadPath = downloadDirectory.resolve(driver.getDriverDownloadDirectoryName());
-                        Path downloadLocation = driverDownloader.downloadFile(driver, downloadPath);
+                        Path downloadLocation = driverDownloader.downloadFile(driver, downloadDirectory);
                         return Tuple.tuple(driver, downloadLocation);
                     }))
                     // extract
