@@ -1,24 +1,24 @@
 package com.github.webdriverextensions;
 
-import org.junit.Test;
+import org.apache.maven.artifact.versioning.ComparableVersion;
+import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class ComparableVersionTest {
+class ComparableVersionTest {
 
     @Test
-    public void testConstructor() {
-        assertThat(new ComparableVersion("2.45.0").compareTo(new ComparableVersion("2.46.0")), is(-1));
-        assertThat(new ComparableVersion("2.46.0").compareTo(new ComparableVersion("2.46.0")), is(0));
-        assertThat(new ComparableVersion("2.46.0").compareTo(new ComparableVersion("2.45.0")), is(1));
+    void testCompareTo() {
+        assertThat(new ComparableVersion("2.45.0").compareTo(new ComparableVersion("2.46.0"))).isNegative();
+        assertThat(new ComparableVersion("2.46.0").compareTo(new ComparableVersion("2.46.0"))).isZero();
+        assertThat(new ComparableVersion("2.46.0").compareTo(new ComparableVersion("2.45.0"))).isPositive();
 
-        assertThat(new ComparableVersion("2.46.0").compareTo(new ComparableVersion("70.0.3538.16")), is(-1));
-        assertThat(new ComparableVersion("70.0.3538.16").compareTo(new ComparableVersion("70.0.3538.16")), is(0));
-        assertThat(new ComparableVersion("70.0.3538.16").compareTo(new ComparableVersion("2.46.0")), is(1));
+        assertThat(new ComparableVersion("2.46.0").compareTo(new ComparableVersion("70.0.3538.16"))).isNegative();
+        assertThat(new ComparableVersion("70.0.3538.16").compareTo(new ComparableVersion("70.0.3538.16"))).isZero();
+        assertThat(new ComparableVersion("70.0.3538.16").compareTo(new ComparableVersion("2.46.0"))).isPositive();
 
-        assertThat(new ComparableVersion("70.0.3538.16").compareTo(new ComparableVersion("70.0.3538.67")), is(-1));
-        assertThat(new ComparableVersion("70.0.3538.67").compareTo(new ComparableVersion("70.0.3538.67")), is(0));
-        assertThat(new ComparableVersion("70.0.3538.67").compareTo(new ComparableVersion("70.0.3538.16")), is(1));
+        assertThat(new ComparableVersion("70.0.3538.16").compareTo(new ComparableVersion("70.0.3538.67"))).isNegative();
+        assertThat(new ComparableVersion("70.0.3538.67").compareTo(new ComparableVersion("70.0.3538.67"))).isZero();
+        assertThat(new ComparableVersion("70.0.3538.67").compareTo(new ComparableVersion("70.0.3538.16"))).isPositive();
     }
 }

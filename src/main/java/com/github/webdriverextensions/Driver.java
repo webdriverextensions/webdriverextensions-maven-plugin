@@ -2,10 +2,10 @@ package com.github.webdriverextensions;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import lombok.Data;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 
 @Data
 public class Driver {
@@ -42,7 +42,7 @@ public class Driver {
     }
 
     public ComparableVersion getComparableVersion() {
-        return new ComparableVersion(version);
+        return new ComparableVersion(version != null ? version : "");
     }
 
     public String getFileName() {
