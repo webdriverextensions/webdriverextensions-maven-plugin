@@ -17,6 +17,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertThrows;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -25,12 +26,15 @@ public class RepositoryTest extends LocalServerTestBase {
     @Test
     public void testConstructor() throws MojoExecutionException, MalformedURLException {
         URL repositoryFile = getCompleteUrlFor("/repository-3.0.json");
-        Driver driver = Repository.load(repositoryFile, Optional.empty()).getDrivers("chromedriver", "linux", "32", "2.9").get(0);
+        Driver driver = Repository.load(repositoryFile, Optional.empty()).getDrivers("chromedriver", "linux", "32", null, "2.9").get(0);
 
         assertThat(driver.getName(), is("chromedriver"));
         assertThat(driver.getPlatform(), is("linux"));
         assertThat(driver.getBit(), is("32"));
         assertThat(driver.getComparableVersion(), is(new ComparableVersion("2.9")));
+        assertThat(driver.getId(), is("chromedriver-linux-32bit"));
+        assertThat(driver.getArchitecture(), is(Architecture.UNKNOWN));
+        assertThat(driver.getArch(), nullValue());
         assertThat(driver.getUrl(), is("http://chromedriver.storage.googleapis.com/2.9/chromedriver_linux32.zip"));
     }
 

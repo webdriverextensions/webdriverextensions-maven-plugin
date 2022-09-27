@@ -1,5 +1,11 @@
-## Changelog
+## Changelog WebDriver Extensions Maven Plugin
+
 ### Unreleased
+#### ⚠ Breaking
+#### ⭐ New Features
+- IMPROVEMENT Added support for different OS/CPU architectures such as AARCH64 (aka ARM64) [Issue 65](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/65)
+
+#### 🐞 Bugs Fixed
 
 ### 3.3.0 (2021 December 13)
 - BUGFIX `keepDownloadedWebdrivers` did not work as expected

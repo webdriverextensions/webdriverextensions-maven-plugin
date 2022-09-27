@@ -8,6 +8,9 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.stream.Collectors;
+import java.util.logging.Level;
+import lombok.extern.java.Log;
+
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+@Log
 public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCase {
 
     private InstallDriversMojo mojo;
@@ -73,30 +77,17 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     private void logTestName() {
-        System.out.println("");
-        System.out.println("");
-        StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        mojo.getLog().info("## TEST: " + stackTrace[2]
-                .getFileName()
-                .replace(".java", "") + "." + stackTrace[2].getMethodName() + " on platform "
-                           + currentPlatform()  + " " + currentBit() + "BIT");
-    }
-
-    private static String currentPlatform() {
-        if (isMac()) {
-            return "MAC";
-        } else if (isWindows10()) {
-            return "WINDOWS";
-        } else if (isWindows()) {
-            return "WINDOWS";
-        } else if (isLinux()) {
-            return "LINUX";
-        }
-        throw new IllegalStateException("Unsupported OS, OS is neither MAC, WINDOWS nor LINUX");
-    }
-
-    private static String currentBit() {
-        return is64Bit() ? "64" : "32";
+        log.log(Level.INFO, () -> {
+            StackTraceElement[] stackTrace = new Exception().getStackTrace();
+            return String.format(
+                    "%n%n## TEST: %s.%s on platform %S(%s) %sBIT",
+                    stackTrace[4].getClassName(),
+                    stackTrace[4].getMethodName(),
+                    detectPlatform(),
+                    detectArch(),
+                    detectBits()
+            );
+        });
     }
 
     FileTime getDriverCreationTime(String driver) throws IOException {
@@ -111,10 +102,18 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
     }
 
     void assertDriverIsInstalled(String driverFileName) {
-        assertDriverIsInstalled(driverFileName, null);
+        assertDriverIsInstalled(driverFileName, null, null);
     }
 
     void assertDriverIsInstalled(String driverFileName, String version) {
+        assertDriverIsInstalled(driverFileName, version, null);
+    }
+
+    void assertDriverIsInstalled(String driverFileName, Architecture arch) {
+        assertDriverIsInstalled(driverFileName, null, arch);
+    }
+
+    void assertDriverIsInstalled(String driverFileName, String version, Architecture arch) {
         boolean foundDriverFile = false;
         boolean foundDriverVersionFile = false;
         String versionFilename = driverFileName.replace(".exe", "") + ".version";
@@ -124,24 +123,28 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
             }
             if (file.getName().equals(versionFilename)) {
                 foundDriverVersionFile = true;
-                if (version != null) {
+                if (version != null || arch != null) {
                     try {
                         String versionFileString = Files.lines(file.toPath()).collect(Collectors.joining());
-                        if (!versionFileString.contains("\"version\": \"" + version + "\"")) {
-                            fail("Version " + version + " was not found in version file, version file content: " + versionFileString);
+                        Driver driverFromVersionfile = Driver.fromJson(versionFileString);
+                        if (version != null && !driverFromVersionfile.getVersion().equalsIgnoreCase(version)) {
+                            fail("Version " + quote(version) + " was not found in version file, version file content: " + versionFileString);
+                        }
+                        if (arch != null && driverFromVersionfile.getArchitecture() != arch) {
+                            fail("arch '" + arch + "' was not found in version file, version file content: " + versionFileString);
                         }
                     } catch (IOException e) {
-                        fail("Failed to read version file " + versionFilename);
+                        fail("Failed to read version file " + quote(versionFilename));
                     }
                 }
             }
         }
         if (!foundDriverFile) {
-            fail("Driver with file name " + driverFileName + " was not found in the installation directory"
+            fail("Driver with file name " + quote(driverFileName) + " was not found in the installation directory"
                  + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath()));
         }
         if (!foundDriverVersionFile) {
-            fail("Driver version file with file name " + versionFilename + " was not found in the installation directory"
+            fail("Driver version file with file name " + quote(versionFilename) + " was not found in the installation directory"
                  + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath()));
         }
     }
@@ -178,11 +181,20 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         System.setProperty(FAKED_BIT_PROPERTY_KEY, "32");
     }
 
+    void fakeArch(Architecture arch) {
+        System.setProperty(FAKED_ARCH_PROPERTY_KEY, arch.toString());
+    }
 
-    public static void fail(String message) {
-        Assert.fail("[" + currentPlatform() + " " + currentBit() + "BIT] " + message);
+    void resetFakes() {
+        System.clearProperty(FAKED_OS_NAME_PROPERTY_KEY);
+        System.clearProperty(FAKED_BIT_PROPERTY_KEY);
+        System.clearProperty(FAKED_ARCH_PROPERTY_KEY);
     }
     
+    public static void fail(String message) {
+        Assert.fail(String.format("[%S(%S) %sBIT] " + message, detectPlatform(), detectArch(), detectBits()));
+    }
+
     private class DownloadAnswer implements Answer<Path> {
 
         @Override
@@ -264,6 +276,6 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
             Files.createFile(downloadDirectory.resolve("download.completed"));
             return downloadFilePath;
         }
-        
+
     }
 }

@@ -12,6 +12,7 @@
                     "name": "chromedriver-beta",
                     "platform": "linux",
                     "bit": "64",
+                    "arch": "amd64",
                     "version": "75.0.3770.8",
                     "url": "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip",
                     "fileMatchInside": ".+/foo\\.exe",
@@ -35,6 +36,7 @@
                         "name": "chromedriver-beta",
                         "platform": "linux",
                         "bit": "64",
+                        "arch": "amd64",
                         "version": "75.0.3770.8",
                         "url": "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip",
                         "fileMatchInside": ".+/foo",
@@ -56,6 +58,7 @@
                                 "name": "chromedriver-beta",
                                 "platform": "linux",
                                 "bit": "64",
+                                "arch": "amd64",
                                 "version": "75.0.3770.8",
                                 "url": "http://chromedriver.storage.googleapis.com/75.0.3770.8/chromedriver_linux64.zip",
                                 "fileMatchInside": ".+/foo",
@@ -105,6 +108,22 @@
                                 "default": "32",
                                 "examples": [
                                     "64"
+                                ]
+                            },
+                            "arch": {
+                                "$id": "#/properties/drivers/items/anyOf/0/properties/arch",
+                                "type": "string",
+                                "title": "driver os/cpu architecture",
+                                "description": "amd64, x86 or arm64? if empty, the current detected os/cpu architecture will be used.",
+                                "enum": [
+                                    "x86",
+                                    "amd64",
+                                    "aarch64",
+                                    "ia64"
+                                ],
+                                "default": "",
+                                "examples": [
+                                    "aarch64"
                                 ]
                             },
                             "version": {

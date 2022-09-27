@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -23,8 +25,8 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
+import static com.github.webdriverextensions.Utils.detectArch;
 import static com.github.webdriverextensions.Utils.detectPlatform;
-import static com.github.webdriverextensions.Utils.is64Bit;
 import static com.github.webdriverextensions.Utils.isWindows10;
 import static com.github.webdriverextensions.Utils.quote;
 import static org.codehaus.plexus.util.StringUtils.isBlank;
@@ -68,8 +70,10 @@ class Repository {
         Comparator<Driver> byId = new DriverComparator.ById();
         // sort by version descending (newest first)
         Comparator<Driver> byVersion = new DriverComparator.ByVersion().reversed();
+        // sort by arch, unknown last
+        Comparator<Driver> byArch = new DriverComparator.ByArch();
 
-        return byId.thenComparing(byVersion);
+        return byId.thenComparing(byVersion).thenComparing(byArch);
     }
 
     private static String downloadAsString(URI url, Optional<Proxy> proxySettings) throws IOException {
@@ -87,15 +91,16 @@ class Repository {
         }
     }
 
-    List<Driver> getDrivers(String name, String platform, String bit, String version) {
-        return filterDrivers(drivers, name, platform, bit, version);
+    List<Driver> getDrivers(@Nullable String name, @Nullable String platform, @Nullable String bit, @Nullable Architecture arch, @Nullable String version) {
+        return filterDrivers(drivers, name, platform, bit, arch, version);
     }
 
-    private List<Driver> filterDrivers(List<Driver> driversToFilter, String name, String platform, String bit, String version) {
+    private List<Driver> filterDrivers(@Nonnull List<Driver> driversToFilter, @Nullable String name, @Nullable String platform, @Nullable String bit, @Nullable Architecture arch, @Nullable String version) {
         return driversToFilter.stream()
                 .filter(driver -> name != null ? name.equalsIgnoreCase(driver.getName()) : true)
                 .filter(driver -> platform != null ? platform.equalsIgnoreCase(driver.getPlatform()) : true)
                 .filter(driver -> bit != null ? bit.equalsIgnoreCase(driver.getBit()) : true)
+                .filter(driver -> arch != null && isNotBlank(driver.getArch()) ? arch == driver.getArchitecture() : true)
                 .filter(driver -> version != null ? new ComparableVersion(version).equals(driver.getComparableVersion()) : true)
                 .collect(Collectors.toList());
     }
@@ -109,7 +114,7 @@ class Repository {
         }
         if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {
             // Explicit driver config make sure it exists in repo
-            if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).isEmpty()) {
+            if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), null, driver.getVersion()).isEmpty()) {
                 throw new InstallDriversMojoExecutionException("Could not find driver", driver, null);
             }
         }
@@ -123,10 +128,14 @@ class Repository {
         if (isBlank(driver.getVersion())) {
             driver.setVersion(getLatestDriverVersion(driver.getId()));
         }
+        if (isBlank(driver.getArch())) {
+            driver.setArch(detectArch().toString());
+        }
 
         List<Driver> drivers = getDrivers(driver.getName(),
                                           driver.getPlatform(),
                                           driver.getBit(),
+                                          driver.getArchitecture(),
                                           driver.getVersion());
         if (drivers.isEmpty()) {
             if ("64".equals(driver.getBit())) {
@@ -134,6 +143,7 @@ class Repository {
                 drivers = getDrivers(driver.getName(),
                                      driver.getPlatform(),
                                      "32",
+                                     driver.getArchitecture(),
                                      driver.getVersion());
 
                 if (drivers.isEmpty()) {
@@ -159,23 +169,19 @@ class Repository {
 
     List<Driver> getLatestDrivers() {
         String platform = detectPlatform();
+        Architecture arch = detectArch();
         return drivers.stream()
                 .map(Driver::getName)
                 .distinct()
                 .map(driverName -> {
-                    List<Driver> driversWithDriverNameAndPlatform = getDrivers(driverName, platform, null, null);
+                    List<Driver> driversWithDriverNameAndPlatform = getDrivers(driverName, platform, null, arch, null);
                     String bit = detectBits(driverName);
-                    boolean is64Bit = bit.equals("64");
                     Driver latestDriver = getDriverByBit(bit, driversWithDriverNameAndPlatform);
-                    if (latestDriver != null) {
-                        return latestDriver;
-                    } else if (is64Bit) {
-                        Driver latestDriverComplement = getDriverByBit("32", driversWithDriverNameAndPlatform);
-                        if (latestDriverComplement != null) {
-                            return latestDriverComplement;
-                        }
+                    if (latestDriver == null && bit.equals("64")) {
+                        // try to find the 32-bit driver if no 64-bit driver was found
+                        latestDriver = getDriverByBit("32", driversWithDriverNameAndPlatform);
                     }
-                    return null;
+                    return latestDriver;
                 })
                 .filter(Objects::nonNull)
                 .sorted(driversComparator())
@@ -183,7 +189,7 @@ class Repository {
     }
 
     private Driver getDriverByBit(String bit, List<Driver> driversWithDriverNameAndPlatform) {
-        List<Driver> driversWithDriverNameAndPlatformAndBit = filterDrivers(driversWithDriverNameAndPlatform, null, null, bit, null);
+        List<Driver> driversWithDriverNameAndPlatformAndBit = filterDrivers(driversWithDriverNameAndPlatform, null, null, bit, null, null);
         return filterLatestDriver(driversWithDriverNameAndPlatformAndBit);
     }
 
@@ -191,13 +197,10 @@ class Repository {
         // Default installed internetexplorer bit version on < Windows 10 versions is 32 bit
         if (driverName.equals("internetexplorerdriver") && !isWindows10()) {
             return "32";
-        }
-
+        } else {
         // Detect bit version from os
-        if (is64Bit()) {
-            return "64";
+            return Utils.detectBits();
         }
-        return "32";
     }
 
     private String getLatestDriverVersion(String driverId) {
@@ -214,6 +217,6 @@ class Repository {
 
     @Override
     public String toString() {
-        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
+        return new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create().toJson(this);
     }
 }

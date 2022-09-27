@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import lombok.experimental.UtilityClass;
 import org.codehaus.plexus.util.StringUtils;
 import org.openqa.selenium.Platform;
@@ -14,6 +15,7 @@ import org.openqa.selenium.Platform;
 public class Utils {
 
     public static final String FAKED_OS_NAME_PROPERTY_KEY = "webdriverextensions.faked.os.name";
+    public static final String FAKED_ARCH_PROPERTY_KEY = "webdriverextensions.faked.os.arch";
     public static final String FAKED_BIT_PROPERTY_KEY = "webdriverextensions.faked.bit";
 
     public static String quote(String text) {
@@ -65,11 +67,27 @@ public class Utils {
         return "windows";
     }
 
-    public static boolean is64Bit() {
-        if (System.getProperty(FAKED_BIT_PROPERTY_KEY) != null) {
-            return "64".equalsIgnoreCase(System.getProperty(FAKED_BIT_PROPERTY_KEY));
+    @Nonnull
+    public static Architecture detectArch() {
+        if (System.getProperty(FAKED_ARCH_PROPERTY_KEY) != null) {
+            return Architecture.fromArchName(System.getProperty(FAKED_ARCH_PROPERTY_KEY));
         }
-        return "64".equalsIgnoreCase(System.getProperty("sun.arch.data.model"));
+        return Architecture.extractFromSysProperty();
+    }
+
+    public static String detectBits() {
+        if (System.getProperty(FAKED_BIT_PROPERTY_KEY) != null) {
+            return System.getProperty(FAKED_BIT_PROPERTY_KEY);
+        }
+        final Architecture arch = detectArch();
+        switch(arch) {
+            case UNKNOWN:
+                return System.getProperty("sun.arch.data.model");
+            case X86:
+                return "32";
+            default:
+                return "64";
+        }
     }
 
     public static String directoryToString(Path path) {
