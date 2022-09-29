@@ -1,15 +1,19 @@
 package com.github.webdriverextensions;
 
-import static com.github.webdriverextensions.Utils.*;
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.apache.commons.lang3.StringUtils.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.annotations.Expose;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.BasicHttpClientResponseHandler;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -19,8 +23,13 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Proxy;
 
-import com.google.gson.*;
-import com.google.gson.annotations.Expose;
+import static com.github.webdriverextensions.Utils.detectPlatform;
+import static com.github.webdriverextensions.Utils.is64Bit;
+import static com.github.webdriverextensions.Utils.isWindows10;
+import static com.github.webdriverextensions.Utils.quote;
+import static org.codehaus.plexus.util.StringUtils.isBlank;
+import static org.codehaus.plexus.util.StringUtils.isNotBlank;
+import static org.codehaus.plexus.util.StringUtils.trim;
 
 class Repository {
 
@@ -35,16 +44,18 @@ class Repository {
             throw new InstallDriversMojoExecutionException("Failed to download repository from url " + quote(
                     repositoryUrl), e);
         }
+        if (isBlank(trim(repositoryAsString))) {
+            throw new InstallDriversMojoExecutionException("repository file is empty");
+        }
 
         final Repository repository = new Repository();
         try {
-            Objects.requireNonNull(trimToNull(repositoryAsString), "repository json is empty");
             repository.drivers = new GsonBuilder()
                     .excludeFieldsWithoutExposeAnnotation()
                     .create()
                     .fromJson(repositoryAsString, Repository.class)
                     .drivers;
-        } catch (JsonSyntaxException | NullPointerException e) {
+        } catch (JsonSyntaxException e) {
             throw new InstallDriversMojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
         }
 
@@ -64,7 +75,7 @@ class Repository {
     private static String downloadAsString(URI url, Optional<Proxy> proxySettings) throws IOException {
         // kept vor backward compatibility
         if ("file".equalsIgnoreCase(url.getScheme())) {
-            return IOUtils.toString(url, UTF_8);
+            return Files.lines(Paths.get(url)).collect(Collectors.joining());
         }
         HttpClientBuilder httpClientBuilder = HttpClients.custom().disableCookieManagement();
         proxySettings.ifPresent(proxy -> {

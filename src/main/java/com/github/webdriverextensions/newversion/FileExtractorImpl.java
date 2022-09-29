@@ -1,18 +1,21 @@
 package com.github.webdriverextensions.newversion;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.regex.Pattern;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.io.FilenameUtils;
-
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.file.*;
-import java.util.regex.Pattern;
+import org.codehaus.plexus.util.FileUtils;
 
 public class FileExtractorImpl implements FileExtractor {
 
@@ -61,7 +64,7 @@ public class FileExtractorImpl implements FileExtractor {
     }
 
     private void extractBz2File(Path file, Path toDirectory) throws IOException {
-        String extractedFilename = FilenameUtils.getBaseName(file.toString());
+        String extractedFilename = FileUtils.basename(file.getFileName().toString());
         Path fileToExtract = toDirectory.resolve(extractedFilename);
         try (FileInputStream fin = new FileInputStream(file.toFile())) {
             try (BufferedInputStream bin = new BufferedInputStream(fin)) {
@@ -73,7 +76,7 @@ public class FileExtractorImpl implements FileExtractor {
     }
 
     private void extractGzFile(Path file, Path toDirectory) throws IOException {
-        String extractedFilename = FilenameUtils.getBaseName(file.toString());
+        String extractedFilename = FileUtils.basename(file.getFileName().toString());
         Path fileToExtract = toDirectory.resolve(extractedFilename);
         try (FileInputStream fin = new FileInputStream(file.toFile())) {
             try (BufferedInputStream bin = new BufferedInputStream(fin)) {

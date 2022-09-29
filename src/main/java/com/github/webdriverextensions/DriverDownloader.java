@@ -1,5 +1,10 @@
 package com.github.webdriverextensions;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
@@ -13,13 +18,7 @@ import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
 import static com.github.webdriverextensions.Utils.quote;
-import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 class DriverDownloader implements Closeable {
 
@@ -49,7 +48,8 @@ class DriverDownloader implements Closeable {
                 HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
                 final int statusCode = fileDownloadResponse.getCode();
                 if (HttpStatus.SC_OK == statusCode) {
-                    copyInputStreamToFile(remoteFileStream.getContent(), downloadFilePath.toFile());
+                    Files.createDirectories(downloadFilePath);
+                    Files.copy(remoteFileStream.getContent(), downloadFilePath, StandardCopyOption.REPLACE_EXISTING);
                 } else {
                     throw new InstallDriversMojoExecutionException("Download failed with status code " + statusCode, mojo, driver);
                 }

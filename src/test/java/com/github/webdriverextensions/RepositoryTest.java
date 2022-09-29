@@ -59,9 +59,7 @@ public class RepositoryTest extends LocalServerTestBase {
         InstallDriversMojoExecutionException e = assertThrows(InstallDriversMojoExecutionException.class, () -> {
             Repository.load(getCompleteUrlFor("/invalid.json"), Optional.empty());
         });
-        assertThat(e.getMessage(), startsWith("Failed to parse repository json"));
-        assertThat(e.getCause(), instanceOf(NullPointerException.class));
-        assertThat(e.getCause().getMessage(), is("repository json is empty"));
+        assertThat(e.getMessage(), is("repository file is empty"));
     }
 
     @Before

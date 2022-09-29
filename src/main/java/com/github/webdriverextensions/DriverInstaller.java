@@ -1,15 +1,13 @@
 package com.github.webdriverextensions;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.util.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Os;
 
 import static com.github.webdriverextensions.Utils.quote;
 
@@ -105,8 +103,8 @@ public class DriverInstaller {
     private void moveFileInDirectory(Path from, Path to, String newFileName) throws MojoExecutionException {
         assert directoryContainsSingleFile(from);
         try {
-            List<String> files = FileUtils.getFileNames(from.toFile(), null, null, true);
-            Path singleFile = Paths.get(files.get(0));
+            File[] files = from.toFile().listFiles();
+            Path singleFile = files[0].toPath();
             mojo.getLog().info("  Moving (one File) " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
             FileUtils.forceDelete(to.resolve(newFileName).toFile());
             Files.move(singleFile, to.resolve(newFileName), StandardCopyOption.REPLACE_EXISTING);
@@ -121,7 +119,7 @@ public class DriverInstaller {
             for (File file : from.toFile().listFiles()) {
                 mojo.getLog().info("  Moving (All Files) " + file + " to " + to.resolve(file.toPath().getFileName()));
                 FileUtils.forceDelete(to.resolve(file.toPath().getFileName()).toFile());
-                if (Utils.isWindows() && file.isDirectory()) {
+                if (Os.isFamily(Os.FAMILY_WINDOWS) && file.isDirectory()) {
                     // (on windows) it is not possible to move a non-empty directory (DirectoryNotEmptyException). copy and delete should be used instead.
                     FileUtils.copyDirectory(file, to.resolve(file.toPath().getFileName()).toFile());
                     FileUtils.forceDelete(file);

@@ -2,14 +2,12 @@ package com.github.webdriverextensions;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
-
-import org.apache.commons.io.FileUtils;
+import java.util.stream.Collectors;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -134,7 +132,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
                 foundDriverVersionFile = true;
                 if (version != null) {
                     try {
-                        String versionFileString = FileUtils.readFileToString(file, Charset.defaultCharset());
+                        String versionFileString = Files.lines(file.toPath()).collect(Collectors.joining());
                         if (!versionFileString.contains("\"version\": \"" + version + "\"")) {
                             fail("Version " + version + " was not found in version file, version file content: " + versionFileString);
                         }

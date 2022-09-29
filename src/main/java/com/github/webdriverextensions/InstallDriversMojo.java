@@ -1,17 +1,5 @@
 package com.github.webdriverextensions;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.settings.Settings;
-import org.jooq.lambda.Unchecked;
-import org.jooq.lambda.UncheckedException;
-import org.jooq.lambda.tuple.Tuple;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -21,6 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.util.FileUtils;
+import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.UncheckedException;
+import org.jooq.lambda.tuple.Tuple;
 
 import static com.github.webdriverextensions.ProxyUtils.getProxyFromSettings;
 import static com.github.webdriverextensions.Utils.quote;
