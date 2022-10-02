@@ -67,7 +67,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         mojo.pluginWorkingDirectory = tempFolder.newFolder();
         DriverDownloader dlMock = Mockito.mock(DriverDownloader.class);
         when(dlMock.downloadFile(any(Driver.class), any(Path.class))).thenAnswer(new DownloadAnswer());
-        doReturn(dlMock).when(mojo).getDownloader();
+        doReturn(dlMock).when(mojo).createDownloader();
 
         return mojo;
     }
@@ -99,20 +99,14 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         return is64Bit() ? "64" : "32";
     }
 
-    FileTime getDriverCreationTime(String driver) {
+    FileTime getDriverCreationTime(String driver) throws IOException {
         for (File file : mojo.installationDirectory.listFiles()) {
             if (file.getName().equals(driver)) {
-                try {
-                    BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                    return attr.creationTime();
-                } catch (IOException e) {
-                    fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-                         + System.lineSeparator() + Utils.debugInfo(mojo));
-                }
+                return Files.readAttributes(file.toPath(), BasicFileAttributes.class).creationTime();
             }
         }
         fail("Did not find driver creation time for driver " + driver + " since driver file or folder is not installed"
-             + System.lineSeparator() + Utils.debugInfo(mojo));
+             + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath()));
         return null;
     }
 
@@ -144,32 +138,11 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         }
         if (!foundDriverFile) {
             fail("Driver with file name " + driverFileName + " was not found in the installation directory"
-                 + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath()));
         }
         if (!foundDriverVersionFile) {
             fail("Driver version file with file name " + versionFilename + " was not found in the installation directory"
-                 + System.lineSeparator() + Utils.debugInfo(mojo));
-        }
-    }
-
-    public void assertDriverIsNotInstalled(String driverFileName) {
-        boolean foundDriverFile = false;
-        boolean foundDriverVersionFile = false;
-        for (File file : mojo.installationDirectory.listFiles()) {
-            if (file.getName().equals(driverFileName)) {
-                foundDriverFile = true;
-            }
-            if (file.getName().equals(driverFileName + ".version")) {
-                foundDriverVersionFile = true;
-            }
-        }
-        if (foundDriverFile) {
-            fail("Driver with file name " + driverFileName + " was found in the installation directory when it should not have been"
-                 + System.lineSeparator() + Utils.debugInfo(mojo));
-        }
-        if (foundDriverVersionFile) {
-            fail("Driver version file with file name " + driverFileName + ".version was not found in the installation directory when it should not have been"
-                 + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath()));
         }
     }
 
@@ -177,7 +150,7 @@ public abstract class AbstractInstallDriversMojoTest extends AbstractMojoTestCas
         int length = mojo.installationDirectory.listFiles().length;
         if (length != numberOfDrivers * 2) {
             fail("Number of drivers installed is not " + numberOfDrivers + ", it is " + (length / 2)
-                 + System.lineSeparator() + Utils.debugInfo(mojo));
+                 + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath()));
         }
     }
 

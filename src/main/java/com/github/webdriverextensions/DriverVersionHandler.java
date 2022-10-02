@@ -8,13 +8,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class DriverVersionHandler {
     private final Path installationDirectory;
-
-    DriverVersionHandler(Path installationDirectory) {
-        this.installationDirectory = installationDirectory;
-    }
 
     void writeVersionFile(Driver driver) throws MojoExecutionException {
         Path file = getVersionFile(driver);
@@ -23,7 +22,7 @@ class DriverVersionHandler {
         try {
             Files.write(file, Collections.singleton(versionString), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            throw new InstallDriversMojoExecutionException("Failed to create version file containing metadata about the installed driver" + Utils.debugInfo(driver), e);
+            throw new InstallDriversMojoExecutionException("Failed to create version file containing metadata about the installed driver", driver, e);
         }
     }
 
@@ -40,7 +39,7 @@ class DriverVersionHandler {
             String savedVersion = Files.lines(versionFile).collect(Collectors.joining());
             return driver.equals(Driver.fromJson(savedVersion));
         } catch (IOException e) {
-            throw new InstallDriversMojoExecutionException("Failed to compare installed driver version with the driver version to install" + Utils.debugInfo(driver), e);
+            throw new InstallDriversMojoExecutionException("Failed to compare installed driver version with the driver version to install", driver, e);
         }
     }
 }

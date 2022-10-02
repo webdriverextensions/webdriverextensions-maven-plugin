@@ -196,8 +196,10 @@ public class InstallDriversMojo extends AbstractMojo {
     int downloadMaxRetries;
 
     /**
-     * retry interval in seconds between subsequent retries 
-     * 
+     * retry interval in seconds between subsequent retries. The interval must
+     * not be greater than the {@link #downloadResponseTimeout response timeout}
+     * otherwise not retry attempt will be made at all!
+     *
      * @since 3.3.0
      */
     @Parameter(defaultValue = "3", property = "webdriverextensions.download.retryDelay")
@@ -236,7 +238,7 @@ public class InstallDriversMojo extends AbstractMojo {
      * <a href="https://maven.apache.org/surefire/maven-surefire-plugin/test-mojo.html#systemPropertyVariables">with
      * "systemPropertyVariables"</a>) because they will be overwritten!<br/>
      * For custom defined drivers: the driver name should start with one of the
-     * known prefixes ("chrome", "chromium", "edge", "firefox", "gecho",
+     * known prefixes ("chrome", "chromium", "edge", "firefox", "gecko",
      * "opera", "internetexplorer"), otherwise the plugin will not know which
      * property to set.
      *
@@ -263,7 +265,7 @@ public class InstallDriversMojo extends AbstractMojo {
             downloadDirectory = pluginWorkingDirectory.toPath().resolve("downloads");
             tempDirectory = Files.createTempDirectory(pluginWorkingDirectory.toPath(), "temp");
         } catch (IOException e) {
-            throw new MojoExecutionException("error while creating folders", e);
+            throw new InstallDriversMojoExecutionException("error while creating folders", e);
         }
     }
 
@@ -312,10 +314,11 @@ public class InstallDriversMojo extends AbstractMojo {
     }
 
     private void performInstallation() throws MojoExecutionException {
-        final DriverExtractor driverExtractor = new DriverExtractor(this);
-        final DriverInstaller driverInstaller = new DriverInstaller(this);
+        final DriverExtractor driverExtractor = createExtractor();
+        final DriverInstaller driverInstaller = createInstaller();
 
-        try (final DriverDownloader driverDownloader = getDownloader()) {
+        try (final DriverDownloader driverDownloader = createDownloader()) {
+            driverDownloader.open();
             drivers.stream()
                     .map(Unchecked.function(repository::enrichDriver))
                     .filter(Objects::nonNull)
@@ -341,15 +344,42 @@ public class InstallDriversMojo extends AbstractMojo {
         } catch (IOException ex) {
             // ignored. close operation of downloader
         } catch (UncheckedException ex) {
-            if (ex.getCause() instanceof MojoExecutionException) {
-                throw (MojoExecutionException) ex.getCause();
+            if (ex.getCause() instanceof InstallDriversMojoExecutionException) {
+                InstallDriversMojoExecutionException mojoError = (InstallDriversMojoExecutionException) ex.getCause();
+                mojoError.setLongMessage(String.format(
+                        "driver: %s%n%n"
+                        + "downloadDirectory: %s%n%n"
+                        + "tempDirectory: %s%n%n"
+                        + "installationDirectory: %s",
+                        mojoError.getSource(),
+                        Utils.directoryToString(downloadDirectory),
+                        Utils.directoryToString(tempDirectory),
+                        Utils.directoryToString(installationDirectory.toPath()))
+                );
+                throw mojoError;
+            } else {
+                throw new InstallDriversMojoExecutionException(ex.getMessage(), ex);
             }
-            throw new InstallDriversMojoExecutionException(ex.getMessage(), ex);
         }
     }
 
-    DriverDownloader getDownloader() throws MojoExecutionException {
-        return new DriverDownloader(this);
+    private DriverExtractor createExtractor() {
+        return new DriverExtractor(getLog(), tempDirectory);
+    }
+    
+    private DriverInstaller createInstaller() {
+        DriverInstaller driverInstaller = new DriverInstaller(getLog(), installationDirectory.toPath());
+        if (setWebdriverPath) {
+            driverInstaller.setDriverPathProperyTarget(session.getUserProperties());
+        }
+        return driverInstaller;
+    }
+    
+    DriverDownloader createDownloader() throws MojoExecutionException {
+        return new DriverDownloader(getLog())
+                .withProxy(ProxyUtils.getProxyFromSettings(settings, proxyId))
+                .withTimeouts(downloadConnectTimeout, downloadResponseTimeout)
+                .withRetry(downloadMaxRetries, downloadRetryDelay);
     }
 
     private void cleanupWorkingDirectory() throws MojoExecutionException {

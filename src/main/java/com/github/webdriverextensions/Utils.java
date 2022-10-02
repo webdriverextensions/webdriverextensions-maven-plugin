@@ -71,59 +71,35 @@ public class Utils {
         return "64".equalsIgnoreCase(System.getProperty("sun.arch.data.model"));
     }
 
-    public static String debugInfo(InstallDriversMojo mojo) {
-        return System.lineSeparator()
-                + "downloadDirectory: " + System.lineSeparator() + directoryToString(mojo.downloadDirectory) + System.lineSeparator()
-                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()
-                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath());
-    }
-
-    public static String debugInfo(Driver driver) {
-        return System.lineSeparator()
-                + "driver: " + driver;
-    }
-
-    public static String debugInfo(InstallDriversMojo mojo, Driver driver) {
-        return System.lineSeparator() + System.lineSeparator()
-                + "driver: " + driver + System.lineSeparator() + System.lineSeparator()
-                + "downloadDirectory: " + System.lineSeparator() + directoryToString(mojo.downloadDirectory) + System.lineSeparator()
-                + "tempDirectory: " + System.lineSeparator() + directoryToString(mojo.tempDirectory) + System.lineSeparator()
-                + "installationDirectory: " + System.lineSeparator() + directoryToString(mojo.installationDirectory.toPath());
-    }
-
     public static String directoryToString(Path path) {
         if (path == null) {
             return "null";
         }
         if (!path.toFile().exists()) {
-            return path + " does not exist" + System.lineSeparator();
+            return path + " does not exist";
         }
         if (!path.toFile().isDirectory()) {
-            throw new IllegalArgumentException("The path is not a directory: " + path);
+            return path + " is not a directory";
         }
 
         File[] files = path.toFile().listFiles();
         if (files.length == 0) {
-            return path + " is empty" + System.lineSeparator();
+            return path + " is empty";
         }
 
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder.append(path);
-        stringBuilder.append(System.lineSeparator());
-
+        StringBuilder stringBuilder = new StringBuilder(path.toString());
         int padSize = longestPath(files, path);
         for (int i = 0, l = files.length; i < l; i++) {
+            stringBuilder.append(System.lineSeparator());
             File file = files[i];
             String relativePath = getRelativePath(file, path);
-            if (i == l - 2) {
+            if (i != l - 1) {
                 stringBuilder.append("├── ");
             } else {
                 stringBuilder.append("└── ");
             }
             stringBuilder.append(StringUtils.rightPad(relativePath, padSize));
             stringBuilder.append(readableFileSize(file));
-            stringBuilder.append(System.lineSeparator());
         }
 
         return stringBuilder.toString();
@@ -141,7 +117,7 @@ public class Utils {
 
     private static String readableFileSize(File file) {
         long size = file.length();
-        final String[] units = new String[]{"B", "KiB", "MiB", "GiB", "TiB"};
+        final String[] units = {"B", "KiB", "MiB", "GiB", "TiB"};
         int digitGroups = size > 0 ? (int) (Math.log10(size) / Math.log10(1024)) : 0;
         return String.format("%8s %s", new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)), units[digitGroups]);
     }

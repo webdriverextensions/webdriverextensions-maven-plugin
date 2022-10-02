@@ -4,12 +4,14 @@ import lombok.experimental.StandardException;
 import org.apache.maven.plugin.MojoExecutionException;
 
 @StandardException
-public class InstallDriversMojoExecutionException extends MojoExecutionException {
-    public InstallDriversMojoExecutionException(String message, InstallDriversMojo mojo, Driver driver) {
-        this(message, null, mojo, driver);
+class InstallDriversMojoExecutionException extends MojoExecutionException {
+
+    InstallDriversMojoExecutionException(String message, Driver driver, Throwable cause) {
+        super(message, cause);
+        this.source = driver;
     }
 
-    public InstallDriversMojoExecutionException(String message, Exception cause, InstallDriversMojo mojo, Driver driver) {
-        this(message + Utils.debugInfo(mojo, driver), cause);
+    void setLongMessage(String longMessage) {
+        this.longMessage = longMessage;
     }
 }

@@ -20,13 +20,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
-import lombok.extern.java.Log;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.http.io.entity.PathEntity;
 import org.apache.hc.core5.io.CloseMode;
 import org.apache.hc.core5.testing.classic.ClassicTestServer;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Settings;
 import org.junit.After;
@@ -35,32 +35,33 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Spy;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @RunWith(MockitoJUnitRunner.class)
-@Log
 public class DriverDownloaderTest extends LocalServerTestBase {
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
-
-    @Spy
-    private InstallDriversMojo mojo;
+    
+    @Mock
+    private Log log;
 
     private int driverDownloadServerInvocations;
     private ClassicTestServer proxyServer;
+    private Path downloadDirectory;
 
     @Test
     public void downloadFileWithMissingCompleteFile() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/foo.zip").toString());
 
-        try (final DriverDownloader uut = new DriverDownloader(mojo)) {
-            Path downloadFilePath = uut.downloadFile(driver, mojo.downloadDirectory);
+        try (final DriverDownloader uut = new DriverDownloader(log)) {
+            uut.open();
+            Path downloadFilePath = uut.downloadFile(driver, downloadDirectory);
             assertThat(downloadFilePath).exists();
             assertThat(driverDownloadServerInvocations).isOne();
         }
@@ -70,11 +71,12 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     public void downloadFileWithCompleteFileAlreadyPresent() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/foo.zip").toString());
-        Files.createDirectory(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()));
-        Files.createFile(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("download.completed"));
+        Files.createDirectory(downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()));
+        Files.createFile(downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("download.completed"));
 
-        try (final DriverDownloader uut = new DriverDownloader(mojo)) {
-            Path downloadFilePath = uut.downloadFile(driver, mojo.downloadDirectory);
+        try (final DriverDownloader uut = new DriverDownloader(log)) {
+            uut.open();
+            Path downloadFilePath = uut.downloadFile(driver, downloadDirectory);
             assertThat(downloadFilePath).exists();
             assertThat(driverDownloadServerInvocations).isOne();
         }
@@ -84,13 +86,13 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     public void downloadFileWithValidCachedShouldNotDownloadAnything() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/foo.zip").toString());
-        Files.createDirectory(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()));
-        Files.createFile(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("download.completed"));
-        Files.createFile(mojo.downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("foo.zip"));
-        mojo.keepDownloadedWebdrivers = true;
+        Files.createDirectory(downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()));
+        Files.createFile(downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("download.completed"));
+        Files.createFile(downloadDirectory.resolve(driver.getDriverDownloadDirectoryName()).resolve("foo.zip"));
 
-        try (final DriverDownloader uut = new DriverDownloader(mojo)) {
-            uut.downloadFile(driver, mojo.downloadDirectory);
+        try (final DriverDownloader uut = new DriverDownloader(log)) {
+            uut.open();
+            uut.downloadFile(driver, downloadDirectory);
             assertThat(driverDownloadServerInvocations).isZero();
         }
     }
@@ -99,12 +101,14 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     public void testRetry() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/429").toString());
+        int downloadMaxRetries = 2;
 
-        try (final DriverDownloader uut = new DriverDownloader(mojo)) {
-            assertThatCode(() -> uut.downloadFile(driver, mojo.downloadDirectory))
+        try (final DriverDownloader uut = new DriverDownloader(log).withTimeouts(1, 1).withRetry(downloadMaxRetries, 1)) {
+            uut.open();
+            assertThatCode(() -> uut.downloadFile(driver, downloadDirectory))
                     .isInstanceOf(InstallDriversMojoExecutionException.class).hasMessageStartingWith("Download failed with status code %d", HttpStatus.SC_TOO_MANY_REQUESTS);
-            assertThat(mojo.downloadDirectory).isEmptyDirectory();
-            assertThat(driverDownloadServerInvocations).isEqualTo(1 + mojo.downloadMaxRetries);
+            assertThat(downloadDirectory).isEmptyDirectory();
+            assertThat(driverDownloadServerInvocations).isEqualTo(1 + downloadMaxRetries);
         }
     }
 
@@ -113,10 +117,11 @@ public class DriverDownloaderTest extends LocalServerTestBase {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/404").toString());
 
-        try (final DriverDownloader uut = new DriverDownloader(mojo)) {
-            assertThatCode(() -> uut.downloadFile(driver, mojo.downloadDirectory))
+        try (final DriverDownloader uut = new DriverDownloader(log)) {
+            uut.open();
+            assertThatCode(() -> uut.downloadFile(driver, downloadDirectory))
                     .isInstanceOf(InstallDriversMojoExecutionException.class).hasMessageStartingWith("Download failed with status code %d", HttpStatus.SC_NOT_FOUND);
-            assertThat(mojo.downloadDirectory).isEmptyDirectory();
+            assertThat(downloadDirectory).isEmptyDirectory();
             assertThat(driverDownloadServerInvocations).isOne();
         }
     }
@@ -125,15 +130,15 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     public void testWithProxy() throws Exception {
         Driver driver = new Driver();
         driver.setUrl(getCompleteUrlFor("/proxy").toString());
+        String proxyId = "test-proxy";
         Proxy proxy = new Proxy();
         proxy.setUsername("user");
         proxy.setPassword("pass");
-        proxy.setId("test-proxy");
+        proxy.setId(proxyId);
         proxy.setHost("localhost");
         proxy.setProtocol("http");
-        mojo.proxyId = "test-proxy";
-        mojo.settings = new Settings();
-        mojo.settings.setProxies(Collections.singletonList(proxy));
+        Settings settings = new Settings();
+        settings.setProxies(Collections.singletonList(proxy));
 
         // create 2nd proxy server. verify that 1st server is not called. verify proxy was called twice: 1st without auth, 2nd with auth.
         proxyServer = new ClassicTestServer();
@@ -153,10 +158,11 @@ public class DriverDownloaderTest extends LocalServerTestBase {
         proxyServer.start();
         proxy.setPort(proxyServer.getPort());
 
-        try (final DriverDownloader uut = new DriverDownloader(mojo)) {
-            assertThatCode(() -> uut.downloadFile(driver, mojo.downloadDirectory)).isInstanceOf(InstallDriversMojoExecutionException.class);
+        try (final DriverDownloader uut = new DriverDownloader(log).withProxy(ProxyUtils.getProxyFromSettings(settings, proxyId))) {
+            uut.open();
+            assertThatCode(() -> uut.downloadFile(driver, downloadDirectory)).isInstanceOf(InstallDriversMojoExecutionException.class);
             assertThat(driverDownloadServerInvocations).isZero();
-            assertThat(mojo.downloadDirectory).isEmptyDirectory();
+            assertThat(downloadDirectory).isEmptyDirectory();
             assertThat(proxyInvocations).hasValue(2);
         }
     }
@@ -164,9 +170,7 @@ public class DriverDownloaderTest extends LocalServerTestBase {
     @Before
     public void setUp() throws Exception {
         driverDownloadServerInvocations = 0;
-        mojo.downloadDirectory = tempFolder.newFolder("download").toPath();
-        mojo.tempDirectory = tempFolder.newFolder("temp").toPath();
-        mojo.installationDirectory = tempFolder.newFolder("install");
+        downloadDirectory = tempFolder.newFolder("download").toPath();
 
         server.registerHandler("/foo.zip", (request, response, context) -> {
             response.setCode(HttpStatus.SC_OK);

@@ -56,7 +56,7 @@ class Repository {
                     .fromJson(repositoryAsString, Repository.class)
                     .drivers;
         } catch (JsonSyntaxException e) {
-            throw new InstallDriversMojoExecutionException("Failed to parse repository json " + repositoryAsString, e);
+            throw new InstallDriversMojoExecutionException("Failed to parse repository json " + quote(repositoryUrl), e);
         }
 
         repository.drivers.sort(driversComparator());
@@ -102,7 +102,7 @@ class Repository {
 
     Driver enrichDriver(Driver driver) throws MojoExecutionException {
         if (isBlank(driver.getName())) {
-            throw new InstallDriversMojoExecutionException("Driver name must be set in configuration, driver: " + driver);
+            throw new InstallDriversMojoExecutionException("Driver name must be set in configuration", driver, null);
         }
         if (isNotBlank(driver.getUrl())) {
             return driver;
@@ -110,9 +110,7 @@ class Repository {
         if (isNotBlank(driver.getPlatform()) || isNotBlank(driver.getBit()) || isNotBlank(driver.getVersion())) {
             // Explicit driver config make sure it exists in repo
             if (getDrivers(driver.getName(), driver.getPlatform(), driver.getBit(), driver.getVersion()).isEmpty()) {
-                throw new MojoExecutionException("Could not find driver: " + driver + System.lineSeparator()
-                                                 + System.lineSeparator()
-                                                 + "in repository: " + this);
+                throw new InstallDriversMojoExecutionException("Could not find driver", driver, null);
             }
         }
 

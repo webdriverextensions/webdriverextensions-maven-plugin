@@ -5,60 +5,68 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Properties;
+import lombok.Setter;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.Os;
 
 import static com.github.webdriverextensions.Utils.quote;
 
-public class DriverInstaller {
-    private final InstallDriversMojo mojo;
+class DriverInstaller {
+    private final Path installationDirectory;
+    private final Log log;
     private final DriverVersionHandler versionHandler;
+    
+    @Setter
+    private Properties driverPathProperyTarget;
 
-    public DriverInstaller(InstallDriversMojo mojo) {
-        this.mojo = mojo;
-        this.versionHandler = new DriverVersionHandler(mojo.installationDirectory.toPath());
+    DriverInstaller(Log log, Path installationDirectory) {
+        this.log = log;
+        this.installationDirectory = installationDirectory;
+        this.versionHandler = new DriverVersionHandler(installationDirectory);
     }
 
-    public boolean needInstallation(Driver driver) {
+    boolean needInstallation(Driver driver) {
         try {
             return !isInstalled(driver) || !versionHandler.isSameVersion(driver);
         } catch (MojoExecutionException ex) {
-            mojo.getLog().warn("Could not determine if same version of driver is already installed, will install it again", ex);
+            log.warn("Could not determine if same version of driver is already installed, will install it again", ex);
             return true;
         }
     }
 
-    public void install(Driver driver, Path extractLocation) throws MojoExecutionException {
-        mojo.getLog().info("start installing : " + driver.getName() + " from " + extractLocation);
+    void install(Driver driver, Path extractLocation) throws MojoExecutionException {
+        log.info("start installing : " + driver.getName() + " from " + extractLocation);
         if (extractLocation.toFile().isDirectory() && directoryIsEmpty(extractLocation)) {
-            throw new InstallDriversMojoExecutionException("Failed to install driver since no files found to install", mojo, driver);
+            throw new InstallDriversMojoExecutionException("Failed to install driver since no files found to install", driver, null);
         }
 
         try {
-            Files.createDirectories(mojo.installationDirectory.toPath());
+            Files.createDirectories(installationDirectory);
             if (directoryContainsSingleDirectory(extractLocation)) {
                 Path singleDirectory = extractLocation.toFile().listFiles()[0].toPath();
-                moveAllFilesInDirectory(singleDirectory, mojo.installationDirectory.toPath().resolve(driver.getId()));
+                moveAllFilesInDirectory(singleDirectory, installationDirectory.resolve(driver.getId()));
             } else if (directoryContainsSingleFile(extractLocation)) {
                 String newFileName = driver.getFileName();
-                moveFileInDirectory(extractLocation, mojo.installationDirectory.toPath(), newFileName);
-                makeExecutable(mojo.installationDirectory.toPath().resolve(newFileName));
-                setDriverPathProperty(driver, mojo.installationDirectory.toPath().resolve(newFileName));
+                moveFileInDirectory(extractLocation, installationDirectory, newFileName);
+                makeExecutable(installationDirectory.resolve(newFileName));
+                setDriverPathProperty(driver, installationDirectory.resolve(newFileName));
             } else {
-                moveAllFilesInDirectory(extractLocation, mojo.installationDirectory.toPath().resolve(driver.getId()));
+                moveAllFilesInDirectory(extractLocation, installationDirectory.resolve(driver.getId()));
             }
 
             versionHandler.writeVersionFile(driver);
         } catch (IOException | MojoExecutionException e) {
-            throw new InstallDriversMojoExecutionException("Failed to install driver cause of " + e.getMessage(), e, mojo, driver);
+            throw new InstallDriversMojoExecutionException("Failed to install driver", driver, e);
         }
 
     }
 
     void setDriverPathPropertyIfInstalled(Driver driver) {
         if (isInstalled(driver)) {
-            setDriverPathProperty(driver, mojo.installationDirectory.toPath().resolve(driver.getFileName()));
+            setDriverPathProperty(driver, installationDirectory.resolve(driver.getFileName()));
         }
     }
     
@@ -76,13 +84,13 @@ public class DriverInstaller {
         } else if (driverName.startsWith("gecko") || driverName.startsWith("firefox")) {
             propertyName = "gecko";
         }
-        if (mojo.setWebdriverPath && !propertyName.isEmpty() && driver.getPlatform().equalsIgnoreCase(Utils.detectPlatform())) {
-            mojo.session.getUserProperties().putIfAbsent(String.format("webdriver.%s.driver", propertyName), location.toAbsolutePath().toString());
+        if (driverPathProperyTarget != null && !propertyName.isEmpty() && driver.getPlatform().equalsIgnoreCase(Utils.detectPlatform())) {
+            driverPathProperyTarget.putIfAbsent(String.format("webdriver.%s.driver", propertyName), location.toAbsolutePath().toString());
         }
     }
 
     private boolean isInstalled(Driver driver) {
-        Path path = mojo.installationDirectory.toPath().resolve(driver.getFileName());
+        Path path = installationDirectory.resolve(driver.getFileName());
         return path.toFile().exists();
     }
 
@@ -105,7 +113,7 @@ public class DriverInstaller {
         try {
             File[] files = from.toFile().listFiles();
             Path singleFile = files[0].toPath();
-            mojo.getLog().info("  Moving (one File) " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
+            log.info("  Moving (one File) " + quote(singleFile) + " to " + quote(to.resolve(newFileName)));
             FileUtils.forceDelete(to.resolve(newFileName).toFile());
             Files.move(singleFile, to.resolve(newFileName), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -117,7 +125,7 @@ public class DriverInstaller {
         try {
             Files.createDirectories(to);
             for (File file : from.toFile().listFiles()) {
-                mojo.getLog().info("  Moving (All Files) " + file + " to " + to.resolve(file.toPath().getFileName()));
+                log.info("  Moving (All Files) " + file + " to " + to.resolve(file.toPath().getFileName()));
                 FileUtils.forceDelete(to.resolve(file.toPath().getFileName()).toFile());
                 if (Os.isFamily(Os.FAMILY_WINDOWS) && file.isDirectory()) {
                     // (on windows) it is not possible to move a non-empty directory (DirectoryNotEmptyException). copy and delete should be used instead.

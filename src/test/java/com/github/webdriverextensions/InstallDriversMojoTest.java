@@ -1,12 +1,11 @@
 package com.github.webdriverextensions;
 
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.project.MavenProject;
-
 import java.io.File;
 import java.nio.file.attribute.FileTime;
+import org.apache.maven.project.MavenProject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
 
@@ -14,17 +13,9 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/driver_not_in_repositoy_pom.xml");
 
-
-        try {
-            // When
-            mojo.execute();
-            fail("should raise an exception");
-        } catch (MojoExecutionException e) {
-            // Then
-            assertEquals("Could not find driver: " + mojo.drivers.get(0) + System.lineSeparator()
-                    + System.lineSeparator()
-                    + "in repository: " + mojo.repository, e.getMessage());
-        }
+        assertThatCode(() -> mojo.execute())
+                .isInstanceOf(InstallDriversMojoExecutionException.class)
+                .hasMessage("Could not find driver");
     }
 
     public void test_that_driver_compressed_with_tar_bz2_is_supported() throws Exception {
@@ -43,11 +34,14 @@ public class InstallDriversMojoTest extends AbstractInstallDriversMojoTest {
     public void test_that_installing_new_driver_should_overwrite_old_driver() throws Exception {
         // Given
         InstallDriversMojo oldDriverMojo = getMojo("src/test/resources/old_driver_pom.xml");
-        InstallDriversMojo newDriverMojo = getMojo("src/test/resources/new_driver_pom.xml");
-
 
         // When
         oldDriverMojo.execute();
+        assertDriverIsInstalled("chromedriver-windows-32bit.exe", "2.14.0");
+        assertNumberOfInstalledDriverIs(1);
+
+        InstallDriversMojo newDriverMojo = getMojo("src/test/resources/new_driver_pom.xml");
+        newDriverMojo.installationDirectory = oldDriverMojo.installationDirectory;
         newDriverMojo.execute();
 
         // Then
