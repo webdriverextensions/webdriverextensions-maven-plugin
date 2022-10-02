@@ -95,6 +95,7 @@
         <!-- File Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
 
         <!-- Dependency Versions -->
         <maven-core.version>3.6.3</maven-core.version>
