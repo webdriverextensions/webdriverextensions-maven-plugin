@@ -63,8 +63,14 @@ public class FileExtractorImpl implements FileExtractor {
         }
     }
 
+    private static String basename(Path file) {
+        final String name = file.getFileName().toString();
+        final String extension = FileUtils.extension(name);
+        return FileUtils.basename(name, extension.isEmpty() ? extension : "." + extension);
+    }
+
     private void extractBz2File(Path file, Path toDirectory) throws IOException {
-        String extractedFilename = FileUtils.basename(file.getFileName().toString());
+        String extractedFilename = basename(file);
         Path fileToExtract = toDirectory.resolve(extractedFilename);
         try (FileInputStream fin = new FileInputStream(file.toFile())) {
             try (BufferedInputStream bin = new BufferedInputStream(fin)) {
@@ -76,7 +82,7 @@ public class FileExtractorImpl implements FileExtractor {
     }
 
     private void extractGzFile(Path file, Path toDirectory) throws IOException {
-        String extractedFilename = FileUtils.basename(file.getFileName().toString());
+        String extractedFilename = basename(file);
         Path fileToExtract = toDirectory.resolve(extractedFilename);
         try (FileInputStream fin = new FileInputStream(file.toFile())) {
             try (BufferedInputStream bin = new BufferedInputStream(fin)) {
