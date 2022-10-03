@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import org.codehaus.plexus.util.StringUtils;
@@ -89,6 +90,7 @@ public class Utils {
 
         StringBuilder stringBuilder = new StringBuilder(path.toString());
         int padSize = longestPath(files, path);
+        Arrays.sort(files);
         for (int i = 0, l = files.length; i < l; i++) {
             stringBuilder.append(System.lineSeparator());
             File file = files[i];
