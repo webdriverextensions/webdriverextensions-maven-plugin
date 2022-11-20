@@ -1,6 +1,35 @@
 {
   "drivers": [
     {
+      "name": "chromedriver",
+      "platform": "windows",
+      "bit": "32",
+      "version": "100.0.4896.20",
+      "url": "https://chromedriver.storage.googleapis.com/100.0.4896.20/chromedriver_win32.zip"
+    },
+    {
+      "name": "chromedriver",
+      "platform": "linux",
+      "bit": "64",
+      "version": "100.0.4896.20",
+      "url": "https://chromedriver.storage.googleapis.com/100.0.4896.20/chromedriver_linux64.zip"
+    },
+    {
+      "name": "chromedriver",
+      "platform": "mac",
+      "bit": "64",
+      "version": "100.0.4896.20",
+      "url": "https://chromedriver.storage.googleapis.com/100.0.4896.20/chromedriver_mac64.zip"
+    },
+    {
+      "name": "chromedriver",
+      "platform": "mac",
+      "bit": "64",
+      "arch": "aarch64",
+      "version": "100.0.4896.20",
+      "url": "https://chromedriver.storage.googleapis.com/100.0.4896.20/chromedriver_mac64_m1.zip"
+    },
+    {
       "name": "chromedriver-beta",
       "platform": "linux",
       "bit": "64",

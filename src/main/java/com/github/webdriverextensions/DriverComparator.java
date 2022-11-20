@@ -17,6 +17,9 @@ package com.github.webdriverextensions;
 
 import java.util.Comparator;
 
+import static org.codehaus.plexus.util.StringUtils.isBlank;
+
+
 class DriverComparator {
 
     private DriverComparator() {
@@ -26,13 +29,13 @@ class DriverComparator {
 
         @Override
         public int compare(Driver o1, Driver o2) {
-            if (o1 == null || o1.getId() == null) {
-                return o2 == null || o2.getId() == null ? 0 : 1;
-            }
-            if (o2 == null || o2.getId() == null) {
+            if (o1 == null || isBlank(o1.getId()) || "null".equals(o1.getId())) {
+                return (o2 == null || isBlank(o2.getId()) || "null".equals(o2.getId())) ? 0 : 1;
+            } else if (o2 == null || isBlank(o2.getId()) || "null".equals(o2.getId())) {
                 return -1;
+            } else {
+                return o1.getId().compareToIgnoreCase(o2.getId());
             }
-            return o1.getId().compareTo(o2.getId());
         }
     }
 
@@ -40,13 +43,30 @@ class DriverComparator {
 
         @Override
         public int compare(Driver o1, Driver o2) {
-            if (o1 == null || o1.getVersion() == null) {
-                return o2 == null || o2.getVersion() == null ? 0 : 1;
-            }
-            if (o2 == null || o2.getVersion() == null) {
+            if (o1 == null || isBlank(o1.getVersion())) {
+                return o2 == null || isBlank(o2.getVersion()) ? 0 : 1;
+            } else if (o2 == null || isBlank(o2.getVersion())) {
                 return -1;
+            } else {
+                return o1.getComparableVersion().compareTo(o2.getComparableVersion());
             }
-            return o1.getComparableVersion().compareTo(o2.getComparableVersion());
+        }
+    }
+
+    /**
+     * sort by {@link Architecture} and their {@code ordinal} with {@code null} last
+     */
+    static class ByArch implements Comparator<Driver> {
+
+        @Override
+        public int compare(Driver o1, Driver o2) {
+            if (o1 == null) {
+                return o2 == null ? 0 : 1;
+            } else if (o2 == null) {
+                return -1;
+            } else {
+                return o1.getArchitecture().compareTo(o2.getArchitecture());
+            }
         }
     }
 }

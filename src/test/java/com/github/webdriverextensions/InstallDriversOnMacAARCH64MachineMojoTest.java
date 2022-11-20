@@ -1,13 +1,12 @@
 package com.github.webdriverextensions;
 
-public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriversMojoTest {
+public class InstallDriversOnMacAARCH64MachineMojoTest extends AbstractInstallDriversMojoTest {
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         fakePlatformToBeMac();
-        fakeBitToBe64();
-        fakeArch(Architecture.AMD64);
+        fakeArch(Architecture.ARM64);
     }
 
     @Override
@@ -20,12 +19,11 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_configuration_pom.xml");
 
-
         // When
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-mac-64bit", Architecture.UNKNOWN);
+        assertDriverIsInstalled("chromedriver-mac-64bit", Architecture.ARM64);
         assertDriverIsInstalled("chromedriver-beta-mac-64bit", Architecture.UNKNOWN);
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
@@ -37,12 +35,11 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_platform_pom.xml");
 
-
         // When
         mojo.execute();
 
         // Then
-        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-mac-32bit", Architecture.UNKNOWN);
         assertDriverIsInstalled("phantomjs-mac-64bit");
         assertDriverIsInstalled("geckodriver-mac-64bit");
         assertDriverIsInstalled("operadriver-mac-64bit");
@@ -53,13 +50,12 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         // Given
         InstallDriversMojo mojo = getMojo("src/test/resources/no_bit_pom.xml");
 
-
         // When
         mojo.execute();
 
         // Then
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
-        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-mac-32bit", Architecture.UNKNOWN);
         assertDriverIsInstalled("chromedriver-linux-64bit");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("phantomjs-linux-64bit");
@@ -83,7 +79,7 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         // Then
         assertDriverIsInstalled("chromedriver-linux-32bit");
         assertDriverIsInstalled("chromedriver-linux-64bit");
-        assertDriverIsInstalled("chromedriver-mac-32bit");
+        assertDriverIsInstalled("chromedriver-mac-32bit", Architecture.UNKNOWN);
         assertDriverIsInstalled("chromedriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-32bit.exe");
         assertDriverIsInstalled("internetexplorerdriver-windows-64bit.exe");
@@ -102,4 +98,5 @@ public class InstallDriversOnMac64BitMachineMojoTest extends AbstractInstallDriv
         assertDriverIsInstalled("operadriver-linux-64bit");
         assertNumberOfInstalledDriverIs(19);
     }
+
 }

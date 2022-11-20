@@ -12,6 +12,7 @@ The following drivers are currently maintained and available for installation:
 - internetexplorerdriver, windows, 64bit
 - chromedriver, windows, 32bit
 - chromedriver, mac, 32bit
+- chromedriver, mac, 64bit
 - chromedriver, linux, 32bit
 - chromedriver, linux, 64bit
 - phantomjs, windows, 64bit

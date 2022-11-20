@@ -2,7 +2,7 @@ package com.github.webdriverextensions;
 
 public class InstallDriversOnlyBrowserMojoTest
         extends AbstractInstallDriversMojoTest {
-    private static final String CHROME_DRIVER_LATEST = "74.0.3729.6";
+    private static final String CHROME_DRIVER_LATEST = "100.0.4896.20";
     private InstallDriversMojo mojoUnderTest;
 
     @Override
