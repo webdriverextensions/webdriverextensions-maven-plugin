@@ -11,11 +11,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
@@ -94,13 +97,15 @@ class DriverDownloader implements Closeable {
     }
 
     private CloseableHttpClient createHttpClient() {
+        final ConnectionConfig connConfig = ConnectionConfig.custom().setConnectTimeout(Timeout.ofSeconds(connectTimeout)).build();
+        final PoolingHttpClientConnectionManager connManager = PoolingHttpClientConnectionManagerBuilder.create().setDefaultConnectionConfig(connConfig).build();
         HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofSeconds(connectTimeout))
                 .setResponseTimeout(Timeout.ofSeconds(responseTimeout))
                 .build()
         )
                 .disableCookieManagement()
                 .disableContentCompression()
+                .setConnectionManager(connManager)
                 .setRetryStrategy(new DefaultHttpRequestRetryStrategy(maxRetries, TimeValue.ofSeconds(retryDelay)));
 
         proxy.ifPresent(proxy -> {
