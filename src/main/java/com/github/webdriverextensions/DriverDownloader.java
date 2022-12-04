@@ -9,14 +9,13 @@ import java.util.Optional;
 import javax.annotation.Nonnull;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.HttpStatus;
 import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
@@ -73,15 +72,19 @@ class DriverDownloader implements Closeable {
             log.info("  Using cached driver from " + quote(downloadFilePath));
         } else {
             log.info("  Downloading " + quote(url) + " to " + quote(downloadFilePath));
-            try (CloseableHttpResponse fileDownloadResponse = httpClient.execute(new HttpGet(url))) {
-                final int statusCode = fileDownloadResponse.getCode();
-                if (HttpStatus.SC_OK == statusCode) {
-                    Files.createDirectories(downloadFilePath);
-                    HttpEntity remoteFileStream = fileDownloadResponse.getEntity();
-                    Files.copy(remoteFileStream.getContent(), downloadFilePath, StandardCopyOption.REPLACE_EXISTING);
-                } else {
-                    throw new InstallDriversMojoExecutionException("Download failed with status code " + statusCode, driver, null);
-                }
+            try {
+                httpClient.execute(new HttpGet(url), fileDownloadResponse -> {
+                    final int statusCode = fileDownloadResponse.getCode();
+                    if (HttpStatus.SC_OK == statusCode) {
+                        Files.createDirectories(downloadFilePath);
+                        Files.copy(fileDownloadResponse.getEntity().getContent(), downloadFilePath, StandardCopyOption.REPLACE_EXISTING);
+                    } else {
+                        throw new ClientProtocolException(String.valueOf(statusCode));
+                    }
+                    return null;
+                });
+            } catch (ClientProtocolException e) {
+                throw new InstallDriversMojoExecutionException("Download failed with status code " + e.getLocalizedMessage(), driver, null);
             } catch (IOException e) {
                 throw new InstallDriversMojoExecutionException("Failed to download driver from " + quote(url) + " to " + quote(downloadFilePath), driver, e);
             }
