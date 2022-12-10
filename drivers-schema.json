@@ -78,6 +78,14 @@
                                 "type": "string",
                                 "title": "The name of the driver",
                                 "default": "",
+                                "enum": [
+                                    "chromedriver",
+                                    "edgedriver",
+                                    "geckodriver",
+                                    "internetexplorerdriver",
+                                    "operadriver",
+                                    "phantomjs"
+                                ],
                                 "examples": [
                                     "chromedriver"
                                 ]
@@ -149,7 +157,7 @@
                                 "$id": "#/properties/drivers/items/anyOf/0/properties/fileMatchInside",
                                 "type": "string",
                                 "title": "fileMatchInside",
-                                "description": "A regular expression for selecting only the files matching the given pattern.",
+                                "description": "A regular expression to select only the files that match the specified pattern.",
                                 "default": "",
                                 "examples": [
                                     ".+/foo\\.exe"
@@ -159,7 +167,7 @@
                                 "$id": "#/properties/drivers/items/anyOf/0/properties/customFileName",
                                 "type": "string",
                                 "title": "custom filename",
-                                "description": "A custom name of the driver file in the installation directory",
+                                "description": "A custom name for the driver file in the installation directory.",
                                 "default": "",
                                 "examples": [
                                     "my-driver.exe"
