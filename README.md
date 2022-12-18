@@ -47,7 +47,7 @@ version add the plugin configured to execute the install-drivers goal.
 <plugin>
     <groupId>com.github.webdriverextensions</groupId>
     <artifactId>webdriverextensions-maven-plugin</artifactId>
-    <version>3.3.0</version>
+    <version>3.4.0</version>
     <executions>
         <execution>
             <goals>

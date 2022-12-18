@@ -3,6 +3,11 @@
 ### Unreleased
 #### ⚠ Breaking
 #### ⭐ New Features
+#### 🐞 Bugs Fixed
+
+### 3.4.0 (2022 December 18)
+#### ⚠ Breaking
+#### ⭐ New Features
 - IMPROVEMENT Added support for different OS/CPU architectures such as AARCH64 (aka ARM64) [Issue 65](https://github.com/webdriverextensions/webdriverextensions-maven-plugin/issues/65)
 
 #### 🐞 Bugs Fixed
