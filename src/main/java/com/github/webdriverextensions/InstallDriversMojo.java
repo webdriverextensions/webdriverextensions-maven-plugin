@@ -197,8 +197,8 @@ public class InstallDriversMojo extends AbstractMojo {
 
     /**
      * retry interval in seconds between subsequent retries. The interval must
-     * not be greater than the {@link #downloadResponseTimeout response timeout}
-     * otherwise not retry attempt will be made at all!
+     * not be greater than {@link #downloadResponseTimeout} otherwise no retry
+     * attempt will be made at all!
      *
      * @since 3.3.0
      */
