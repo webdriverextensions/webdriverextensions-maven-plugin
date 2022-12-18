@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="webdriverextensions-maven-plugin">
-  <publishDate format="dd MMM yyyy" position="left"/>
-  <skin>
-    <groupId>org.apache.maven.skins</groupId>
-    <artifactId>maven-fluido-skin</artifactId>
-    <version>1.9</version>
-  </skin>
-  <custom>
-    <fluidoSkin>
-      <gitHub>
-        <projectId>webdriverextensions/webdriverextensions-maven-plugin</projectId>
-        <ribbonOrientation>right</ribbonOrientation>
-        <ribbonColor>black</ribbonColor>
-      </gitHub>
-      <ohloh>
-        <projectId>webdriverextensions-maven-plugin</projectId>
-        <widget>thin-badge</widget>
-      </ohloh>
-    </fluidoSkin>
-  </custom>
-  <body>
+    <publishDate format="dd MMM yyyy" position="left"/>
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.11.1</version>
+    </skin>
+    <custom>
+        <fluidoSkin>
+            <gitHub>
+                <projectId>webdriverextensions/webdriverextensions-maven-plugin</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>black</ribbonColor>
+            </gitHub>
+            <ohloh>
+                <projectId>webdriverextensions-maven-plugin</projectId>
+                <widget>thin-badge</widget>
+            </ohloh>
+        </fluidoSkin>
+    </custom>
+    <body>
 
-   <menu name="Overview">
-      <item name="Introduction" href="index.html"/>
-      <item name="Goals" href="plugin-info.html"/>
-      <item name="Usage" href="usage.html" />
-      <item name="Releases" href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin/releases" />
-      <item name="Changelog" href="changelog.html" />
-   </menu>
+        <menu name="Overview">
+            <item name="Introduction" href="index.html"/>
+            <item name="Goals" href="plugin-info.html"/>
+            <item name="Usage" href="usage.html" />
+            <item name="Releases" href="https://github.com/webdriverextensions/webdriverextensions-maven-plugin/releases" />
+            <item name="Changelog" href="changelog.html" />
+        </menu>
 
-   <menu ref="reports"/>
+        <menu ref="reports"/>
 
-   <menu name="External Links">
-     <item name="WebDriver Extensions" href="https://github.com/webdriverextensions/webdriverextensions#webdriver-extensions" />
-     <item name="Selenium/WebDriver" href="https://www.selenium.dev/" />
-   </menu>
+        <menu name="External Links">
+            <item name="WebDriver Extensions" href="https://github.com/webdriverextensions/webdriverextensions#webdriver-extensions" />
+            <item name="Selenium/WebDriver" href="https://www.selenium.dev/" />
+        </menu>
 
-  </body>
+    </body>
 </project>
