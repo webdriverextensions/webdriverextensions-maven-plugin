@@ -110,7 +110,7 @@
         <maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
         <maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
-        <maven-project-info-reports-plugin.version>3.4.1</maven-project-info-reports-plugin.version>
+        <maven-project-info-reports-plugin.version>3.4.2</maven-project-info-reports-plugin.version>
         <maven-release-plugin.version>3.0.0-M7</maven-release-plugin.version>
         <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     </properties>
