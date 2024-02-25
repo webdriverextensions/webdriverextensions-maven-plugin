@@ -310,7 +310,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[11,21]</version>
+                                    <version>[11,22)</version>
                                 </requireJavaVersion>
                             </rules>    
                         </configuration>
