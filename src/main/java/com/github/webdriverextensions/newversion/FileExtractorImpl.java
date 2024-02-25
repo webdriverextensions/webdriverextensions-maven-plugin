@@ -118,7 +118,7 @@ public class FileExtractorImpl implements FileExtractor {
     }
 
     private void extractTar(Path toDirectory, TarArchiveInputStream tarArchive) throws IOException {
-        for (TarArchiveEntry tarEntry = tarArchive.getNextTarEntry(); tarEntry != null; tarEntry = tarArchive.getNextTarEntry()) {
+        for (TarArchiveEntry tarEntry = tarArchive.getNextEntry(); tarEntry != null; tarEntry = tarArchive.getNextEntry()) {
             if (tarEntry.isDirectory()) {
                 Path fileToExtract = toDirectory.resolve(tarEntry.getName());
                 if (extractPattern != null || !isPathSaveToUse(fileToExtract, toDirectory)) {
@@ -170,7 +170,7 @@ public class FileExtractorImpl implements FileExtractor {
         try (FileInputStream fis = new FileInputStream(file.toFile())) {
             try (BufferedInputStream bis = new BufferedInputStream(fis)) {
                 try (ZipArchiveInputStream zipArchive = new ZipArchiveInputStream(bis)) {
-                    for (ZipArchiveEntry zipEntry = zipArchive.getNextZipEntry(); zipEntry != null; zipEntry = zipArchive.getNextZipEntry()) {
+                    for (ZipArchiveEntry zipEntry = zipArchive.getNextEntry(); zipEntry != null; zipEntry = zipArchive.getNextEntry()) {
 
                         Path fileToExtract = toDirectory.resolve(zipEntry.getName());
                         if (zipEntry.isDirectory()) {
