@@ -5,6 +5,16 @@
 #### ⭐ New Features
 #### 🐞 Bugs Fixed
 
+### 4.0.0
+#### ⚠ Breaking
+- Requires Maven 3.9.6
+
+#### ⭐ New Features
+- Verified to work with Java 21
+
+#### 🐞 Bugs Fixed
+- Updates vulnerable version of commons-compress (CVE-2023-42503, CVE-2024-26308)
+
 ### 3.4.0 (2022 December 18)
 #### ⚠ Breaking
 #### ⭐ New Features
