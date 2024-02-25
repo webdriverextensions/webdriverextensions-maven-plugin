@@ -98,8 +98,8 @@
         <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
 
         <!-- Dependency Versions -->
-        <maven-core.version>3.6.3</maven-core.version>
-        <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
+        <maven-core.version>3.9.6</maven-core.version>
+        <maven-plugin-plugin.version>3.11.0</maven-plugin-plugin.version>
         <maven-plugin-testing-harness.version>3.3.0</maven-plugin-testing-harness.version>
 
         <httpclient.version>5.2.1</httpclient.version>
@@ -196,11 +196,23 @@
             <version>${maven-core.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- plexus-utils must be made an explicit dependency to use them during runtime -->
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-utils</artifactId>
-            <version>3.5.0</version>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-xml</artifactId>
+            <version>4.0.3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
