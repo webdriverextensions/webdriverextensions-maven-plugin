@@ -5,7 +5,7 @@
 #### ⭐ New Features
 #### 🐞 Bugs Fixed
 
-### 4.0.0
+### 4.0.0 (2024 March 29)
 #### ⚠ Breaking
 - Requires Maven 3.9.6
 
