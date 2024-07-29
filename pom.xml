@@ -104,7 +104,7 @@
 
         <httpclient.version>5.3.1</httpclient.version>
         <junit.version>5.10.2</junit.version>
-        <junit-platform.version>1.10.2</junit-platform.version>
+        <junit-platform.version>1.10.3</junit-platform.version>
 
         <!-- Plugin Versions -->
         <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
