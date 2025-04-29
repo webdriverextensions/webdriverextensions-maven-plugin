@@ -143,7 +143,7 @@ public class DriverDownloaderTest extends LocalServerTestBase {
         // create 2nd proxy server. verify that 1st server is not called. verify proxy was called twice: 1st without auth, 2nd with auth.
         proxyServer = new ClassicTestServer();
         final AtomicInteger proxyInvocations = new AtomicInteger();
-        proxyServer.registerHandler("/proxy", (request, response, context) -> {
+        proxyServer.register("/proxy", (request, response, context) -> {
             proxyInvocations.incrementAndGet();
             if (!request.containsHeader(HttpHeaders.PROXY_AUTHORIZATION) || !"Basic dXNlcjpwYXNz".equals(request.getHeader(HttpHeaders.PROXY_AUTHORIZATION).getValue())) {
                 // httpclient does not perform pre-emptive authentication by default.
@@ -172,16 +172,16 @@ public class DriverDownloaderTest extends LocalServerTestBase {
         driverDownloadServerInvocations = 0;
         downloadDirectory = tempFolder.newFolder("download").toPath();
 
-        server.registerHandler("/foo.zip", (request, response, context) -> {
+        server.register("/foo.zip", (request, response, context) -> {
             response.setCode(HttpStatus.SC_OK);
             response.setEntity(new PathEntity(Paths.get("src/test/resources/fake-drivers/chromedriver/chromedriver_win32.zip"), ContentType.create("application/zip")));
             driverDownloadServerInvocations++;
         });
-        server.registerHandler("/429", (request, response, context) -> {
+        server.register("/429", (request, response, context) -> {
             response.setCode(HttpStatus.SC_TOO_MANY_REQUESTS);
             driverDownloadServerInvocations++;
         });
-        server.registerHandler("/404", (request, response, context) -> {
+        server.register("/404", (request, response, context) -> {
             response.setCode(HttpStatus.SC_NOT_FOUND);
             driverDownloadServerInvocations++;
         });

@@ -41,8 +41,8 @@ public class RepositoryTest extends LocalServerTestBase {
     @Test
     public void testLoadWithInvalidUrl() {
         InstallDriversMojoExecutionException e = assertThrows(InstallDriversMojoExecutionException.class, () -> {
-            // hostname missing
-            Repository.load(new URL("ftp:///"), Optional.empty());
+            // host does not exist
+            Repository.load(new URL("ftp://host.invalid.loc/"), Optional.empty());
         });
         assertThat(e.getMessage(), startsWith("Failed to download repository from url"));
         assertThat(e.getCause(), instanceOf(IOException.class));
@@ -68,14 +68,14 @@ public class RepositoryTest extends LocalServerTestBase {
 
     @Before
     public void setUp() throws IOException {
-        server.registerHandler("/repository-3.0.json", (request, response, context) -> {
+        server.register("/repository-3.0.json", (request, response, context) -> {
             response.setCode(HttpStatus.SC_OK);
             response.setEntity(new InputStreamEntity(getClass().getResource("/repository-3.0.json").openStream(), ContentType.APPLICATION_JSON));
         });
-        server.registerHandler("/404", (request, response, context) -> {
+        server.register("/404", (request, response, context) -> {
             response.setCode(HttpStatus.SC_NOT_FOUND);
         });
-        server.registerHandler("/invalid.json", (request, response, context) -> {
+        server.register("/invalid.json", (request, response, context) -> {
             response.setCode(HttpStatus.SC_OK);
             response.setEntity(new StringEntity(""));
         });
